@@ -16,13 +16,12 @@ import simulation_functions as sf
 
 
 
-plt.rcParams['figure.figsize'] = (10, 10)
+#plt.rcParams['figure.figsize'] = (20.0, 10.0)
 plt.rcParams['xtick.labelsize'] = 24.
 plt.rcParams['ytick.labelsize'] = 24.
 plt.rcParams['axes.labelsize'] = 24.
 plt.rcParams['legend.fontsize'] = 24.
 plt.rcParams['axes.titlesize'] = 30
-
 
 
 
@@ -632,6 +631,250 @@ def plotStrainAnisotropy(cell, numOfLayer,step = None, alpha = 0.8, Length=1.0,s
 	return# eigenvalueratioarray
 
 
+def getAbsAnistropy(lambda1, lambda2):
+	lambda1 = abs(lambda1)
+	lambda2 = abs(lambda2)
+	lambdamax = max(lambda1, lambda2)
+	lambdamin = min(lambda1, lambda2)
+	return (lambdamax-lambdamin)/(lambdamax+lambdamin)
+################################################################
+def getDifference(lambda1, lambda2):
+	lambdamax = max(lambda1, lambda2)
+	lambdamin = min(lambda1, lambda2)
+	return (lambdamax-lambdamin)#/(lambdamax+lambdamin)
+################################################################
+def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.0,save=False,azim = -60, elev=50,
+                      colormap = 'magma'):
+	import matplotlib.colors as colors
+	import matplotlib.cm as cmx
+	#import the libraries
+	from mpl_toolkits.mplot3d import Axes3D
+	import matplotlib as mpl
+	from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+	import numpy as np
+	import matplotlib.pyplot as plt
+	#limits of the plot
+	radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
+	#plotting part
+	fig = plt.figure(frameon=True,figsize=(22,10))
+	#fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+	ax1 = fig.add_subplot(121,projection='3d')
+	ax2 = fig.add_subplot(122,projection='3d')
+	#ax = Axes3D(fig)
+	ax1.set_xlim((-0.6*radius,0.6*radius))
+	ax1.set_ylim((-0.6*radius,0.6*radius))
+	ax1.set_zlim((-0.4*radius,0.8*radius))
+	ax1.axis('off')
+	ax1.xaxis.pane.set_edgecolor('black')
+	ax1.yaxis.pane.set_edgecolor('black')
+	#################################################
+	ax2.set_xlim((-0.6*radius,0.6*radius))
+	ax2.set_ylim((-0.6*radius,0.6*radius))
+	ax2.set_zlim((-0.4*radius,.8*radius))
+	ax2.axis('off')
+	ax2.xaxis.pane.set_edgecolor('black')
+	ax2.yaxis.pane.set_edgecolor('black')
+	#ax.xaxis.pane.fill = False
+	#ax.yaxis.pane.fill = False
+	#ax.zaxis.pane.fill = False
+	########################################################################
+	#                    Plotting the Strain vectors                       #
+	########################################################################
+	X = []
+	Y = []
+	Z = []
+	U = []
+	V = []
+	W = []
+	eigenvalue =[]
+	eigenvalue1array = []
+	eigenvalue2array = []
+	eigenvalueratioarray = []
+	faces = qd.CellFaceIterator(cell)
+	face = faces.next()
+	while face != None:
+		if face.getID() == 1:
+			face  = faces.next()
+			continue
+		if sf.checkExternalFace(face):
+			face  = faces.next()
+			continue
+		eigenvec1 = face.getStressEigenVector1()
+		eigenvec2 = face.getStressEigenVector2()
+		eigenvalue1 = face.getStressEigenValue1()
+		eigenvalue2 = face.getStressEigenValue2()
+		eigenvalue.append(eigenvalue1)
+		eigenvalue.append(eigenvalue2) 
+		eigenvalue1array.append(eigenvalue1)
+		eigenvalue2array.append(eigenvalue2)
+		eigen1 = eigenvalue1
+		eigen2 = eigenvalue2
+		#ratio = (max(eigen1,eigen2)- min(eigen1,eigen2))/max(eigen1,eigen2)
+		ratio = getAbsAnistropy(eigen1,eigen2)#(max(eigen1,eigen2)- min(eigen1,eigen2))/(eigen1+eigen2)
+		eigenvalueratioarray.append(ratio)
+		#########~~~ EIGEN VEC 1 ~~~#########
+		#getting the centralised coordinate of centroid
+		X.append(face.getXCentralised())
+		Y.append(face.getYCentralised())
+		Z.append(face.getZCentralised())
+		#getting the vector headings
+		U.append(qd.doublearray_getitem(eigenvec1,0))
+		V.append(qd.doublearray_getitem(eigenvec1,1))
+		W.append(qd.doublearray_getitem(eigenvec1,2))
+		 #########~~~ EIGEN VEC 2 ~~~#########
+		#getting the centralised coordinate of centroid
+		X.append(face.getXCentralised())
+		Y.append(face.getYCentralised())
+		Z.append(face.getZCentralised())
+		#getting the vector headings
+		U.append(qd.doublearray_getitem(eigenvec2,0))
+		V.append(qd.doublearray_getitem(eigenvec2,1))
+		W.append(qd.doublearray_getitem(eigenvec2,2))
+		#ax.scatter(X[-1],Y[-1],Z[-1])
+		face = faces.next()
+	###getting Maximum Eigenvalue ratio
+	maxEigenValueRatio = (max(eigenvalueratioarray))
+	minEigenValueRatio = (min(eigenvalueratioarray))
+	maxEigenValue = max(map(abs,eigenvalue))
+	#print "Max Eigen Value Ration :", maxEigenValueRatio
+	#print "Min Eigen Value Ratio :", minEigenValueRatio
+	############################################
+	#                 Plotting the Cell        #
+	############################################
+	######### Color Map A ######################
+	jet1 = cm1 = plt.get_cmap(colormap) 
+	maxvalue = 1.
+	minvalue = 0.
+	normMax = 1 # value to normalize by
+	cNorm1  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
+	scalarMap1 = cmx.ScalarMappable(norm=cNorm1, cmap=jet1)
+	######### Color Map B ######################
+	jet2 = cm2 = plt.get_cmap(colormap) 
+	maxvalue = maxEigenValueRatio
+	minvalue = minEigenValueRatio
+	normMax = 1 # value to normalize by
+	cNorm2  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
+	scalarMap2 = cmx.ScalarMappable(norm=cNorm2, cmap=jet2)
+	###################
+	faces = qd.CellFaceIterator(cell)
+	###################
+	face = faces.next()
+	xcenarray = []
+	ycenarray = []
+	zcenarray = []
+	while (face != None):
+		if face.getID() == 1:
+			face  = faces.next()
+			continue
+		faceid = face.getID()#grabbing face id
+		xlist = []
+		ylist = []
+		zlist = []
+		xproj = []
+		yproj = []
+		zproj = []
+		#print "== Face ID : ", faceid, "=="
+		xmean = face.getXCentralised()
+		ymean = face.getYCentralised()
+		zmean = face.getZCentralised()
+		edges = qd.FaceEdgeIterator(face)
+		edge = edges.next()
+		while edge != None:
+			####grabbing the origin of edge####
+			#centralised coordiante
+			vertex = edge.Org()
+			#print vertex.getID()
+			xCoord1 = vertex.getXcoordinate()
+			yCoord1 = vertex.getYcoordinate()
+			zCoord1 = vertex.getZcoordinate()
+			xlist.append(xCoord1)
+			ylist.append(yCoord1)
+			zlist.append(zCoord1)
+			edge = edges.next()
+		xlist.append(xlist[0])
+		ylist.append(ylist[0])
+		zlist.append(zlist[0])
+		verts = [zip(xlist, ylist,zlist)]
+		#adding to 3d plot
+		xcenarray.append(face.getXCentralised())
+		ycenarray.append(face.getYCentralised())
+		zcenarray.append(face.getZCentralised())
+		#ratio = (max(eigen1,eigen2)- min(eigen1,eigen2))/(max(eigen1,eigen2))
+		ratio = (max(eigen1,eigen2)- min(eigen1,eigen2))/(eigen1+eigen2)
+		eigenvec1 = face.getStressEigenVector1()
+		eigenvec2 = face.getStressEigenVector2()
+		eigenvalue1 = face.getStressEigenValue1()
+		eigenvalue2 = face.getStressEigenValue2()
+		eigenvalue.append(eigenvalue1)
+		eigenvalue.append(eigenvalue2) 
+		eigenvalue1array.append(eigenvalue1)
+		eigenvalue2array.append(eigenvalue2)
+		eigen1 = eigenvalue1
+		eigen2 = eigenvalue2
+		#ratio = (max(eigen1,eigen2)- min(eigen1,eigen2))/max(eigen1,eigen2)
+		absratio = getAbsAnistropy(eigen1,eigen2)#(max(eigen1,eigen2)- min(eigen1,eigen2))/(eigen1+eigen2)
+		diffratio = getDifference(eigen1,eigen2)#(max(eigen1,eigen2)- min(eigen1,eigen2))/(eigen1+eigen2)
+		#####################################################################
+		eigenvalueratioarray.append(ratio)
+		if sf.checkExternalFace(face):
+			absratio = 0.
+			diffratio = 0.
+		#print "face ID : ", face.getID(), " ratio : ", ratio
+		color1 = scalarMap1.to_rgba(absratio)
+		color2 = scalarMap2.to_rgba(diffratio)
+		#print face.getID(), ratio
+		#print face.getZCentralised(), alpha_fac
+		#ax.add_collection3d(arrow(xcen-0.5,ycen-0.5,zcen-0.5,xcen+0.5,ycen+0.5,zcen+0.5))
+		pc = Poly3DCollection(verts,alpha = alpha,facecolor = color1,linewidths=1,zorder=0)
+		pc.set_edgecolor('k')
+		ax1.add_collection3d(pc)
+		ax1.scatter(xcenarray[-1], ycenarray[-1],zcenarray[-1],c='r')
+		###########################################################################################
+		pc = Poly3DCollection(verts,alpha = alpha,facecolor = color2,linewidths=1,zorder=0)
+		pc.set_edgecolor('k')
+		ax2.add_collection3d(pc)
+		ax2.scatter(xcenarray[-1], ycenarray[-1],zcenarray[-1],c='r')
+		#ax.text(xcenarray[-1], ycenarray[-1],zcenarray[-1],face.getID(),fontsize = 18)        
+		face = faces.next()
+		#if face.getID() == 1: break
+	#plt.clf()
+	for i in range(len(X)):
+		veclength = np.sqrt((U[i])**2+(V[i])**2+(W[i])**2)
+		#print " veclength : ", veclength, (eigenvalue[i]/maxEigenValue)
+		veclength *= (eigenvalue[i]/maxEigenValue)
+		if veclength <= 0:
+			colorvec = 'r'
+		else:
+			colorvec = 'k'
+		plot1 = ax1.quiver(X[i], Y[i], Z[i], U[i], V[i], W[i],color=colorvec,length = veclength,pivot='tail',zorder=-1)
+		plot2 = ax2.quiver(X[i], Y[i], Z[i], U[i], V[i], W[i],color=colorvec,length = veclength,pivot='tail',zorder=-1)
+		#ax.quiver(X[i], Y[i], Z[i], U[i], V[i], W[i],color='k',pivot='tail',zorder=4)# for older matplotlib
+	scalarMap1._A = []
+	scalarMap2._A = []
+	#cbar_ax = fig.add_axes([0.78, 0.2, 0.04, 0.55])
+	#clrbar = plt.colorbar(scalarMap,shrink=0.5, aspect=10)
+	#clrbar = plt.colorbar(scalarMap,cax = cbar_ax,ticks=np.linspace(minvalue,maxvalue,5))#,orientation='horizontal',cax = cbar_ax)
+	clrbar1 = plt.colorbar(scalarMap1, ax=ax1,shrink = 0.5,aspect = 10,ticks=np.linspace(0,1,5))#,orientation='horizontal',cax = cbar_ax)
+	clrbar1.set_label(r"Stress Anisotrophy $(s_a)$")
+	clrbar2 = plt.colorbar(scalarMap2, ax=ax2,shrink = 0.5,aspect = 10, ticks=np.linspace(minvalue,maxvalue,5))#,orientation='horizontal',cax = cbar_ax)
+	clrbar2.set_label(r"Stress Difference $(s_d)$")
+	#ax.set_title("Time %d : Anisotrophy of Strain : Max %.4f Min %.4f"%(step,maxEigenValueRatio,minEigenValueRatio), fontsize = 20)
+	#print xcenarray-0.5
+	#plt.close("all")
+	ax1.view_init(azim = azim, elev= elev)
+	ax2.view_init(azim = azim, elev= elev)
+	if save:
+		saveDirectory = "strainFigures_u=%03d_v=%03d"%(azim,elev)+r"/stressSurface"
+		import os
+		if not os.path.exists(saveDirectory):
+			os.makedirs(saveDirectory)
+		#plt.tight_layout()
+		#plt.savefig(saveDirectory+r"/strainSurface_Time=%03d.eps"%(step),dpi = 500,format='eps', transparent=True)
+		plt.savefig(saveDirectory+r"/stessAnisotropy_Time=%03d.png"%(step),dpi = 500,format='png', transparent=True)
+		plt.close()
+	return# eigenvalueratioarray
+
+
 
 
 ##########################################################################################
@@ -866,8 +1109,9 @@ for step in range(startStep,endStep+1):
 	#plotting and Savnig
 	############################################################
 	#plotStrainMagnitude(cell,numOfLayer,step = step, alpha = alpha, targetface = targetface,save = True,azim = azim, elev = elev)
-	plotStrainAnisotropy(cell,numOfLayer,step = step, alpha = alpha,  save = True,azim = azim, elev = elev)
-	plotStrainDifference(cell,numOfLayer,step = step, alpha = alpha,  save = True,azim = azim, elev = elev)
+	plotAbsAnisotropyStress(cell,numOfLayer,step = step, alpha = alpha,  save = True,colormap='inferno')
+	#plotStrainAnisotropy(cell,numOfLayer,step = step, alpha = alpha,  save = True,azim = azim, elev = elev)
+	#plotStrainDifference(cell,numOfLayer,step = step, alpha = alpha,  save = True,azim = azim, elev = elev)
 	plotFaceArea(cell,numOfLayer,step = step, save = True,azim = azim, elev = elev)
 	### Plotting surface
 	saveDirectory = "strainFigures_u=%03d_v=%03d"%(azim,elev)
