@@ -86,7 +86,7 @@ def calculatePrimiordiaHeight(cell,targetid,large = False):
 # another with orthoradialDirection vectors for each face
 ###############################################################################################################
 def getRadialOrthoradialDict(cell,targetid, large = False):
-	primordiafacelist= sf.getSeparatePrimordiaBoundaryFaceList(cell, targetfaceID, large=large)
+	primordiafacelist= sf.getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=large)
 	orthoradialDict = {}
 	radialDict = {}
 	############################################################
