@@ -4810,6 +4810,7 @@ def getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=False):
     edge = face.getEdge()
     faceidlist = []
     faceList = []
+    faceList2 = []
     ########################################################
     # tracing the primordial boundary
     ########################################################
@@ -4866,7 +4867,6 @@ def getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=False):
             faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
             ####################
         ###############################################################
-        faceList2 = []
         ###################
         # Second Layer
         ###################
