@@ -661,16 +661,17 @@ def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.
 	ax1 = fig.add_subplot(121,projection='3d')
 	ax2 = fig.add_subplot(122,projection='3d')
 	#ax = Axes3D(fig)
-	ax1.set_xlim((-0.6*radius,0.6*radius))
-	ax1.set_ylim((-0.6*radius,0.6*radius))
-	ax1.set_zlim((-0.4*radius,0.8*radius))
+	xlim = 0.5
+	ax1.set_xlim((-xlim*radius,xlim*radius))
+	ax1.set_ylim((-xlim*radius,xlim*radius))
+	ax1.set_zlim((-0.3*radius,0.7*radius))
 	ax1.axis('off')
 	ax1.xaxis.pane.set_edgecolor('black')
 	ax1.yaxis.pane.set_edgecolor('black')
 	#################################################
-	ax2.set_xlim((-0.6*radius,0.6*radius))
-	ax2.set_ylim((-0.6*radius,0.6*radius))
-	ax2.set_zlim((-0.4*radius,.8*radius))
+	ax2.set_xlim((-xlim*radius,xlim*radius))
+	ax2.set_ylim((-xlim*radius,xlim*radius))
+	ax2.set_zlim((-0.3*radius,.7*radius))
 	ax2.axis('off')
 	ax2.xaxis.pane.set_edgecolor('black')
 	ax2.yaxis.pane.set_edgecolor('black')
@@ -870,7 +871,7 @@ def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.
 			os.makedirs(saveDirectory)
 		#plt.tight_layout()
 		#plt.savefig(saveDirectory+r"/strainSurface_Time=%03d.eps"%(step),dpi = 500,format='eps', transparent=True)
-		plt.savefig(saveDirectory+r"/stessAnisotropy_Time=%03d.png"%(step),dpi = 500,format='png', transparent=True)
+		plt.savefig(saveDirectory+r"/stressAnisotropy_Time=%03d.png"%(step),dpi = 500,format='png', transparent=True)
 		plt.close()
 	return# eigenvalueratioarray
 

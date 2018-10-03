@@ -4790,3 +4790,107 @@ def getPrimordiaFaces(cell,targetid, large = False):
             #####################
             edge = edge.Lnext()
     return faceList
+########################################################################################
+# Getting separate lists of faces in primorida
+########################################################################################
+def getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=False):
+    def addFaceList(faceList,faceidlist, face):
+        if not face.getID() in faceidlist:
+            faceList.append(face)
+            faceidlist.append(face.getID())
+        return faceList,faceidlist
+    ########################################################
+    """
+    Get a list of all Faces arround a primordia
+    targetid : center of primordia
+    large : if true, large primordia is calculated for (2 layers)
+            if false, small primordia (1 layer)
+    """
+    face = getFace(cell, targetid)
+    edge = face.getEdge()
+    faceidlist = []
+    faceList = []
+    ########################################################
+    # tracing the primordial boundary
+    ########################################################
+    if not large:
+        #########################################################
+        # Smaller Promordia
+        #########################################################
+        ###################
+        # First Layer
+        ###################
+        for _ in range(1):
+            edge = edge.Rprev()
+        ###############################################################
+        # listing Primordia vertex starts here
+        ###############################################################
+        for _ in range(3):
+            edge = edge.Lnext()
+            faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
+        #####################
+        for _ in range(5):
+            edge = edge.Rprev()
+            faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
+            ####################
+            edge = edge.Lnext()
+            faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
+            ####################
+            edge = edge.Lnext()
+            faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
+            ####################
+    else:
+        #########################################################
+        #Larger Promordia
+        #########################################################
+        ###################
+        # First Layer
+        ###################
+        for _ in range(1):
+            edge = edge.Rprev()
+        ###############################################################
+        # listing Primordia vertex starts here
+        ###############################################################
+        for _ in range(3):
+            edge = edge.Lnext()
+            faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
+        #####################
+        for _ in range(5):
+            edge = edge.Rprev()
+            faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
+            ####################
+            edge = edge.Lnext()
+            faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
+            ####################
+            edge = edge.Lnext()
+            faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
+            ####################
+        ###############################################################
+        faceList2 = []
+        ###################
+        # Second Layer
+        ###################
+        face = getFace(cell, targetid)
+        edge = face.getEdge()
+        for _ in range(2):
+            edge = edge.Rprev()
+        #####################
+        for _ in range(3):
+            edge = edge.Lnext()
+        ####################################################
+        # listing Primordia vertex starts here
+        ####################################################
+        for _ in range(6):
+            edge = edge.Rprev()
+            faceList2,faceidlist = addFaceList(faceList2,faceidlist, edge.Right())
+            #####################
+            for _ in range(2):
+                edge = edge.Lnext()
+                faceList2,faceidlist = addFaceList(faceList2,faceidlist, edge.Right())
+            #####################
+            edge = edge.Rprev()
+            faceList2,faceidlist = addFaceList(faceList2,faceidlist, edge.Right())
+            #####################
+            edge = edge.Lnext()
+            faceList2,faceidlist = addFaceList(faceList2,faceidlist, edge.Right())
+    return [faceList,faceList2]

@@ -82,6 +82,60 @@ def calculatePrimiordiaHeight(cell,targetid,large = False):
 	#####################################
 	return height
 ###############################################################################################################
+# Get 2 dictionaries one with radialDirection vectors for each face and 
+# another with orthoradialDirection vectors for each face
+###############################################################################################################
+def getRadialOrthoradialDict(cell,targetid, large = False):
+	primordiafacelist= sf.getSeparatePrimordiaBoundaryFaceList(cell, targetfaceID, large=large)
+	orthoradialDict = {}
+	radialDict = {}
+	############################################################
+	for listiter in range(len(primordiafacelist)):
+		facelist = primordiafacelist[listiter]
+		########################################################
+		for count in range(len(facelist)):
+			face = facelist[count]
+			nextface = facelist[(count+1)%len(facelist)]
+			facecentroid = np.array([face.getXCentralised(), face.getYCentralised(),face.getZCentralised()])
+			radialvec = np.subtract(targetcentroid,facecentroid)
+			radialvec = radialvec/np.linalg.norm(radialvec)
+			normal = face.getNormal()
+			normalvec = np.array([qd.doublearray_getitem(normal,0),
+							qd.doublearray_getitem(normal,1),
+							qd.doublearray_getitem(normal,2)])
+			crossvec = np.cross(radialvec,normalvec)
+			crossvec = crossvec/np.linalg.norm(crossvec)
+			orthoradialDict[face.getID()] = crossvec
+			radialDict[face.getID()]= radialvec
+	return radialDict,orthoradialDict
+###############################################################################################################
+# for a face, projecting its stress eigendecomposed vectors onto radial-orthoradial direction
+###############################################################################################################
+def getRadialOrthoradialStress(face, radialDict,orthoradialDict, vectors = False):
+	eigenvec1 = face.getStressEigenVector1()
+	eigenvec2 = face.getStressEigenVector2()
+	eigenvalue1 = face.getStressEigenValue1()
+	eigenvalue2 = face.getStressEigenValue2()
+	vec1 =eigenvalue1*np.array([qd.doublearray_getitem(eigenvec1,0),
+					qd.doublearray_getitem(eigenvec1,1),
+					qd.doublearray_getitem(eigenvec1,2)])
+	vec2 = eigenvalue2*np.array([qd.doublearray_getitem(eigenvec2,0),
+					qd.doublearray_getitem(eigenvec2,1),
+					qd.doublearray_getitem(eigenvec2,2)])
+	radialvec = np.copy(radialDict[face.getID()])
+	orthoradialvec = np.copy(orthoradialDict[face.getID()])
+	#print radialvec,orthoradialvec
+	############################################
+	radialComp = np.dot(radialvec,vec1)+np.dot(radialvec,vec2)
+	orthoradialComp = np.dot(orthoradialvec,vec1)+np.dot(orthoradialvec,vec2)
+	############################################
+	if vectors:
+		radialvec = radialComp*radialvec
+		orthoradialvec = orthoradialComp*orthoradialvec
+		return radialvec, orthoradialvec
+	############################################
+	return radialComp, orthoradialComp#radialvec,orthoradialvec
+###############################################################################################################
 # Function to calculate the height of primordia
 ###############################################################################################################
 def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = False,otherplot=None):
@@ -89,10 +143,16 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 	cell.calculateStressStrain()
 	################################################
 	faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
+	radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
 	maximalStress = []
 	traceStress = []
 	absSumStress = []
 	detStress = []
+	radialStress = []
+	orthoradialStress = []
+	sumRadialOrthoradial = []
+	sumAbsRadialOrthoradial = []
+	######################################################
 	for face in faceList:
 		maximalStress.append(max(face.getStressEigenValue1(),
 								face.getStressEigenValue2()
@@ -110,18 +170,34 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 		detStress.append((qd.getEigenMatrix(face.stress,0,0)*qd.getEigenMatrix(face.stress,1,1)-
 						(qd.getEigenMatrix(face.stress,1,0)*qd.getEigenMatrix(face.stress,0,1))
 						))
+		radstress, orthstress = getRadialOrthoradialStress(face,radialDict,orthoradialDict)
+		radialStress.append(radstress)
+		orthoradialStress.append(orthstress)
+		sumRadialOrthoradial.append(radstress+orthstress)
+		sumAbsRadialOrthoradial.append(abs(radstress)+abs(orthstress))
+		######################################################
 	maximalStress = np.array(maximalStress)
 	traceStress = np.array(traceStress)
 	absSumStress = np.array(absSumStress)
 	detStress = np.array(detStress)
 	minimalStress = np.array(minimalStress)
+	radialStress = np.array(radialStress)
+	orthoradialStress = np.array(orthoradialStress)
+	sumRadialOrthoradial = np.array(sumRadialOrthoradial)
+	sumAbsRadialOrthoradial = np.array(sumAbsRadialOrthoradial)
 	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
+	############################################################
+	N = np.sqrt(len(maximalStress))
 	if otherplot:
 		#print maximalStress,np.mean(maximalStress), np.std(maximalStress)
-		plot.errorbar(eta,np.mean(maximalStress), yerr = np.std(maximalStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
-		otherplot[0].errorbar(eta,np.mean(traceStress), yerr = np.std(traceStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
-		otherplot[1].errorbar(eta,np.mean(absSumStress), yerr = np.std(absSumStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
-		otherplot[2].errorbar(eta,np.mean(minimalStress), yerr = np.std(minimalStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
+		plot.errorbar(eta,np.mean(maximalStress), yerr = np.std(maximalStress)/N,fmt='o', color = color,**plotargs)
+		otherplot[0].errorbar(eta,np.mean(traceStress), yerr = np.std(traceStress)/N,fmt='o', color = color,**plotargs)
+		otherplot[1].errorbar(eta,np.mean(absSumStress), yerr = np.std(absSumStress)/N,fmt='o', color = color,**plotargs)
+		otherplot[2].errorbar(eta,np.mean(detStress), yerr = np.std(detStress)/N,fmt='o', color = color,**plotargs)
+		otherplot[3].errorbar(eta,np.mean(sumAbsRadialOrthoradial), yerr = np.std(sumAbsRadialOrthoradial)/N,fmt='o', color = color,**plotargs)
+		otherplot[4].errorbar(eta,np.mean(radialStress), yerr = np.std(radialStress)/N,fmt='o', color = color,**plotargs)
+		otherplot[5].errorbar(eta,np.mean(orthoradialStress), yerr = np.std(orthoradialStress)/N,fmt='o', color = color,**plotargs)
+		otherplot[6].errorbar(eta,np.mean(sumRadialOrthoradial), yerr = np.std(sumRadialOrthoradial)/N,fmt='o', color = color,**plotargs)
 		#otherplot[3].errorbar(eta,np.mean(absSumStress), yerr = np.std(absSumStress)/np.sqrt(len(maximalStress)),fmt='o', color = color)
 	else:
 		plot.errorbar(eta,np.mean(maximalStress), yerr = np.std(maximalStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
@@ -229,14 +305,20 @@ if targetface == None:
 		targetface = 214
 
 #################################################################################
-fig = plt.figure(figsize=(18,12))
+fig = plt.figure(figsize=(18,18))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-areaplot = fig.add_subplot(231)
-areaplot1 = fig.add_subplot(232)
-areaplot2 = fig.add_subplot(233)
-areaplot3 = fig.add_subplot(234)
-areaplot4 = fig.add_subplot(235)
-heightplot = fig.add_subplot(236)
+areaplot = fig.add_subplot(331)
+areaplot1 = fig.add_subplot(332)
+areaplot2 = fig.add_subplot(333)
+areaplot3 = fig.add_subplot(334)
+
+heightplot = fig.add_subplot(335)
+
+areaplot4 = fig.add_subplot(336)
+areaplot5 = fig.add_subplot(337)
+areaplot6 = fig.add_subplot(338)
+areaplot7 = fig.add_subplot(339)
+
 
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
@@ -252,16 +334,31 @@ areaplot1.set_ylabel(r"$\langle tr (\sigma) \rangle$")
 areaplot1.set_xlabel(r"$\eta$")
 
 areaplot2.set_title(r"$A_t =  %d$"%targetArea)
-areaplot2.set_ylabel(r"$\langle \sum_i abs(\sigma_{ii}) \rangle$")
+areaplot2.set_ylabel(r"$\langle \sum_i |\sigma_{ii}| \rangle$")
 areaplot2.set_xlabel(r"$\eta$")
 
 areaplot3.set_title(r"$A_t =  %d$"%targetArea)
-areaplot3.set_ylabel(r"$\langle \sigma_{min} \rangle$")
+areaplot3.set_ylabel(r"$\langle det(\sigma) \rangle$")
 areaplot3.set_xlabel(r"$\eta$")
 
 areaplot4.set_title(r"$A_t =  %d$"%targetArea)
-areaplot4.set_ylabel(r"$\langle det(\sigma) \rangle$")
+areaplot4.set_ylabel(r"$\langle |\sigma_o|+|\sigma_r| \rangle$")
 areaplot4.set_xlabel(r"$\eta$")
+
+# Radial stress
+areaplot5.set_title(r"$A_t =  %d$"%targetArea)
+areaplot5.set_ylabel(r"$\langle \sigma_{r} \rangle$")
+areaplot5.set_xlabel(r"$\eta$")
+
+# Orthoradial stress
+areaplot6.set_title(r"$A_t =  %d$"%targetArea)
+areaplot6.set_ylabel(r"$\langle \sigma_{o} \rangle$")
+areaplot6.set_xlabel(r"$\eta$")
+
+# sum of the radial and orthoradial stress (should be equal to tr(\sigma))
+areaplot7.set_title(r"$A_t =  %d$"%targetArea)
+areaplot7.set_ylabel(r"$\langle \sigma_{r}+\sigma_{o} \rangle$")
+areaplot7.set_xlabel(r"$\eta$")
 
 
 
@@ -315,12 +412,10 @@ for folder in listdir:
 	endStep = int(numbers.split(file_name)[1])
 	########################################################
 	plotStressAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
-							 heightplot=heightplot,otherplot = [areaplot1,areaplot2,areaplot3,areaplot4])
+							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7])
 	########################################################
 	os.chdir("..")
 	counter += 1
-
-
 ########################################################
 ### Saving figure
 ########################################################
