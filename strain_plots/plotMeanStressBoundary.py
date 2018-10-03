@@ -89,6 +89,8 @@ def getRadialOrthoradialDict(cell,targetid, large = False):
 	primordiafacelist= sf.getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=large)
 	orthoradialDict = {}
 	radialDict = {}
+	targetface = sf.getFace(cell,targetid)
+	targetcentroid = np.array([targetface.getXCentralised(), targetface.getYCentralised(),targetface.getZCentralised()])
 	############################################################
 	for listiter in range(len(primordiafacelist)):
 		facelist = primordiafacelist[listiter]
@@ -145,6 +147,7 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 	faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
 	radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
 	maximalStress = []
+	minimalStress = []
 	traceStress = []
 	absSumStress = []
 	detStress = []
