@@ -257,7 +257,7 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
         sphericityArray.append(sphericity)
         meanGaussianCurvature.append(np.mean(np.array(gaussianCurvature)))
         tissueVolumeArray.append(tissueVolume)
-        timestep.append(step)
+        timestep.append(step-1.)
     #################################################################################
     #                         Plotting 
     #################################################################################
