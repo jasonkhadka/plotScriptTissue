@@ -97,14 +97,20 @@ def getRadialOrthoradialDict(cell,targetid, large = False):
 		########################################################
 		for count in range(len(facelist)):
 			face = facelist[count]
-			nextface = facelist[(count+1)%len(facelist)]
-			facecentroid = np.array([face.getXCentralised(), face.getYCentralised(),face.getZCentralised()])
-			radialvec = np.subtract(targetcentroid,facecentroid)
-			radialvec = radialvec/np.linalg.norm(radialvec)
+			#nextface = facelist[(count+1)%len(facelist)]
 			normal = face.getNormal()
 			normalvec = np.array([qd.doublearray_getitem(normal,0),
 							qd.doublearray_getitem(normal,1),
 							qd.doublearray_getitem(normal,2)])
+			########################################################
+			facecentroid = np.array([face.getXCentralised(), face.getYCentralised(),face.getZCentralised()])
+			#Calculating direction Vector to primordia centroid
+			direcvec = np.subtract(targetcentroid,facecentroid)
+			direcvec = direcvec/np.linalg.norm(direcvec)
+			#Radial Vec to on-plane unitvector
+			radialvec = direcvec - normalvec*(np.dot(direcvec,normalvec))
+			radialvec = radialvec/np.linalg.norm(radialvec)
+			########################################################
 			crossvec = np.cross(radialvec,normalvec)
 			crossvec = crossvec/np.linalg.norm(crossvec)
 			orthoradialDict[face.getID()] = crossvec
@@ -424,9 +430,9 @@ for folder in listdir:
 ########################################################
 plt.tight_layout()
 if large:# larger primiordia
-	fig.savefig(saveDirectory+r"/plotlarge_stressmagnitude_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),transparent = True)
+	fig.savefig(saveDirectory+r"/plotlarge_stressmagnitude_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),transparent = True, bbox_inches="tight")
 else:
-	fig.savefig(saveDirectory+r"/plotsmall_stressmagnitude_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),transparent = True)
+	fig.savefig(saveDirectory+r"/plotsmall_stressmagnitude_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),transparent = True, bbox_inches="tight")
 
 plt.close('all')
 

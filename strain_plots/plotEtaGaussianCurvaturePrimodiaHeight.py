@@ -12,6 +12,7 @@ import centered_lattice_generator as latgen
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 sys.path.append('/home/jkhadka/transferdata/scripts/simulation_functions/')
+sys.path.append('/home/jkhadka/transferdata/scripts/plotscript/')
 import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
@@ -156,7 +157,7 @@ def getFaceAreaData(cell,faceidarray):
 ###################################################################
 def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta, 
     mincurvatureplot, heightplot,ax3,ax4,ax5,ax6,ax7,
-    color,startStep=0,stepsize= 1,largerCondition = False):
+    color,startStep=0,stepsize= 1,largerCondition = False,maxarea = None):
     import numpy as np
     import matplotlib.pyplot as plt
     import os
@@ -261,6 +262,22 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
     #################################################################################
     #                         Plotting 
     #################################################################################
+    # calculating the plotlen
+    if maxarea:
+        plotlen = ppf.getPlotlenMaxArea(tissueSurfaceAreaArray,maxarea)
+        #print timestep, primodialheight, meanGaussianCurvature
+        # Min Gaussian curvature
+        #print timestep
+        mincurvatureplot.plot(tissueSurfaceAreaArray[:plotlen],meanGaussianCurvature[:plotlen],c=color,lw = 1.5)
+        ###################################
+        # Height of Primodia
+        heightplot.plot(tissueSurfaceAreaArray[:plotlen], primodialheight[:plotlen], c=color,lw = 1.5)
+        ###################################
+        # primordial area vs surface area
+        ax3.plot(tissueSurfaceAreaArray[:plotlen], primodialAreaArray[:plotlen], c = color, lw = 1.5)
+        ###################################
+        # surface area vs time
+        ax4.plot(timestep[:plotlen],tissueSurfaceAreaArray[:plotlen], c = color, lw = 1.5)
     #print timestep, primodialheight, meanGaussianCurvature
     # Min Gaussian curvature
     #print timestep
@@ -297,6 +314,7 @@ parser = argparse.ArgumentParser()#parser
 parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
 parser.add_argument('-e',"--end", help="End of simulation step", type = int)
 parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only cacluated till this value", type = float, default = 0.0)
+parser.add_argument("-x","--maxarea", help = "if this is given, then plot is only made till this area value value", type = float, default = None)
 parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
 parser.add_argument('-l', "--layer", help = "The number of layers in the quadedge cell",type=int,default = 8)
 parser.add_argument("-a","--alpha",help = "value to set for Alpha (weigth of first term of Energy), default = 0",
@@ -342,6 +360,7 @@ stepsize = args.stepsize
 maxeta = args.maxeta
 fastkappaOption = args.fastkappa
 large  = args.Large
+maxarea = args.maxarea
 # For surpressing err
 class NullDevice():
 	def write(self, s):
@@ -501,7 +520,7 @@ for folder in listdir:
 				mincurvatureplot = ax1,startStep = startStep,  
                 heightplot=ax2,ax3= ax3, ax4 = ax4, ax5 = ax5, ax6 = ax6,ax7 = ax7,
 				color = etacolor,stepsize = stepsize,
-                largerCondition = large)
+                largerCondition = large,maxarea = maxarea)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
@@ -534,7 +553,7 @@ clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
 clrbar.set_label("$\eta$")"""
 #plt.tight_layout()
 #plt.tight_layout( rect=[0, 0, 1, 1])
-fig.tight_layout(rect=[0.1,0.1,1.,0.9])
+#fig.tight_layout(rect=[0.1,0.1,1.,0.9])
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	fig.savefig(saveDirectory+r"/plot_fk_vs_curvature_height_%d_targetface=%d.png"%(endStep,targetid),transparent = True)
 else:
