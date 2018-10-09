@@ -246,7 +246,7 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 			if (tissueSurfaceArea > targetArea):
 				areaStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
 				radialStressData.append(areaStressPoints[0])
-				rthoradialStressData.append(areaStressPoints[1])
+				orthoradialStressData.append(areaStressPoints[1])
 				sumAbsRadialOrthoradialData.append(areaStressPoints[2])
 				absSumStressData.append(areaStressPoints[3])
 		################################################
