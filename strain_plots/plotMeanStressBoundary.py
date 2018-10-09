@@ -229,7 +229,7 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 	sumAbsRadialOrthoradialData = []
 	absSumStressData = []
 	####################################################
-	for step in range(1, endStep+1):
+	for step in range(1, endStep+1,10):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return
 		################################################
@@ -238,18 +238,28 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 		if heightPlotStatus:
 			primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
 			if (primordialHeight > targetHeight):
-				heightStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,heightplot,color='salmon' ,large = large)
-				heightPlotStatus = False
+				for calstep in range(step,step-10,-1):
+					cell = sf.loadCellFromFile(calstep)
+					primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
+					if (primordialHeight<targetHeight):
+						heightStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,heightplot,color='salmon' ,large = large)
+						heightPlotStatus = False
+						break
 		################################################
 		if (areaPlotStatus):
 			tissueSurfaceArea = sf.getSurfaceArea(cell)
 			if (tissueSurfaceArea > targetArea):
-				areaStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
-				radialStressData.append(areaStressPoints[0])
-				orthoradialStressData.append(areaStressPoints[1])
-				sumAbsRadialOrthoradialData.append(areaStressPoints[2])
-				absSumStressData.append(areaStressPoints[3])
-				areaPlotStatus = False
+				for calstep in range(step,step-10,-1):
+					cell = sf.loadCellFromFile(calstep)
+					tissueSurfaceArea = sf.getSurfaceArea(cell)
+					if (tissueSurfaceArea < targetArea):
+						areaStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
+						radialStressData.append(areaStressPoints[0])
+						orthoradialStressData.append(areaStressPoints[1])
+						sumAbsRadialOrthoradialData.append(areaStressPoints[2])
+						absSumStressData.append(areaStressPoints[3])
+						areaPlotStatus = False
+						break
 		################################################
 		if not (heightPlotStatus or areaPlotStatus):
 			return
