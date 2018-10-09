@@ -212,8 +212,8 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 		plot.errorbar(eta,np.mean(maximalStress), yerr = np.std(maximalStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
 	
 	################################################
-	return [zip([np.mean(radialStress), np.mean(orthoradialStress), np.mean(sumAbsRadialOrthoradial), np.mean(absSumStress)],
-			[np.std(radialStress)/N, np.std(orthoradialStress)/N, np.std(sumAbsRadialOrthoradial)/N, np.std(absSumStress)/N])]
+	return zip([np.mean(radialStress), np.mean(orthoradialStress), np.mean(sumAbsRadialOrthoradial), np.mean(absSumStress)],
+			[np.std(radialStress)/N, np.std(orthoradialStress)/N, np.std(sumAbsRadialOrthoradial)/N, np.std(absSumStress)/N])
 
 ###############################################################################################################
 ###	Plotting the Stress magnitude vs feedback
@@ -249,6 +249,7 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 				orthoradialStressData.append(areaStressPoints[1])
 				sumAbsRadialOrthoradialData.append(areaStressPoints[2])
 				absSumStressData.append(areaStressPoints[3])
+				areaPlotStatus = False
 		################################################
 		if not (heightPlotStatus or areaPlotStatus):
 			return
