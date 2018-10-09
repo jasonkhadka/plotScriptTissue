@@ -212,7 +212,8 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 		plot.errorbar(eta,np.mean(maximalStress), yerr = np.std(maximalStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
 	
 	################################################
-	return
+	return [zip([np.mean(radialStress), np.mean(orthoradialStress), np.mean(sumAbsRadialOrthoradial), np.mean(absSumStress)],
+			[np.std(radialStress)/N, np.std(orthoradialStress)/N, np.std(sumAbsRadialOrthoradial)/N, np.std(absSumStress)/N])]
 
 ###############################################################################################################
 ###	Plotting the Stress magnitude vs feedback
@@ -223,6 +224,11 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 	heightPlotStatus = True
 	areaPlotStatus = True
 	####################################################
+	radialStressData = []
+	orthoradialStressData = []
+	sumAbsRadialOrthoradialData = []
+	absSumStressData = []
+	####################################################
 	for step in range(1, endStep+1):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return
@@ -232,20 +238,24 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 		if heightPlotStatus:
 			primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
 			if (primordialHeight > targetHeight):
-				plotStressAgainstFeedbackPoint(cell,targetid,eta,heightplot,color='salmon' ,large = large)
+				heightStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,heightplot,color='salmon' ,large = large)
 				heightPlotStatus = False
 		################################################
 		if (areaPlotStatus):
 			tissueSurfaceArea = sf.getSurfaceArea(cell)
 			if (tissueSurfaceArea > targetArea):
-				plotStressAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
-				areaPlotStatus = False
+				areaStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
+				radialStressData.append(areaStressPoints[0])
+				rthoradialStressData.append(areaStressPoints[1])
+				sumAbsRadialOrthoradialData.append(areaStressPoints[2])
+				absSumStressData.append(areaStressPoints[3])
 		################################################
 		if not (heightPlotStatus or areaPlotStatus):
 			return
 		################################################
 		gc.collect()
-	return 
+
+	return [radialStressData, orthoradialStressData,sumAbsRadialOrthoradialData,absSumStressData]
 ################################################################################################
 #        Plotting Part 
 ################################################################################################
@@ -400,6 +410,7 @@ else:
 	etalist = [float(dict(item.split("=") for item in folder.split("_"))['n']) for folder in listdir]
 #################################################################################
 counter = 0
+plotData = {}
 for folder in listdir:
 	# Converting folder name to dictionary
 	#print folder
@@ -420,14 +431,19 @@ for folder in listdir:
 	file_name = sorted((fn for fn in os.listdir('.') if fn.startswith('surface')), key = numericalSort)[-1]
 	endStep = int(numbers.split(file_name)[1])
 	########################################################
-	plotStressAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
+	plotData[etacurrent] = plotStressAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
 							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7])
 	########################################################
 	os.chdir("..")
 	counter += 1
 ########################################################
-### Saving figure
+### Saving figure and Data
 ########################################################
+if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
+	np.save('meanStressBoundary_fk_a=%d_h=%.1f.npy'%(targetArea,targetHeight),plotData)
+else:
+	np.save('meanStressBoundary_eta_a=%d_h=%.1f.npy'%(targetArea,targetHeight),plotData)
+##############################################################################
 plt.tight_layout()
 if large:# larger primiordia
 	fig.savefig(saveDirectory+r"/plotlarge_stressmagnitude_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),transparent = True, bbox_inches="tight")
