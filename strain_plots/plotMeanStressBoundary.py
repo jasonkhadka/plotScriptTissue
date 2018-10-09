@@ -202,7 +202,7 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 		plot.errorbar(eta,np.mean(maximalStress), yerr = np.std(maximalStress)/N,fmt='o', color = color,**plotargs)
 		otherplot[0].errorbar(eta,np.mean(traceStress), yerr = np.std(traceStress)/N,fmt='o', color = color,**plotargs)
 		otherplot[1].errorbar(eta,np.mean(absSumStress), yerr = np.std(absSumStress)/N,fmt='o', color = color,**plotargs)
-		otherplot[2].errorbar(eta,np.mean(detStress), yerr = np.std(detStress)/N,fmt='o', color = color,**plotargs)
+		otherplot[2].errorbar(eta,np.mean(minimalStress), yerr = np.std(minimalStress)/N,fmt='o', color = color,**plotargs)
 		otherplot[3].errorbar(eta,np.mean(sumAbsRadialOrthoradial), yerr = np.std(sumAbsRadialOrthoradial)/N,fmt='o', color = color,**plotargs)
 		otherplot[4].errorbar(eta,np.mean(radialStress), yerr = np.std(radialStress)/N,fmt='o', color = color,**plotargs)
 		otherplot[5].errorbar(eta,np.mean(orthoradialStress), yerr = np.std(orthoradialStress)/N,fmt='o', color = color,**plotargs)
@@ -358,7 +358,7 @@ areaplot2.set_ylabel(r"$\langle \sum_i |\sigma_{ii}| \rangle$")
 areaplot2.set_xlabel(r"$\eta$")
 
 areaplot3.set_title(r"$A_t =  %d$"%targetArea)
-areaplot3.set_ylabel(r"$\langle det(\sigma) \rangle$")
+areaplot3.set_ylabel(r"$\langle \sigma_{min} \rangle$")
 areaplot3.set_xlabel(r"$\eta$")
 
 areaplot4.set_title(r"$A_t =  %d$"%targetArea)
