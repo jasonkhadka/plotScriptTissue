@@ -238,10 +238,10 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 		if heightPlotStatus:
 			primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
 			if (primordialHeight > targetHeight):
-				for calstep in range(step,step-10,-1):
+				for calstep in range(step-1,step-11,-1):
 					cell = sf.loadCellFromFile(calstep)
 					primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
-					if (primordialHeight<targetHeight):
+					if (primordialHeight<=targetHeight):
 						heightStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,heightplot,color='salmon' ,large = large)
 						heightPlotStatus = False
 						break
@@ -249,10 +249,10 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 		if (areaPlotStatus):
 			tissueSurfaceArea = sf.getSurfaceArea(cell)
 			if (tissueSurfaceArea > targetArea):
-				for calstep in range(step,step-10,-1):
+				for calstep in range(step-1,step-11,-1):
 					cell = sf.loadCellFromFile(calstep)
 					tissueSurfaceArea = sf.getSurfaceArea(cell)
-					if (tissueSurfaceArea < targetArea):
+					if (tissueSurfaceArea <= targetArea):
 						areaStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
 						radialStressData.append(areaStressPoints[0])
 						orthoradialStressData.append(areaStressPoints[1])

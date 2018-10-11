@@ -168,6 +168,8 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
     cell = sf.loadCellFromFile(0)
     faceList = sf.getPrimordiaFaces(cell,targetid, large = largerCondition)
     faceidarray = [xface.getID() for xface in faceList]
+    primordialFaceNum  = len(faceList)
+    slowFaceNum = cell.countFaces()-primordialFaceNum- 1.
     #print largerCondition, faceidarray
     #######################################################################
     # Checking if the files exists if not going to step down
@@ -211,8 +213,11 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
         #################################
         tfmdet, slowfacearea, fastfacearea,areaPrimodia = getFaceAreaData(cell,faceidarray)
         m0determinantArray.append(tfmdet)
-        slowarray.append(slowfacearea)
-        fastarray.append(fastfacearea)
+        ################################################################################
+        # saving the mean area 
+        ################################################################################
+        slowarray.append(slowfacearea/slowFaceNum)
+        fastarray.append(fastfacearea/primordialFaceNum)
         ########################################################################
         #  Starting the Calcuation of Primordial Height & Curvature            #
         ########################################################################
@@ -303,10 +308,6 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
     tissueSurfaceAreaArray,tissueVolumeArray, 
     sphericityArray,m0determinantArray,
      fastarray, slowarray,timestep]
-
-
-
-
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser

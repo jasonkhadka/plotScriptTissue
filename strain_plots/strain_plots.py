@@ -1110,7 +1110,7 @@ for step in range(startStep,endStep+1):
 	#plotting and Savnig
 	############################################################
 	#plotStrainMagnitude(cell,numOfLayer,step = step, alpha = alpha, targetface = targetface,save = True,azim = azim, elev = elev)
-	plotAbsAnisotropyStress(cell,numOfLayer,step = step, alpha = alpha,  save = True,colormap='inferno')
+	plotAbsAnisotropyStress(cell,numOfLayer,step = step, alpha = alpha,  save = True,colormap='inferno',azim = azim, elev = elev)
 	#plotStrainAnisotropy(cell,numOfLayer,step = step, alpha = alpha,  save = True,azim = azim, elev = elev)
 	#plotStrainDifference(cell,numOfLayer,step = step, alpha = alpha,  save = True,azim = azim, elev = elev)
 	plotFaceArea(cell,numOfLayer,step = step, save = True,azim = azim, elev = elev)
