@@ -412,7 +412,7 @@ heightplot.set_xlabel(r"$\eta$")
 #################################################################################
 fig1 = plt.figure(2, figsize=(6,6))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-saveplot = savefig.add_subplot(111)
+saveplot = fig1.add_subplot(111)
 #########################################
 import sys
 import os
