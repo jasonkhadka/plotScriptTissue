@@ -455,7 +455,7 @@ for folder in listdir:
 	endStep = int(numbers.split(file_name)[1])
 	########################################################
 	plotData[etacurrent] = plotStressAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
-							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7],saveplot)
+							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7],saveplot= saveplot)
 	########################################################
 	os.chdir("..")
 	counter += 1
