@@ -479,6 +479,9 @@ else:
 ##########################################################################################
 # saveplot saving the orthoradial and radial plot together
 ##########################################################################################
+from collections import OrderedDict
+
+
 fig1.tight_layout()
 handles, lables = saveplot.get_legend_handles_labels()
 by_label = OrderedDict(zip(labels,handles))
