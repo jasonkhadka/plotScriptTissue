@@ -211,8 +211,8 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 		################################
 		# saveplot
 		################################
-		saveplot.errorbar(eta,np.mean(radialStress), yerr = np.std(radialStress)/N,fmt='o', color = 'm',**plotargs)
-		saveplot.errorbar(eta,np.mean(orthoradialStress), yerr = np.std(orthoradialStress)/N,fmt='<', color = 'g',**plotargs)
+		savefig.errorbar(eta,np.mean(radialStress), yerr = np.std(radialStress)/N,fmt='o', color = 'm',**plotargs)
+		savefig.errorbar(eta,np.mean(orthoradialStress), yerr = np.std(orthoradialStress)/N,fmt='<', color = 'g',**plotargs)
 	else:
 		plot.errorbar(eta,np.mean(maximalStress), yerr = np.std(maximalStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
 	
@@ -455,7 +455,7 @@ for folder in listdir:
 	endStep = int(numbers.split(file_name)[1])
 	########################################################
 	plotData[etacurrent] = plotStressAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
-							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7],saveplot= saveplot)
+							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7],savefig= saveplot)
 	########################################################
 	os.chdir("..")
 	counter += 1
