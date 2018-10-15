@@ -226,7 +226,7 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep, 
 	areaplot, heightplot,large = False,otherplot = None,savefig = None,stepsize = 20):
 	####################################################
-	heightPlotStatus = True
+	heightPlotStatus = False
 	areaPlotStatus = True
 	####################################################
 	radialStressData = []
@@ -498,8 +498,8 @@ else:
 
 
 
-fig1.close('all')
-fig.close('all')
+#fig1.close('all')
+#fig.close('all')
 
 ################################################################################
 print "\n"+"#"*55
