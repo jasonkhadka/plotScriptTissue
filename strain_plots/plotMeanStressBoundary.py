@@ -483,7 +483,7 @@ from collections import OrderedDict
 
 
 fig1.tight_layout()
-handles, lables = saveplot.get_legend_handles_labels()
+handles, labels = saveplot.get_legend_handles_labels()
 by_label = OrderedDict(zip(labels,handles))
 saveplot.legend(by_label.values(),by_label.keys())
 if large:# larger primiordia
