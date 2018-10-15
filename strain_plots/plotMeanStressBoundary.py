@@ -224,7 +224,7 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 ###	Plotting the Stress magnitude vs feedback
 ###############################################################################################################
 def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep, 
-	areaplot, heightplot,large = False,otherplot = None,savefig = None):
+	areaplot, heightplot,large = False,otherplot = None,savefig = None,stepsize = 20):
 	####################################################
 	heightPlotStatus = True
 	areaPlotStatus = True
@@ -234,7 +234,7 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 	sumAbsRadialOrthoradialData = []
 	absSumStressData = []
 	####################################################
-	for step in range(1, endStep+1,20):
+	for step in range(1, endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return
 		################################################
@@ -254,7 +254,7 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 		if (areaPlotStatus):
 			tissueSurfaceArea = sf.getSurfaceArea(cell)
 			if (tissueSurfaceArea > targetArea):
-				for calstep in range(step-1,step-11,-1):
+				for calstep in range(step-1,step-stepsize-1,-1):
 					cell = sf.loadCellFromFile(calstep)
 					tissueSurfaceArea = sf.getSurfaceArea(cell)
 					if (tissueSurfaceArea <= targetArea):
@@ -288,6 +288,7 @@ parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only 
 parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
 parser.add_argument("-f","--fastkappa", help = "if option is used, the figures are made with respect to chaning fast kappa", action= "store_true")
 parser.add_argument('-e',"--end", help="End of simulation step", type = int)
+parser.add_argument('-d',"--stepsize", help="stepsize for progressing on looking for match of facearea and height", type = int,default = 20)
 #parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
 parser.add_argument('-l', "--layer", help = "The number of layers in the quadedge cell",default = 10, type=int)
 parser.add_argument("-a","--alpha",help = "value to set for Alpha (weigth of first term of Energy), default = 0",
@@ -322,6 +323,7 @@ gamma = args.gamma
 anglethreshold = args.angle
 fastkappaOption = args.fastkappa
 maxeta = args.maxeta
+stepsize = args.stepsize
 
 azim = args.azimuthal
 elev = args.elevation
@@ -455,7 +457,7 @@ for folder in listdir:
 	endStep = int(numbers.split(file_name)[1])
 	########################################################
 	plotData[etacurrent] = plotStressAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
-							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7],savefig= saveplot)
+							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7],savefig= saveplot,stepsize = stepsize)
 	########################################################
 	os.chdir("..")
 	counter += 1
@@ -483,9 +485,11 @@ from collections import OrderedDict
 
 
 fig1.tight_layout()
-handles, labels = saveplot.get_legend_handles_labels()
-by_label = OrderedDict(zip(labels,handles))
-saveplot.legend(by_label.values(),by_label.keys())
+#handles, labels = saveplot.get_legend_handles_labels()
+#by_label = OrderedDict(zip(labels,handles))
+#print by_label
+#saveplot.legend(by_label.values(),by_label.keys())
+saveplot.legend()
 if large:# larger primiordia
 	fig1.savefig(saveDirectory+r"/plotlarge_radialOrthoradialStress_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),dpi = 300,transparent = True, bbox_inches="tight")
 else:
