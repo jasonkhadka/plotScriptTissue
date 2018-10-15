@@ -4791,6 +4791,35 @@ def getPrimordiaFaces(cell,targetid, large = False):
             edge = edge.Lnext()
     return faceList
 ########################################################################################
+#   Calculating Growth in the cells
+# cell1 = cell_i
+# cell2 = cell_{i+1}
+########################################################################################
+def getGrowthOfCells(cell1, cell2):
+    faces1 = qd.CellFaceIterator(cell1)
+    face1 = faces1.next()
+    growthdict = {}
+    ##########################
+    """
+    while face1 != None:
+        if face1.getID() == 1:
+            face1 = faces1.next()
+            continue
+        ##########################
+        faceid1 = face1.getID()
+        face2 = getFace(cell2, faceid1)
+        ##########################
+        cfm1 = [[qd.getCurrentFormMatrix(face1, 0, 0 ),qd.getCurrentFormMatrix(face1, 0, 1 )],
+                [qd.getCurrentFormMatrix(face1, 1, 0 ),qd.getCurrentFormMatrix(face1, 1, 1 )]]
+        ##########################
+        cfm2 = [[qd.getCurrentFormMatrix(face2, 0, 0 ),qd.getCurrentFormMatrix(face2, 0, 1 )],
+                [qd.getCurrentFormMatrix(face2, 1, 0 ),qd.getCurrentFormMatrix(face2, 1, 1 )]]
+        ##########################
+        #incomplete !!! 
+        ##########################
+    """
+    return
+########################################################################################
 # Getting separate lists of faces in primorida
 ########################################################################################
 def getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=False):

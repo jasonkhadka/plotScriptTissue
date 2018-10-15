@@ -146,7 +146,7 @@ def getRadialOrthoradialStress(face, radialDict,orthoradialDict, vectors = False
 ###############################################################################################################
 # Function to calculate the height of primordia
 ###############################################################################################################
-def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = False,otherplot=None):
+def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = False,otherplot=None,savefig = None):
 	################################################
 	cell.calculateStressStrain()
 	################################################
@@ -208,6 +208,11 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 		otherplot[5].errorbar(eta,np.mean(orthoradialStress), yerr = np.std(orthoradialStress)/N,fmt='o', color = color,**plotargs)
 		otherplot[6].errorbar(eta,np.mean(sumRadialOrthoradial), yerr = np.std(sumRadialOrthoradial)/N,fmt='o', color = color,**plotargs)
 		#otherplot[3].errorbar(eta,np.mean(absSumStress), yerr = np.std(absSumStress)/np.sqrt(len(maximalStress)),fmt='o', color = color)
+		################################
+		# saveplot
+		################################
+		saveplot.errorbar(eta,np.mean(radialStress), yerr = np.std(radialStress)/N,fmt='o', color = 'm',**plotargs)
+		saveplot.errorbar(eta,np.mean(orthoradialStress), yerr = np.std(orthoradialStress)/N,fmt='<', color = 'g',**plotargs)
 	else:
 		plot.errorbar(eta,np.mean(maximalStress), yerr = np.std(maximalStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
 	
@@ -219,7 +224,7 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 ###	Plotting the Stress magnitude vs feedback
 ###############################################################################################################
 def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep, 
-	areaplot, heightplot,large = False,otherplot = None):
+	areaplot, heightplot,large = False,otherplot = None,savefig = None):
 	####################################################
 	heightPlotStatus = True
 	areaPlotStatus = True
@@ -242,7 +247,7 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 					cell = sf.loadCellFromFile(calstep)
 					primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
 					if (primordialHeight<=targetHeight):
-						heightStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,heightplot,color='salmon' ,large = large)
+						heightStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,heightplot,color='salmon' ,large = large,savefig = savefig)
 						heightPlotStatus = False
 						break
 		################################################
@@ -253,7 +258,7 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 					cell = sf.loadCellFromFile(calstep)
 					tissueSurfaceArea = sf.getSurfaceArea(cell)
 					if (tissueSurfaceArea <= targetArea):
-						areaStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
+						areaStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot,savefig = savefig)
 						radialStressData.append(areaStressPoints[0])
 						orthoradialStressData.append(areaStressPoints[1])
 						sumAbsRadialOrthoradialData.append(areaStressPoints[2])
@@ -350,6 +355,8 @@ areaplot6 = fig.add_subplot(338)
 areaplot7 = fig.add_subplot(339)
 
 
+
+
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
 #################################################################################
@@ -401,6 +408,11 @@ heightplot.set_title(r"$h =  %.2f $"%targetHeight)
 heightplot.set_ylabel(r"$\langle \sigma_{max} \rangle$")
 heightplot.set_xlabel(r"$\eta$")
 ###################################
+
+#################################################################################
+savefig = plt.figure(2, figsize=(6,6))
+#fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
+saveplot = savefig.add_subplot(111)
 #########################################
 import sys
 import os
@@ -443,7 +455,7 @@ for folder in listdir:
 	endStep = int(numbers.split(file_name)[1])
 	########################################################
 	plotData[etacurrent] = plotStressAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
-							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7])
+							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7],saveplot)
 	########################################################
 	os.chdir("..")
 	counter += 1
@@ -455,14 +467,32 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 else:
 	np.save('meanStressBoundary_eta_a=%d_h=%.1f.npy'%(targetArea,targetHeight),plotData)
 ##############################################################################
-plt.tight_layout()
+fig.tight_layout()
 if large:# larger primiordia
 	fig.savefig(saveDirectory+r"/plotlarge_stressmagnitude_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),transparent = True, bbox_inches="tight")
 else:
 	fig.savefig(saveDirectory+r"/plotsmall_stressmagnitude_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),transparent = True, bbox_inches="tight")
 
-plt.close('all')
 
+
+
+##########################################################################################
+# saveplot saving the orthoradial and radial plot together
+##########################################################################################
+fig1.tight_layout()
+handles, lables = saveplot.get_legend_handles_labels()
+by_label = OrderedDict(zip(labels,handles))
+saveplot.legend(by_label.values(),by_label.keys())
+if large:# larger primiordia
+	fig1.savefig(saveDirectory+r"/plotlarge_radialOrthoradialStress_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),dpi = 300,transparent = True, bbox_inches="tight")
+else:
+	fig1.savefig(saveDirectory+r"/plotsmall_radialOrthoradialStress_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),dpi = 300, transparent = True, bbox_inches="tight")
+
+
+
+
+fig1.close('all')
+fig.close('all')
 
 ################################################################################
 print "\n"+"#"*55
