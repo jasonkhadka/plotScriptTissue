@@ -234,7 +234,7 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 	sumAbsRadialOrthoradialData = []
 	absSumStressData = []
 	####################################################
-	for step in range(1, endStep+1,10):
+	for step in range(1, endStep+1,20):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return
 		################################################
@@ -410,7 +410,7 @@ heightplot.set_xlabel(r"$\eta$")
 ###################################
 
 #################################################################################
-savefig = plt.figure(2, figsize=(6,6))
+fig1 = plt.figure(2, figsize=(6,6))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 saveplot = savefig.add_subplot(111)
 #########################################
