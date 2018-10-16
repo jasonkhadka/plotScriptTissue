@@ -493,10 +493,10 @@ saveplot.legend(by_label.values(),by_label.keys())
 
 if large:# larger primiordia
 	fig1.savefig(saveDirectory+r"/plotlarge_radialOrthoradialStress_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),dpi = 300,transparent = True, bbox_inches="tight")
-	fig1.savefig(saveDirectory+r"/plotlarge_radialOrthoradialStress_faceArea=%d_height=%.2f.eps"%(targetArea,targetHeight),format = eps, dpi = 300,transparent = True, bbox_inches="tight")
+	fig1.savefig(saveDirectory+r"/plotlarge_radialOrthoradialStress_faceArea=%d_height=%.2f.eps"%(targetArea,targetHeight),format = 'eps', dpi = 300,transparent = True, bbox_inches="tight")
 else:
 	fig1.savefig(saveDirectory+r"/plotsmall_radialOrthoradialStress_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),dpi = 300, transparent = True, bbox_inches="tight")
-	fig1.savefig(saveDirectory+r"/plotsmall_radialOrthoradialStress_faceArea=%d_height=%.2f.eps"%(targetArea,targetHeight),format = eps, dpi = 300,transparent = True, bbox_inches="tight")
+	fig1.savefig(saveDirectory+r"/plotsmall_radialOrthoradialStress_faceArea=%d_height=%.2f.eps"%(targetArea,targetHeight),format = 'eps', dpi = 300,transparent = True, bbox_inches="tight")
 
 
 
