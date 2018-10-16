@@ -211,8 +211,8 @@ def plotStressAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 		################################
 		# saveplot
 		################################
-		savefig.errorbar(eta,np.mean(radialStress), yerr = np.std(radialStress)/N,fmt='o', color = 'm',**plotargs)
-		savefig.errorbar(eta,np.mean(orthoradialStress), yerr = np.std(orthoradialStress)/N,fmt='<', color = 'g',**plotargs)
+		savefig.errorbar(eta,np.mean(radialStress), yerr = np.std(radialStress)/N,fmt='o', color = 'm',label=r'\sigma_r',**plotargs)
+		savefig.errorbar(eta,np.mean(orthoradialStress), yerr = np.std(orthoradialStress)/N,fmt='<', color = 'g',label=r'\sigma_o',**plotargs)
 	else:
 		plot.errorbar(eta,np.mean(maximalStress), yerr = np.std(maximalStress)/np.sqrt(len(maximalStress)),fmt='o', color = color,**plotargs)
 	
@@ -485,15 +485,18 @@ from collections import OrderedDict
 
 
 fig1.tight_layout()
-#handles, labels = saveplot.get_legend_handles_labels()
-#by_label = OrderedDict(zip(labels,handles))
+handles, labels = saveplot.get_legend_handles_labels()
+by_label = OrderedDict(zip(labels,handles))
 #print by_label
-#saveplot.legend(by_label.values(),by_label.keys())
-saveplot.legend()
+saveplot.legend(by_label.values(),by_label.keys())
+
+
 if large:# larger primiordia
 	fig1.savefig(saveDirectory+r"/plotlarge_radialOrthoradialStress_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),dpi = 300,transparent = True, bbox_inches="tight")
+	fig1.savefig(saveDirectory+r"/plotlarge_radialOrthoradialStress_faceArea=%d_height=%.2f.eps"%(targetArea,targetHeight),format = eps, dpi = 300,transparent = True, bbox_inches="tight")
 else:
 	fig1.savefig(saveDirectory+r"/plotsmall_radialOrthoradialStress_faceArea=%d_height=%.2f.png"%(targetArea,targetHeight),dpi = 300, transparent = True, bbox_inches="tight")
+	fig1.savefig(saveDirectory+r"/plotsmall_radialOrthoradialStress_faceArea=%d_height=%.2f.eps"%(targetArea,targetHeight),format = eps, dpi = 300,transparent = True, bbox_inches="tight")
 
 
 
