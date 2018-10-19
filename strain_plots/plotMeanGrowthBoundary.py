@@ -146,12 +146,12 @@ def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False
 ###############################################################################################################
 # Function to calculate the height of primordia
 ###############################################################################################################
-def plotGrowthAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = False,otherplot=None):
+def plotGrowthAgainstFeedbackPoint(cell1,cell2, targetid,eta,plot,color='r',large = False,otherplot=None):
 	################################################
 	cell.calculateStressStrain()
 	################################################
 	faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
-	radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
+	radialDict, orthoradialDict = getRadialOrthoradialDict(cell1,cell2,targetid,large = large)
 	maximalStress = []
 	minimalStress = []
 	traceStress = []
@@ -219,7 +219,7 @@ def plotGrowthAgainstFeedbackPoint(cell,targetid,eta,plot,color='r',large = Fals
 ###	Plotting the Stress magnitude vs feedback
 ###############################################################################################################
 def plotGrowthAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep, 
-	areaplot, heightplot,large = False,otherplot = None):
+	areaplot, heightplot,large = False,otherplot = None,stepsize = 20):
 	####################################################
 	heightPlotStatus = False
 	areaPlotStatus = True
@@ -233,8 +233,8 @@ def plotGrowthAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return
 		################################################
-		cell = sf.loadCellFromFile(step)
-		cell1 = sf.loadCellFromFile(step+1)
+		cell1 = sf.loadCellFromFile(step)
+		cell2 = sf.loadCellFromFile(step+1)
 		################################################
 		if heightPlotStatus:
 			primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
@@ -250,11 +250,11 @@ def plotGrowthAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 		if (areaPlotStatus):
 			tissueSurfaceArea = sf.getSurfaceArea(cell)
 			if (tissueSurfaceArea > targetArea):
-				for calstep in range(step-1,step-11,-1):
+				for calstep in range(step-1,step-stepsize-1,-1):
 					cell = sf.loadCellFromFile(calstep)
 					tissueSurfaceArea = sf.getSurfaceArea(cell)
 					if (tissueSurfaceArea <= targetArea):
-						areaStressPoints = plotGrowthAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
+						areaStressPoints = plotGrowthAgainstFeedbackPoint(cell1,cell2,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
 						radialStressData.append(areaStressPoints[0])
 						orthoradialStressData.append(areaStressPoints[1])
 						sumAbsRadialOrthoradialData.append(areaStressPoints[2])
@@ -284,6 +284,7 @@ parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only 
 parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
 parser.add_argument("-f","--fastkappa", help = "if option is used, the figures are made with respect to chaning fast kappa", action= "store_true")
 parser.add_argument('-e',"--end", help="End of simulation step", type = int)
+parser.add_argument('-d',"--stepsize", help="stepsize for progressing on looking for match of facearea and height", type = int,default = 20)
 #parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
 parser.add_argument('-l', "--layer", help = "The number of layers in the quadedge cell",default = 10, type=int)
 parser.add_argument("-a","--alpha",help = "value to set for Alpha (weigth of first term of Energy), default = 0",
@@ -357,38 +358,38 @@ areaplot7 = fig.add_subplot(339)
 # Area plot
 ##################################
 areaplot.set_title(r"$A_t =  %d$"%targetArea)
-areaplot.set_ylabel(r"$\langle \sigma_{max} \rangle$")
+areaplot.set_ylabel(r"$\langle g_{max} \rangle$")
 areaplot.set_xlabel(r"$\eta$")
 
 areaplot1.set_title(r"$A_t =  %d$"%targetArea)
-areaplot1.set_ylabel(r"$\langle tr (\sigma) \rangle$")
+areaplot1.set_ylabel(r"$\langle tr (G) \rangle$")
 areaplot1.set_xlabel(r"$\eta$")
 
 areaplot2.set_title(r"$A_t =  %d$"%targetArea)
-areaplot2.set_ylabel(r"$\langle \sum_i |\sigma_{ii}| \rangle$")
+areaplot2.set_ylabel(r"$\langle \sum_i |g_{ii}| \rangle$")
 areaplot2.set_xlabel(r"$\eta$")
 
 areaplot3.set_title(r"$A_t =  %d$"%targetArea)
-areaplot3.set_ylabel(r"$\langle \sigma_{min} \rangle$")
+areaplot3.set_ylabel(r"$\langle g_{min} \rangle$")
 areaplot3.set_xlabel(r"$\eta$")
 
 areaplot4.set_title(r"$A_t =  %d$"%targetArea)
-areaplot4.set_ylabel(r"$\langle |\sigma_o|+|\sigma_r| \rangle$")
+areaplot4.set_ylabel(r"$\langle |g_o|+|g_r| \rangle$")
 areaplot4.set_xlabel(r"$\eta$")
 
 # Radial stress
 areaplot5.set_title(r"$A_t =  %d$"%targetArea)
-areaplot5.set_ylabel(r"$\langle \sigma_{r} \rangle$")
+areaplot5.set_ylabel(r"$\langle g_{r} \rangle$")
 areaplot5.set_xlabel(r"$\eta$")
 
 # Orthoradial stress
 areaplot6.set_title(r"$A_t =  %d$"%targetArea)
-areaplot6.set_ylabel(r"$\langle \sigma_{o} \rangle$")
+areaplot6.set_ylabel(r"$\langle g_{o} \rangle$")
 areaplot6.set_xlabel(r"$\eta$")
 
 # sum of the radial and orthoradial stress (should be equal to tr(\sigma))
 areaplot7.set_title(r"$A_t =  %d$"%targetArea)
-areaplot7.set_ylabel(r"$\langle \sigma_{r}+\sigma_{o} \rangle$")
+areaplot7.set_ylabel(r"$\langle g_{r}+g_{o} \rangle$")
 areaplot7.set_xlabel(r"$\eta$")
 
 

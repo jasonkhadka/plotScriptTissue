@@ -415,6 +415,12 @@ heightplot.set_xlabel(r"$\eta$")
 fig1 = plt.figure(2, figsize=(6,6))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 saveplot = fig1.add_subplot(111)
+saveplot.set_ylabel(r"$\langle \sigma \rangle$")
+if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
+	saveplot.set_xlabel(r"$\kappa_{f}$")
+else:
+	saveplot.set_xlabel(r"$\eta$")
+
 #########################################
 import sys
 import os
@@ -457,7 +463,9 @@ for folder in listdir:
 	endStep = int(numbers.split(file_name)[1])
 	########################################################
 	plotData[etacurrent] = plotStressAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
-							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7],savefig= saveplot,stepsize = stepsize)
+							 heightplot=heightplot,large = large, 
+						otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7],
+						savefig= saveplot,stepsize = stepsize)
 	########################################################
 	os.chdir("..")
 	counter += 1
