@@ -229,10 +229,6 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 	heightPlotStatus = False
 	areaPlotStatus = True
 	####################################################
-	radialStressData = []
-	orthoradialStressData = []
-	sumAbsRadialOrthoradialData = []
-	absSumStressData = []
 	####################################################
 	for step in range(1, endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
@@ -259,19 +255,16 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 					tissueSurfaceArea = sf.getSurfaceArea(cell)
 					if (tissueSurfaceArea <= targetArea):
 						areaStressPoints = plotStressAgainstFeedbackPoint(cell,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot,savefig = savefig)
-						radialStressData.append(areaStressPoints[0])
-						orthoradialStressData.append(areaStressPoints[1])
-						sumAbsRadialOrthoradialData.append(areaStressPoints[2])
-						absSumStressData.append(areaStressPoints[3])
 						areaPlotStatus = False
 						break
 		################################################
 		if not (heightPlotStatus or areaPlotStatus):
-			return
+			gc.collect()
+			return areaStressPoints
 		################################################
 		gc.collect()
 
-	return [radialStressData, orthoradialStressData,sumAbsRadialOrthoradialData,absSumStressData]
+	return areaStressPoints
 ################################################################################################
 #        Plotting Part 
 ################################################################################################
