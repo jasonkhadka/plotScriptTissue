@@ -138,7 +138,7 @@ def getAreaGrowthData(cell, areaCellDict, surfaceAreaArray,dAreaCellDict,counter
 	########################################
 	return
 ########################################################################
-def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,colormap = 'PuBu',
+def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,colormap = 'PuBu',alpha = 0.8,
 	azim = -60, elev = 50):
 	###############################################################
 	# Average area growth rate
