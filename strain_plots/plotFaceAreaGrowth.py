@@ -222,8 +222,7 @@ def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,colormap = 
 	#######################################################
 	return 
 ########################################################################
-def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,
-	color,startStep=1,norm=True,fastid = 0,azim = azim, 
+def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,startStep=1,norm=True,fastid = 0,azim = azim, 
 	elev = elev,stepsize = stepsize):
 	import matplotlib.colors as colors
 	import matplotlib.cm as cmx
@@ -355,7 +354,7 @@ fig = plt.figure(figsize=(10,10))
 ax2 = fig.add_subplot(111,projection='3d')
 #################################################################################
 plotAverageGrowthRate(endStep,areaDerivativePlot=None, 
-	faceAreaDerivativePlot=ax2,color,startStep=startStep,
+	faceAreaDerivativePlot=ax2,startStep=startStep,
 	norm=True,fastid = 0,azim = azim, elev = elev,stepsize = stepsize)
 ################################################################################
 fig.savefig(name+'/'+'faceAreaGrowthRate_time=%03d.png'%endStep,
