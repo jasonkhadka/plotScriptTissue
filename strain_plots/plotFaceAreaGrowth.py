@@ -15,11 +15,11 @@ sys.path.append('/home/jkhadka/transferdata/scripts/simulation_functions/')
 import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 10.
-plt.rcParams['ytick.labelsize'] = 10.
-plt.rcParams['axes.labelsize'] = 10.
-plt.rcParams['legend.fontsize'] = 10.
-plt.rcParams['axes.titlesize'] = 10.
+plt.rcParams['xtick.labelsize'] = 24.
+plt.rcParams['ytick.labelsize'] = 24.
+plt.rcParams['axes.labelsize'] = 24.
+plt.rcParams['legend.fontsize'] = 24.
+plt.rcParams['axes.titlesize'] = 30
 
 def getNeighbourFaces(cell,faceid):
 	faces = qd.CellFaceIterator(cell)
