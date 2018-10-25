@@ -138,7 +138,7 @@ def getAreaGrowthData(cell, areaCellDict, surfaceAreaArray,dAreaCellDict,counter
 	########################################
 	return
 ########################################################################
-def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,targetid,colormap = 'hot',alpha = 0.8,
+def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,targetid,colormap = 'cool',alpha = 0.8,
 	azim = -60, elev = 50):
 	###############################################################
 	# Average area growth rate
@@ -273,8 +273,29 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,tar
 		elev = elev)
 	########################
 	return
-	
-
+####################################################################################################################
+# Calculating the max time step for target surface area
+####################################################################################################################
+def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
+	####################################################
+	for step in range(startStep, endStep+1,stepsize):
+		if not os.path.isfile("qdObject_step=%03d.obj"%step):
+			return endStep,0.
+		################################################
+		cell = sf.loadCellFromFile(step)
+		################################################
+		tissueSurfaceArea = sf.getSurfaceArea(cell)
+		if (tissueSurfaceArea > targetArea):
+			gc.collect()
+			for calstep in range(step-1,step-stepsize-1,-1):
+					cell = sf.loadCellFromFile(calstep)
+					tissueSurfaceArea = sf.getSurfaceArea(cell)
+					if (tissueSurfaceArea <= targetArea):
+						gc.collect()
+						return calstep,tissueSurfaceArea
+		################################################
+		gc.collect()
+	return endStep,tissueSurfaceArea
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -296,7 +317,7 @@ parser.add_argument("-o","--angle",help = "value to set for convex angle thresho
 											  default = 360., type = float)
 parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneath the epidermis, comming from lower level cells. acting as the volume maximizing agent", default = 0.1, type = float)
 
-parser.add_argument("-t","--target", help = "Target face for faster growth", default = 135, type = int)
+parser.add_argument("-t","--target", help = "Target face for faster growth", default = None, type = int)
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 
@@ -355,6 +376,8 @@ if targetface == None:
         targetface = 135
     elif numOfLayer == 10:
         targetface = 214
+
+
 Length = 1.
 radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
 fig = plt.figure(figsize=(10,10))
@@ -364,6 +387,10 @@ ax2.set_ylim((-0.6*radius,0.6*radius))
 ax2.set_zlim((-0.4*radius,0.8*radius))
 ax2.axis('off')
 #################################################################################
+if targetarea:
+	endStep,surfacearea = getTimeStep(targetArea, endStep, startStep=startStep, stepsize = stepsize)
+	ax2.set_title("Surface Area = %d"%surfacearea)
+
 plotAverageGrowthRate(endStep,areaDerivativePlot=None, 
 	faceAreaDerivativePlot=ax2,targetid = targetface,
 	startStep=startStep,
