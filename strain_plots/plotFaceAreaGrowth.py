@@ -305,7 +305,7 @@ parser.add_argument('-e',"--end", help="End of simulation step", type = int)
 parser.add_argument("-d","--stepsize", help = "stepsize on plot", default = 1, type = int)
 parser.add_argument('-c',"--surfaceArea", help="The surface area for which the stress vs feedback plot would need to be plotStrainDifferenceSurface",
 					default =None, type = float)
-parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
+
 parser.add_argument('-l', "--layer", help = "The number of layers in the quadedge cell",type=int,default = 8)
 parser.add_argument("-a","--saveall",help = "to save all plot individually", action= "store_true")
 parser.add_argument("-n","--eta", help = "if option is used, plot is varying eta, else plot is vary fastkappa", action= "store_false")
