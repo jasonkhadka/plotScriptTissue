@@ -5,6 +5,7 @@ import numpy as np
 import sys
 sys.path.append("/home/jkhadka/plantdev")
 import quadedge as qd
+import gc
 sys.path.append("/home/jkhadka/plantdev/python_quadedge")
 #sys.path.append("/home/jkhadka/transferfile/scripts/simulation_functions")
 import Quadedge_lattice_development as latdev
