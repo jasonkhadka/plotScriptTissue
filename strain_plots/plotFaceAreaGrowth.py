@@ -329,6 +329,7 @@ args = parser.parse_args()
 endStep = args.end
 startStep = args.start
 stepsize = args.stepsize
+targetarea = args.surfaceArea
 #alpha = args.alpha
 beta = args.beta
 zeta  = args.zeta
@@ -389,7 +390,7 @@ ax2.set_zlim((-0.4*radius,0.8*radius))
 ax2.axis('off')
 #################################################################################
 if targetarea:
-	endStep,surfacearea = getTimeStep(targetArea, endStep, startStep=startStep, stepsize = stepsize)
+	endStep,surfacearea = getTimeStep(targetarea, endStep, startStep=startStep, stepsize = stepsize)
 	ax2.set_title("Surface Area = %d"%surfacearea)
 
 plotAverageGrowthRate(endStep,areaDerivativePlot=None, 
