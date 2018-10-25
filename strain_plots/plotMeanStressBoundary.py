@@ -264,7 +264,7 @@ def plotStressAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 		################################################
 		gc.collect()
 
-	return areaStressPoints
+	return
 ################################################################################################
 #        Plotting Part 
 ################################################################################################

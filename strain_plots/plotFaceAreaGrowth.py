@@ -41,7 +41,7 @@ def plotAverageFaceArea(endstep,areaplot,ax2 ,ax3,color,startstep=1,norm=True,fa
 	import matplotlib.cm as cmx
 	# Getting Initial Area
 	if not os.path.isfile("qdObject_step=001.obj"):
-        return
+		return
 	cell = sf.loadCellFromFile(1)
 	#neighbourhood array 
 	faceidarray = getNeighbourFaces(cell,fastid)
@@ -117,6 +117,166 @@ def plotAverageFaceArea(endstep,areaplot,ax2 ,ax3,color,startstep=1,norm=True,fa
 	#ax1.set_xlim(0,100)
 	#plt.show()
 	return
+########################################################################
+def getAreaGrowthData(cell, areaCellDict, surfaceAreaArray,dAreaCellDict,counter):
+	surfaceAreaArray[counter] = cell.getSurfaceArea()
+	dareaTissue = surfaceAreaArray[counter]-surfaceAreaArray[counter-1]
+	################################################
+	faces = qd.CellFaceIterator(cell)
+	face = faces.next()
+	while face 	!= None:
+		faceid = face.getID()
+		if faceid == 1:
+			face = faces.next()
+			continue
+		########################################
+		areaCellDict[faceid][counter] = face.getAreaOfFace() 
+		dareaCell = areaCellDict[faceid][counter]-areaCellDict[faceid][counter-1]
+		dAreaCellDict[faceid] = dareaCell/dareaTissue
+		########################################
+		face = faces.next()
+	########################################
+	return
+########################################################################
+def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,colormap = 'PuBu'):
+	###############################################################
+	# Average area growth rate
+	###############################################################
+	averagedDArea = {}
+	faces = qd.CellFaceIterator(cell)
+	face = faces.next()
+	minMagnitude = 0.
+	maxMagnitude = 0.
+	while (face != None):
+		if face.getID()==1:
+			face  = faces.next()
+			continue
+		averagedDArea[face.getID()] = np.mean(dAreaCellDict[face.getID()])
+		if averagedDArea[face.getID()] > maxMagnitude:
+			maxMagnitude = averagedDArea[face.getID()]
+		elif averagedDArea[face.getID()] < minMagnitude:
+			minMagnitude = averagedDArea[face.getID()]
+		###########################################################
+		face = faces.next()
+	###############################################################
+	#                 Plotting the Cell                          #
+	##############################################################
+	jet = cm = plt.get_cmap(colormap) 
+	cNorm  = colors.Normalize(vmin=minMagnitude, vmax=maxMagnitude)
+	scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+	#########################################################
+	faces = qd.CellFaceIterator(cell)
+	face = faces.next()
+	while (face != None):
+		if face.getID()==1:
+			face  = faces.next()
+			continue
+		faceid = face.getID()#grabbing face id
+		xlist = []
+		ylist = []
+		zlist = []
+		xproj = []
+		yproj = []
+		zproj = []
+		#print "== Face ID : ", faceid, "=="
+		xmean = face.getXCentralised()
+		ymean = face.getYCentralised()
+		zmean = face.getZCentralised()
+		edges = qd.FaceEdgeIterator(face)
+		edge = edges.next()
+		while edge != None:
+			####grabbing the origin of edge####
+			#centralised coordiante
+			vertex = edge.Org()
+			#print vertex.getID()
+			xCoord1 = vertex.getXcoordinate()
+			yCoord1 = vertex.getYcoordinate()
+			zCoord1 = vertex.getZcoordinate()
+			xlist.append(xCoord1)
+			ylist.append(yCoord1)
+			zlist.append(zCoord1)
+			edge = edges.next()
+		xlist.append(xlist[0])
+		ylist.append(ylist[0])
+		zlist.append(zlist[0])
+		verts = [zip(xlist, ylist,zlist)]
+		#adding to 3d plot
+		xcenarray.append(face.getXCentralised())
+		ycenarray.append(face.getYCentralised())
+		zcenarray.append(face.getZCentralised())
+		########################################################################################
+		color = scalarMap.to_rgba(averagedDArea[face.getID()])
+		#print face.getZCentralised(), alpha_fac
+		#ax.add_collection3d(arrow(xcen-0.5,ycen-0.5,zcen-0.5,xcen+0.5,ycen+0.5,zcen+0.5))
+		pc = Poly3DCollection(verts,alpha = alpha,facecolor = color,linewidths=1,zorder=0)
+		pc.set_edgecolor('k')
+		faceAreaDerivativePlot.add_collection3d(pc)
+		#faceAreaDerivativePlot.scatter(xcenarray[-1], ycenarray[-1],zcenarray[-1], 'o',c='r')
+		#ax.text(xcenarray[-1], ycenarray[-1],zcenarray[-1], face.getID())
+		face = faces.next()
+	########################################################################################
+	scalarMap._A = []
+	clrbar1 = plt.colorbar(scalarMap, ax=faceAreaDerivativePlot,shrink = 0.5,aspect = 10,ticks=np.linspace(minMagnitude,maxMagnitude,3))
+	clrbar1.set_label(r"Area Growth Rate")
+	faceAreaDerivativePlot.view_init(azim = azim, elev = elev)
+	#######################################################
+	return 
+########################################################################
+def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,
+	color,startStep=1,norm=True,fastid = 0,azim = azim, 
+	elev = elev,stepsize = stepsize):
+	import matplotlib.colors as colors
+	import matplotlib.cm as cmx
+	######################################################
+	# Getting the first step 
+	######################################################
+	if not os.path.isfile("qdObject_step=%03d.obj"%startStep):
+		return
+	cell = sf.loadCellFromFile(startStep)
+	######################################################
+	# dict of area
+	######################################################
+	areaCelldict = {}
+	initialarea = {}
+	surfaceAreaArray = np.zeros(endStep-startStep)
+	faceidarray = getNeighbourFaces(cell,fastid)
+	faces = qd.CellFaceIterator(cell)
+	face = faces.next()
+	surfaceAreaArray[0] = cell.getSurfaceArea()
+	######################################################
+	while face != None:
+		if face.getID() == 1 : 
+			face = faces.next()
+			continue
+		initialarea[face.getID()] = face.getAreaOfFace()
+		areaCelldict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize))
+		dAreaCellDict[faceid] = np.zeros(int((endStep-startStep)/stepsize)-1)
+		######################################################
+		# Calculating areas for first step
+		######################################################
+		areaCellDict[faceid][0] = face.getAreaOfFace() 
+		face =faces.next()
+	######################################################
+	# Gathering face area
+	######################################################
+	stepcounter = 0
+	########################################
+	for i in range(startStep+1,endStep+1,stepsize):
+		if not os.path.isfile("qdObject_step=%03d.obj"%i):#check if file exists
+			break
+		cell = sf.loadCellFromFile(i)
+		######################################
+		getAreaGrowthData(cell, areaCellDict, surfaceAreaArray,dAreaCellDict,stepcounter)
+		######################################################
+		stepcounter += 1
+		######################################################
+	########################
+	# plotting
+	########################
+	plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,azim = azim, 
+		elev = elev)
+	########################
+	return
 	
 
 ####################################################################################################################################################################################
@@ -125,6 +285,7 @@ parser = argparse.ArgumentParser()#parser
 #parser.add_argument('-l','--location', help="The location of targetformmatrix and coordinate file",type = string)
 parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
 parser.add_argument('-e',"--end", help="End of simulation step", type = int)
+parser.add_argument("-d","--stepsize", help = "stepsize on plot", default = 1, type = int)
 parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
 parser.add_argument('-l', "--layer", help = "The number of layers in the quadedge cell",type=int,default = 8)
 parser.add_argument("-a","--saveall",help = "to save all plot individually", action= "store_true")
@@ -148,6 +309,7 @@ args = parser.parse_args()
 #location = args.location
 endStep = args.end
 startStep = args.start
+stepsize = args.stepsize
 cylinder = args.cylinder
 #alpha = args.alpha
 beta = args.beta
@@ -179,143 +341,28 @@ import sys
 import os
 #################################
 cwd = os.getcwd()#getting the current working directory
-DIRNAMES=1
-listdir = sorted(os.walk('.').next()[DIRNAMES])#all the list of directory in cwd
-directoryName = "gaussianPlot"
-saveDirectory = cwd+"/"+directoryName
-if not os.path.exists(saveDirectory):
-	os.makedirs(saveDirectory)
-# only taking directories that contain data
-listdir = [d for d in listdir if d[0] == 'a']
-if ploteta:
-		fklist = [float(dict(item.split("=") for item in folder.split("_"))['fk']) for folder in listdir]
-else:
-		fklist = [float(dict(item.split("=") for item in folder.split("_"))['n']) for folder in listdir]
+saveDirectory = "strainFigures_u=%03d_v=%03d"%(azim,elev)
+surfaceSaveDirectory = saveDirectory+r"/areaGrowthRate"
+if not os.path.exists(surfaceSaveDirectory):
+		os.makedirs(surfaceSaveDirectory)
 #################################################################################
 #     Making the Plots
 #################################################################################
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
-jet = cm = plt.get_cmap('viridis') 
-maxvalue = max(fklist)
-minvalue = min(fklist)
-#print "Max value", maxvalue, " minvalue", minvalue
-cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
-scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
-#fig = plt.figure(frameon=False,figsize=(20,16))
-fig = plt.figure(figsize=(10,10))
-#fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-ax1 = fig.add_subplot(311)
-ax2 = fig.add_subplot(312)
-ax3 = fig.add_subplot(313)
-#ax2 = fig.add_subplot(122)
-#fig.set_aspect(aspect='equal', adjustable='box')
-#ax.axis('equal')
-#################################################################################
-# Min Gaussian curvature
-##################################
-ax1.set_title("Face Area")
-ax1.set_xlabel("Time")
-ax1.set_ylabel("Face Area")
-##################################
-ax2.set_title("Mean Face Area")
-ax2.set_xlabel("Time")
-ax2.set_ylabel("Mean Face Area")
-##################################
-ax3.set_title("Log-Log plot Area vs time")
-ax3.set_xlabel(r"$log(t)$")
-ax3.set_ylabel(r"$log(<A>)$")
-#ax1.set_ylim(0.,80.)
-###################################
-# Height of Primodia
-###################################
-#ax2.set_title("Height of Primodia")
-#ax2.set_xlabel("time")
-#ax2.set_ylabel("Height of Primodia")
 ########################################################
-if not saveall:
-	counter = 0
-	totalfolders = len(listdir)
-	#print listdir
-	for folder in listdir:
-		# Converting folder name to dictionary
-		#print folder
-		if ploteta:
-			fkcurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
-		else:
-			fkcurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
-		#scaled color for plotting
-		#print fkcurrent
-		fkcolor = scalarMap.to_rgba(fkcurrent)
-		percentStep = int((counter)/float(totalfolders)*100)
-		sys.stdout.write('\r'+"step : "+ str(counter) +" "+"#"*percentStep+' '*(100-percentStep)+"%d%%"%percentStep)
-		sys.stdout.flush()
-		###########################################################
-		#plotting and Saving
-		############################################################
-		#print os.listdir('.')
-		os.chdir(folder)
-		#print float(folderdict['n'])
-		#print "\n",os.getcwd()
-		plotAverageFaceArea(endStep,ax1,ax2,ax3,color = fkcolor,startstep=1,norm=True,fastid = targetface)
-		#plotMeanGrowthRate(step=endStep,azim = azim, elev = elev,eta = float(folderdict['n']),save=True)
-		os.chdir("..")
-		counter+= 1
-	###############################################################################
-	#color bar
-	scalarMap._A = []
-	fig.subplots_adjust(bottom=0.2)
-	cbar_ax = fig.add_axes([0.15, 0.1, 0.7, 0.02])
-	clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
-	if ploteta:
-		clrbar.set_label("Fast Kappa")
-	else:
-		clrbar.set_label("$\eta$")
-	#plt.tight_layout()
-	#plt.tight_layout( rect=[0, 0, 1, 1])
-	plt.savefig(saveDirectory+r"/plot_face_area.png",transparent = True)
-	plt.close('all')
-else:
-	counter = 0
-	ax1.set_xlabel("Time")
-	ax1.set_ylabel("Face Area")
-	#ax1.set_ylim(0.,80.)
-	totalfolders = len(listdir)
-	#print listdir
-	for folder in listdir:
-		# Converting folder name to dictionary
-		#print folder
-		if ploteta:
-			fkcurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
-		else:
-			fkcurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
-		#scaled color for plotting
-		#print fkcurrent
-		fkcolor = scalarMap.to_rgba(fkcurrent)
-		percentStep = int((counter)/float(totalfolders)*100)
-		sys.stdout.write('\r'+"step : "+ str(counter) +" "+"#"*percentStep+' '*(100-percentStep)+"%d%%"%percentStep)
-		sys.stdout.flush()
-		###########################################################
-		#plotting and Saving
-		############################################################
-		#print os.listdir('.')
-		os.chdir(folder)
-		#print float(folderdict['n'])
-		#print "\n",os.getcwd()
-		plotAverageFaceArea(endstep = endStep,areaplot = ax1,ax2 = ax2, color = fkcolor,startstep=1,norm=True,fastid = targetface)
-		if ploteta:
-			plt.savefig(saveDirectory+r"/plot_face_area_fk=%.2f.png"%fkcurrent,transparent = True)
-		else:
-			ax1.set_title("Face Area $\eta$ = %.2f"%fkcurrent)
-			plt.savefig(saveDirectory+r"/plot_face_area_n=%.2f.png"%fkcurrent,transparent = True)
-		plt.cla()
-		#plotMeanGrowthRate(step=endStep,azim = azim, elev = elev,eta = float(folderdict['n']),save=True)
-		os.chdir("..")
-		counter+= 1
-plt.close('all')
-
+fig = plt.figure(figsize=(10,10))
+ax2 = fig.add_subplot(111,projection='3d')
+#################################################################################
+plotAverageGrowthRate(endStep,areaDerivativePlot=None, 
+	faceAreaDerivativePlot=ax2,color,startStep=startStep,
+	norm=True,fastid = 0,azim = azim, elev = elev,stepsize = stepsize)
 ################################################################################
-print "\n ################################################################################"
-print " DONE "
-print "################################################################################"
-
+fig.savefig(name+'/'+'faceAreaGrowthRate_time=%03d.png'%endStep,
+	bbox_inches='tight',dpi=100,transparent = True)
+################################################################################
+print "\n"+ "#"*100
+print " "*45+"DONE "
+print "#"*100
+################################################################################
+plt.close('all')
