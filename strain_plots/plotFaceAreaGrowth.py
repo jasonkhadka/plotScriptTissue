@@ -201,10 +201,6 @@ def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,colormap = 
 		ylist.append(ylist[0])
 		zlist.append(zlist[0])
 		verts = [zip(xlist, ylist,zlist)]
-		#adding to 3d plot
-		xcenarray.append(face.getXCentralised())
-		ycenarray.append(face.getYCentralised())
-		zcenarray.append(face.getZCentralised())
 		########################################################################################
 		color = scalarMap.to_rgba(averagedDArea[face.getID()])
 		#print face.getZCentralised(), alpha_fac
