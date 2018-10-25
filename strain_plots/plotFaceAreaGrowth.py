@@ -353,7 +353,7 @@ plotAverageGrowthRate(endStep,areaDerivativePlot=None,
 	faceAreaDerivativePlot=ax2,startStep=startStep,
 	norm=True,fastid = 0,azim = azim, elev = elev,stepsize = stepsize)
 ################################################################################
-fig.savefig(name+'/'+'faceAreaGrowthRate_time=%03d.png'%endStep,
+fig.savefig(surfaceSaveDirectory+'/'+'faceAreaGrowthRate_time=%03d.png'%endStep,
 	bbox_inches='tight',dpi=100,transparent = True)
 ################################################################################
 print "\n"+ "#"*100
