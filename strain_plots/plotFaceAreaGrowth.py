@@ -342,6 +342,9 @@ if not os.path.exists(surfaceSaveDirectory):
 #################################################################################
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib as mpl
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 ########################################################
 fig = plt.figure(figsize=(10,10))
 ax2 = fig.add_subplot(111,projection='3d')
