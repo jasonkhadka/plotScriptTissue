@@ -214,7 +214,7 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
 					tissueSurfaceArea = sf.getSurfaceArea(cell)
 					if (tissueSurfaceArea <= targetArea):
 						gc.collect()
-						return calstep,tissueSurfaceArea
+						return calstep+1,tissueSurfaceArea
 		################################################
 		gc.collect()
 	return endStep,tissueSurfaceArea
