@@ -37,88 +37,6 @@ def getNeighbourFaces(cell,faceid):
 		face =faces.next()
 	return faceidarray
 ########################################################################
-def plotAverageFaceArea(endstep,areaplot,ax2 ,ax3,color,startstep=1,norm=True,fastid = 0):
-	import matplotlib.colors as colors
-	import matplotlib.cm as cmx
-	# Getting Initial Area
-	if not os.path.isfile("qdObject_step=001.obj"):
-		return
-	cell = sf.loadCellFromFile(1)
-	#neighbourhood array 
-	faceidarray = getNeighbourFaces(cell,fastid)
-	initialarea = {}
-	faces = qd.CellFaceIterator(cell)
-	face = faces.next()
-	while face != None:
-		if face.getID() == 1 : 
-			face = faces.next()
-			continue
-		initialarea[face.getID()] = face.getAreaOfFace()
-		face =faces.next()
-	######################################################
-	# Gathering face area
-	######################################################
-	fastfaceareamean = []
-	fastfaceareastd = []
-	slowfaceareamean = []
-	slowfaceareastd = []
-	totalMeanFaceArea = []
-	for i in range(startstep,endstep+1):
-		if not os.path.isfile("qdObject_step=%03d.obj"%i):#check if file exists
-			break
-		cell = sf.loadCellFromFile(i)
-		fastfaceareaarray = []
-		slowfaceareaarray = []
-		######################################
-		faces = qd.CellFaceIterator(cell)
-		face = faces.next()
-		while face != None:
-			if face.getID() == 1 : 
-				face = faces.next()
-				continue
-			area0 =initialarea[face.getID()]
-			#print face.getID(), area0
-			area = face.getAreaOfFace()
-			if norm:
-				facearea = area/area0
-			else:
-				facearea = area
-			if face.getID() in faceidarray:
-				fastfaceareaarray.append(facearea)
-			else:
-				slowfaceareaarray.append(facearea)
-			face =faces.next()
-		totalMeanFaceArea.append(np.mean(np.array(slowfaceareaarray + fastfaceareaarray)))
-		fastfaceareamean.append(np.mean(fastfaceareaarray))
-		fastfaceareastd.append(np.std(fastfaceareaarray))
-		slowfaceareamean.append(np.mean(slowfaceareaarray))
-		slowfaceareastd.append(np.std(slowfaceareaarray))
-	#print facearea
-	######################################################
-	# making plot
-	######################################################
-	########################
-	# plotting
-	########################
-	fastfaceareamean = np.array(fastfaceareamean)
-	fastfaceareastd = np.array(fastfaceareastd)
-	slowfaceareamean = np.array(slowfaceareamean)
-	slowfaceareastd = np.array(slowfaceareastd)
-	areaplot.fill_between(range(len(fastfaceareamean)),fastfaceareamean-fastfaceareastd,fastfaceareamean+fastfaceareastd,alpha = 0.3,color = color)
-	areaplot.plot(range(len(fastfaceareamean)),fastfaceareamean,color = color)
-	areaplot.fill_between(range(len(slowfaceareamean)),slowfaceareamean-slowfaceareastd,slowfaceareamean+slowfaceareastd,alpha = 0.5,color = color)
-	areaplot.plot(range(len(slowfaceareamean)),slowfaceareamean,color = color)
-	ax2.plot(range(len(totalMeanFaceArea)),totalMeanFaceArea,color = color)
-	ax3.plot(np.log(range(1,len(totalMeanFaceArea)+1)),np.log(totalMeanFaceArea),color = color)
-	#ax2.fill_between(range(len(fastfaceareamean)),fastfaceareamean-fastfaceareastd,fastfaceareamean+fastfaceareastd,alpha = 0.5)
-	#ax2.plot(range(len(fastfaceareamean)),fastfaceareamean)
-	#ax2.fill_between(range(len(slowfaceareamean)),slowfaceareamean-slowfaceareastd,slowfaceareamean+slowfaceareastd,alpha = 0.5)
-	#ax2.plot(range(len(slowfaceareamean)),slowfaceareamean)
-	#ax2.plot(range(len(value)),value,c = scalarMap.to_rgba(key))
-	#ax1.set_xlim(0,100)
-	#plt.show()
-	return
-########################################################################
 def getAreaGrowthData(cell, areaCellDict, surfaceAreaArray,dAreaCellDict,counter):
 	surfaceAreaArray[counter] = cell.getSurfaceArea()
 	dareaTissue = surfaceAreaArray[counter]-surfaceAreaArray[counter-1]
@@ -144,7 +62,10 @@ def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,targetid,co
 	###############################################################
 	# Average area growth rate
 	###############################################################
-	faceidarray = getNeighbourFaces(cell,targetid)
+	if targetid:
+		faceidarray = getNeighbourFaces(cell,targetid)
+	else:
+		faceidarray = []
 	averagedDArea = {}
 	faces = qd.CellFaceIterator(cell)
 	face = faces.next()
@@ -374,11 +295,6 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 ########################################################
-if targetface == None:
-    if numOfLayer == 8:
-        targetface = 135
-    elif numOfLayer == 10:
-        targetface = 214
 
 
 Length = 1.
