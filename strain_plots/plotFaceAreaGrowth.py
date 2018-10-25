@@ -346,8 +346,12 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 ########################################################
+radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
 fig = plt.figure(figsize=(10,10))
 ax2 = fig.add_subplot(111,projection='3d')
+ax2.set_xlim((-0.5*radius,0.9*radius))
+ax2.set_ylim((-0.5*radius,0.9*radius))
+ax2.set_zlim((-0.5*radius,1.*radius))
 #################################################################################
 plotAverageGrowthRate(endStep,areaDerivativePlot=None, 
 	faceAreaDerivativePlot=ax2,startStep=startStep,
