@@ -222,8 +222,8 @@ def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,colormap = 
 	#######################################################
 	return 
 ########################################################################
-def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,startStep=1,norm=True,fastid = 0,azim = azim, 
-	elev = elev,stepsize = stepsize):
+def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,startStep=1,norm=True,fastid = 0,azim = -60, 
+	elev = 50,stepsize = 1):
 	import matplotlib.colors as colors
 	import matplotlib.cm as cmx
 	######################################################
@@ -236,7 +236,8 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,sta
 	# dict of area
 	######################################################
 	areaCelldict = {}
-	initialarea = {}
+	dAreaCellDict = {}
+	areaCellDict= {}
 	surfaceAreaArray = np.zeros(endStep-startStep)
 	faceidarray = getNeighbourFaces(cell,fastid)
 	faces = qd.CellFaceIterator(cell)
@@ -247,13 +248,9 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,sta
 		if face.getID() == 1 : 
 			face = faces.next()
 			continue
-		initialarea[face.getID()] = face.getAreaOfFace()
 		areaCelldict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize))
-		dAreaCellDict[faceid] = np.zeros(int((endStep-startStep)/stepsize)-1)
-		######################################################
-		# Calculating areas for first step
-		######################################################
-		areaCellDict[faceid][0] = face.getAreaOfFace() 
+		dAreaCellDict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize)-1)
+		areaCellDict[face.getID()][0] = face.getAreaOfFace() 
 		face =faces.next()
 	######################################################
 	# Gathering face area
