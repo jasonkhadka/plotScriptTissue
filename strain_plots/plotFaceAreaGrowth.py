@@ -247,8 +247,8 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,sta
 		if face.getID() == 1 : 
 			face = faces.next()
 			continue
-		areaCellDict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize))
-		dAreaCellDict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize)-1)
+		areaCellDict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize)+1)
+		dAreaCellDict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize))
 		areaCellDict[face.getID()][0] = face.getAreaOfFace() 
 		face =faces.next()
 	######################################################
