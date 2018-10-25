@@ -329,7 +329,6 @@ args = parser.parse_args()
 endStep = args.end
 startStep = args.start
 stepsize = args.stepsize
-cylinder = args.cylinder
 #alpha = args.alpha
 beta = args.beta
 zeta  = args.zeta
