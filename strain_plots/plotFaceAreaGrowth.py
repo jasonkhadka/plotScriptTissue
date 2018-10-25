@@ -24,7 +24,7 @@ plt.rcParams['axes.titlesize'] = 30
 def getNeighbourFaces(cell,faceid):
 	faces = qd.CellFaceIterator(cell)
 	face = faces.next()
-	faceidarray = []
+	faceidarray = [faceid]
 	while face != None:
 		if face.getID() == faceid : 
 			edges = qd.FaceEdgeIterator(face)
@@ -138,18 +138,19 @@ def getAreaGrowthData(cell, areaCellDict, surfaceAreaArray,dAreaCellDict,counter
 	########################################
 	return
 ########################################################################
-def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,colormap = 'PuBu',alpha = 0.8,
+def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,targetid,colormap = 'hot',alpha = 0.8,
 	azim = -60, elev = 50):
 	###############################################################
 	# Average area growth rate
 	###############################################################
+	faceidarray = getNeighbourFaces(cell,targetid)
 	averagedDArea = {}
 	faces = qd.CellFaceIterator(cell)
 	face = faces.next()
 	minMagnitude = 0.
 	maxMagnitude = 0.
 	while (face != None):
-		if face.getID()==1:
+		if ((face.getID()==1) or (face.getID() in faceidarray)):
 			face  = faces.next()
 			continue
 		averagedDArea[face.getID()] = np.mean(dAreaCellDict[face.getID()])
@@ -202,7 +203,10 @@ def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,colormap = 
 		zlist.append(zlist[0])
 		verts = [zip(xlist, ylist,zlist)]
 		########################################################################################
-		color = scalarMap.to_rgba(averagedDArea[face.getID()])
+		if face.getID() in faceidarray:
+			color = 'w'
+		else:
+			color = scalarMap.to_rgba(averagedDArea[face.getID()])
 		#print face.getZCentralised(), alpha_fac
 		#ax.add_collection3d(arrow(xcen-0.5,ycen-0.5,zcen-0.5,xcen+0.5,ycen+0.5,zcen+0.5))
 		pc = Poly3DCollection(verts,alpha = alpha,facecolor = color,linewidths=1,zorder=0)
@@ -219,7 +223,8 @@ def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,colormap = 
 	#######################################################
 	return 
 ########################################################################
-def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,startStep=1,norm=True,fastid = 0,azim = -60, 
+def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,targetid, startStep=1,norm=True,
+	fastid = 0,azim = -60, 
 	elev = 50,stepsize = 1):
 	import matplotlib.colors as colors
 	import matplotlib.cm as cmx
@@ -235,7 +240,6 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,sta
 	dAreaCellDict = {}
 	areaCellDict= {}
 	surfaceAreaArray = np.zeros(endStep-startStep)
-	faceidarray = getNeighbourFaces(cell,fastid)
 	faces = qd.CellFaceIterator(cell)
 	face = faces.next()
 	surfaceAreaArray[0] = cell.getSurfaceArea()
@@ -265,7 +269,7 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,sta
 	########################
 	# plotting
 	########################
-	plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,azim = azim, 
+	plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,targetid,azim = azim, 
 		elev = elev)
 	########################
 	return
@@ -346,6 +350,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 ########################################################
+if targetface == None:
+    if numOfLayer == 8:
+        targetface = 135
+    elif numOfLayer == 10:
+        targetface = 214
 Length = 1.
 radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
 fig = plt.figure(figsize=(10,10))
@@ -356,7 +365,8 @@ ax2.set_zlim((-0.4*radius,0.8*radius))
 ax2.axis('off')
 #################################################################################
 plotAverageGrowthRate(endStep,areaDerivativePlot=None, 
-	faceAreaDerivativePlot=ax2,startStep=startStep,
+	faceAreaDerivativePlot=ax2,targetid = targetface,
+	startStep=startStep,
 	norm=True,fastid = 0,azim = azim, elev = elev,stepsize = stepsize)
 ################################################################################
 fig.savefig(surfaceSaveDirectory+'/'+'faceAreaGrowthRate_time=%03d.png'%endStep,
