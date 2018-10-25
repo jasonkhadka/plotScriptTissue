@@ -350,9 +350,10 @@ Length = 1.
 radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
 fig = plt.figure(figsize=(10,10))
 ax2 = fig.add_subplot(111,projection='3d')
-ax2.set_xlim((-0.5*radius,0.9*radius))
-ax2.set_ylim((-0.5*radius,0.9*radius))
-ax2.set_zlim((-0.5*radius,1.*radius))
+ax2.set_xlim((-0.6*radius,0.6*radius))
+ax2.set_ylim((-0.6*radius,0.6*radius))
+ax2.set_zlim((-0.4*radius,0.8*radius))
+ax2.axis('off')
 #################################################################################
 plotAverageGrowthRate(endStep,areaDerivativePlot=None, 
 	faceAreaDerivativePlot=ax2,startStep=startStep,
