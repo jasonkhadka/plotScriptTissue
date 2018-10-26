@@ -150,6 +150,7 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,tar
 	elev = 50,stepsize = 1):
 	import matplotlib.colors as colors
 	import matplotlib.cm as cmx
+	import math
 	######################################################
 	# Getting the first step 
 	######################################################
@@ -171,8 +172,8 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,tar
 		if face.getID() == 1 : 
 			face = faces.next()
 			continue
-		areaCellDict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize)+1)
-		dAreaCellDict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize))
+		areaCellDict[face.getID()] = np.zeros(int(math.ceil((float(endStep)-startStep)/stepsize))+1)
+		dAreaCellDict[face.getID()] = np.zeros(int(math.ceil((float(endStep)-startStep)/stepsize)))
 		areaCellDict[face.getID()][stepcounter] = face.getAreaOfFace() 
 		face =faces.next()
 	######################################################
@@ -180,7 +181,7 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,tar
 	######################################################
 	stepcounter += 1
 	########################################
-	for i in range(startStep+1,endStep+1,stepsize):
+	for i in range(startStep+stepsize,endStep+stepsize,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%i):#check if file exists
 			break
 		cell = sf.loadCellFromFile(i)
