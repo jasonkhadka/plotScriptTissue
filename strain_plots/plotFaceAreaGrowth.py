@@ -307,8 +307,10 @@ fig = plt.figure(figsize=(10,10))
 ax2 = fig.add_subplot(111,projection='3d')
 ax2.set_xlim((-0.6*radius,0.6*radius))
 ax2.set_ylim((-0.6*radius,0.6*radius))
-ax2.set_zlim((-0.4*radius,0.8*radius))
+ax2.set_zlim((-0.4radius,0.8*radius))
 ax2.axis('off')
+if abs(elev)<20.:
+	ax2.set_zlim((-0.radius,1.4*radius))
 #################################################################################
 if targetarea:
 	endStep,surfacearea = getTimeStep(targetarea, endStep, startStep=startStep, stepsize = stepsize)
