@@ -51,7 +51,7 @@ def getAreaGrowthData(cell, areaCellDict, surfaceAreaArray,dAreaCellDict,counter
 		########################################
 		areaCellDict[faceid][counter] = face.getAreaOfFace() 
 		dareaCell = areaCellDict[faceid][counter]-areaCellDict[faceid][counter-1]
-		dAreaCellDict[faceid] = dareaCell/dareaTissue
+		dAreaCellDict[faceid][counter-1] = dareaCell/dareaTissue
 		########################################
 		face = faces.next()
 	########################################
@@ -166,18 +166,19 @@ def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,tar
 	face = faces.next()
 	surfaceAreaArray[0] = cell.getSurfaceArea()
 	######################################################
+	stepcounter = 0
 	while face != None:
 		if face.getID() == 1 : 
 			face = faces.next()
 			continue
 		areaCellDict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize)+1)
 		dAreaCellDict[face.getID()] = np.zeros(int((endStep-startStep)/stepsize))
-		areaCellDict[face.getID()][0] = face.getAreaOfFace() 
+		areaCellDict[face.getID()][stepcounter] = face.getAreaOfFace() 
 		face =faces.next()
 	######################################################
 	# Gathering face area
 	######################################################
-	stepcounter = 0
+	stepcounter += 1
 	########################################
 	for i in range(startStep+1,endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%i):#check if file exists
