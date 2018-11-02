@@ -4923,3 +4923,23 @@ def getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=False):
             edge = edge.Lnext()
             faceList2,faceidlist = addFaceList(faceList2,faceidlist, edge.Right())
     return [faceList,faceList2]
+##############################################################################
+# Calculate dilation in cells
+##############################################################################
+def calculateDilation(cell1,cell2):
+    faces = qd.CellFaceIterator(cell1)
+    face1 = faces.next()
+    #######################################
+    while face1 != None:
+        if face1.getID() == 1:
+            face1 = faces.next()
+            continue
+        #######################################
+        face2 = getFace(cell2,face1.getID())
+        #######################################
+        #calculating the dilation in face
+        face1.getRotatedGrowthMatrix(face2)
+        #######################################
+        face1 = faces.next()
+    #######################################
+    return

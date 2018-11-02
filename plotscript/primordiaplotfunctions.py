@@ -185,7 +185,7 @@ def plotFeedbackPrimordiaHeight(meancurvefile,xlim = None, maxeta=None,
 # Function to plot data on the different feedback data
 ######################################################################
 def plotFeedbackPrimordiaHeightAgainstSurface(meancurvefile,xlim = None, maxeta=None,
-    fitlength = None,plotlen =None,maxarea=None,growthtype = None):
+    fitlength = None,plotlen =None,maxarea=None,growthtype = None,descriptive = False):
     ####################################################################################
     # Plotting 
     ####################################################################################
@@ -220,6 +220,10 @@ def plotFeedbackPrimordiaHeightAgainstSurface(meancurvefile,xlim = None, maxeta=
     #ax1.set_title("Height of Primodia vs surface area")
     #if growthtype:
     #    ax1.set_title(growthtype)
+    if descriptive:
+        plt.rcParams['xtick.labelsize'] = 20
+        plt.rcParams['ytick.labelsize'] = 20.
+        plt.xticks(fontsize=20)
     ax1.set_xlabel(r"$A_{T}$")
     ax1.set_ylabel(r"$h$")
     #ax1.set_ylim((0.1,1.0))
@@ -315,6 +319,11 @@ def plotFeedbackPrimordiaHeightAgainstSurface(meancurvefile,xlim = None, maxeta=
     cbar_ax = fig.add_axes(clrbarpos)
     clrbar = plt.colorbar(scalarMap,cax = cbar_ax,ticks=np.linspace(minvalue,maxeta,3))
     clrbar.set_label(r"$\eta$")
+    if descriptive:
+        ax1.set_xlabel('Surface Area of Tissue, $A_T$',fontsize= 24)
+        ax1.set_ylabel('Height of Primordium, $h$',fontsize= 24)
+        clrbar.set_label(r"Mechanical Feedback, $\eta$",fontsize = 24)
+
     #clrbar.set_label(r"Feedback",fontsize=plt.rcParams['legend.fontsize'] ,labelpad = 0)
     
     #plt.savefig(growthtype+"_fk=%.3f_sk=%.3f_feedback.png"%(fk, sk),transparent=True)
