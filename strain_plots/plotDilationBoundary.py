@@ -262,6 +262,7 @@ def plotGrowthAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 				if (tissueSurfaceArea <= (targetArea-areastep)):
 					cell1 = sf.loadCellFromFile(calstep)
 					cell1Status = True
+					break
 		################################################
 		#cell 2
 		################################################
@@ -272,6 +273,7 @@ def plotGrowthAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 				if (tissueSurfaceArea <= targetArea):
 					cell2 = sf.loadCellFromFile(calstep)
 					cell2Status = True
+					break
 		if cell1Status and cell2Status:
 			areaGrowthPoints = plotGrowthAgainstFeedbackPoint(cell1,cell2,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
 			radialGrowthData.append(areaGrowthPoints[0])
@@ -295,7 +297,7 @@ import argparse #argument parser, handles the arguments passed by command line
 parser = argparse.ArgumentParser()#parser
 #parser.add_argument('-l','--location', help="The location of targetformmatrix and coordinate file",type = string)
 parser.add_argument('-c',"--surfaceArea", help="The surface area for which the Growth vs feedback plot would need to be plotStrainDifferenceSurface",
-					default =0., type = float)
+					default =700., type = float)
 parser.add_argument('-i',"--height", help="The height of primiordia for which the Growth vs feedback plot would need to be plotStrainDifferenceSurface",
 					default =0., type = float)
 parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only cacluated till this value", type = float, default = 0.0)
