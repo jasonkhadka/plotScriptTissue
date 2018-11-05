@@ -228,9 +228,9 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         # mean dilation
         ########################################################################
         meandilation.errorbar(tissueSurfaceArea, np.mean(radialGrowth),
-            yerr = np.std(radialGrowth)/float(len(radialGrowth)),fmt='o',label = r":$g_{r}$",c=color)
+            yerr = np.std(radialGrowth)/float(len(radialGrowth)),fmt='o',label = r":$g_{r}$",c=color,**plotargs)
         meandilation.errorbar(tissueSurfaceArea, np.mean(orthoradialGrowth),
-            yerr = np.std(orthoradialGrowth)/float(len(orthoradialGrowth)),fmt='<',label = r":$g_{o}$",c=color)
+            yerr = np.std(orthoradialGrowth)/float(len(orthoradialGrowth)),fmt='<',label = r":$g_{o}$",c=color,**plotargs)
         ########################################################################
         laststep = step
         ########################################################################
