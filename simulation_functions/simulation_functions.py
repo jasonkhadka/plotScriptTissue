@@ -4733,7 +4733,7 @@ def getPrimordiaBoundaryFaceList(cell, targetid, large=False):
 ########################################################################################
 def getFaceList(cell):
     facelist = []
-    faces1 = qd.CellFaceIterator(cell1)
+    faces1 = qd.CellFaceIterator(cell)
     face1 = faces1.next()
     while face1 != None:
         if face1.getID() == 1:

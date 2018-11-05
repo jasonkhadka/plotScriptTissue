@@ -120,29 +120,43 @@ def getRadialOrthoradialDict(cell,targetid, large = False):
 # for a face, projecting its Growth eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
 def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False):
-	eigenvec1 = face.getRotGrowthEigenVector1()
-	eigenvec2 = face.getRotGrowthEigenVector2()
-	eigenvalue1 = face.getRotGrowthEigenValue1()
-	eigenvalue2 = face.getRotGrowthEigenValue2()
-	vec1 =eigenvalue1*np.array([qd.doublearray_getitem(eigenvec1,0),
-					qd.doublearray_getitem(eigenvec1,1),
-					qd.doublearray_getitem(eigenvec1,2)])
-	vec2 = eigenvalue2*np.array([qd.doublearray_getitem(eigenvec2,0),
-					qd.doublearray_getitem(eigenvec2,1),
-					qd.doublearray_getitem(eigenvec2,2)])
-	radialvec = np.copy(radialDict[face.getID()])
-	orthoradialvec = np.copy(orthoradialDict[face.getID()])
-	#print radialvec,orthoradialvec
-	############################################
-	radialComp = np.dot(radialvec,vec1)+np.dot(radialvec,vec2)
-	orthoradialComp = np.dot(orthoradialvec,vec1)+np.dot(orthoradialvec,vec2)
-	############################################
-	if vectors:
-		radialvec = radialComp*radialvec
-		orthoradialvec = orthoradialComp*orthoradialvec
-		return radialvec, orthoradialvec
-	############################################
-	return radialComp, orthoradialComp#radialvec,orthoradialvec
+    eigenvec1 = face.getRotGrowthEigenVector1()
+    eigenvec2 = face.getRotGrowthEigenVector2()
+    eigenvalue1 = face.getRotGrowthEigenValue1()
+    eigenvalue2 = face.getRotGrowthEigenValue2()
+    vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
+                    qd.doublearray_getitem(eigenvec1,1),
+                    qd.doublearray_getitem(eigenvec1,2)])
+    vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
+                    qd.doublearray_getitem(eigenvec2,1),
+                    qd.doublearray_getitem(eigenvec2,2)])
+    vec1 =eigenvalue1*vec1unit
+    vec2 = eigenvalue2*vec2unit
+    #print vec1unit
+    radialvec = np.copy(radialDict[face.getID()])
+    orthoradialvec = np.copy(orthoradialDict[face.getID()])
+    #print radialvec,orthoradialvec
+    ########################################################################################
+    # sign change if needed : 
+    #       if EigenVector and RadialVec are opposite facing
+    ########################################################################################
+    #print "rad.vec1 :",np.dot(radialvec, vec1unit), 'rad.vec2',np.dot(radialvec, vec2unit), np.dot(vec1unit,vec2unit)
+    ########################################################################################
+    radsign1 = (np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
+    radsign2 = (np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
+    orthosign1 = (np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
+    orthosign2 = (np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
+    #print radsign1, radsign2, orthosign1, orthosign2
+    ########################################################################################
+    radialComp = np.dot(radialvec,vec1)*radsign1+np.dot(radialvec,vec2)*radsign2
+    orthoradialComp = np.dot(orthoradialvec,vec1)*orthosign1+np.dot(orthoradialvec,vec2)*orthosign2
+    ############################################
+    if vectors:
+        radialvec = radialComp*radialvec
+        orthoradialvec = orthoradialComp*orthoradialvec
+        return radialvec, orthoradialvec
+    ############################################
+    return radialComp, orthoradialComp#radialvec,orthoradialvec
 ###############################################################################################################
 # Function to calculate the height of primordia
 ###############################################################################################################
