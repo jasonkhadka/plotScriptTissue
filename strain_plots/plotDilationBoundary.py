@@ -208,7 +208,7 @@ def plotGrowthAgainstFeedbackPoint(cell1,cell2, targetid,eta,plot,color='r',larg
 		otherplot[5].errorbar(eta,np.mean(orthoradialGrowth), yerr = np.std(orthoradialGrowth)/N,fmt='o', color = color,**plotargs)
 		otherplot[6].errorbar(eta,np.mean(sumRadialOrthoradial), yerr = np.std(sumRadialOrthoradial)/N,fmt='o', color = color,**plotargs)
 		#otherplot[3].errorbar(eta,np.mean(absSumGrowth), yerr = np.std(absSumGrowth)/np.sqrt(len(maximalGrowth)),fmt='o', color = color)
-	elif areaplot:
+	else:
 		plot.errorbar(eta,np.mean(maximalGrowth), yerr = np.std(maximalGrowth)/np.sqrt(len(maximalGrowth)),fmt='o', color = color,**plotargs)
 	
 	################################################
@@ -219,7 +219,7 @@ def plotGrowthAgainstFeedbackPoint(cell1,cell2, targetid,eta,plot,color='r',larg
 ###	Plotting the Growth magnitude vs feedback
 ###############################################################################################################
 def plotGrowthAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep, 
-	areaplot, heightplot,large = False,otherplot = None,stepsize = 5):
+	areaplot, heightplot,large = False,otherplot = None,stepsize = 20):
 	####################################################
 	heightPlotStatus = False
 	areaPlotStatus = True
@@ -229,23 +229,45 @@ def plotGrowthAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep,
 	sumAbsRadialOrthoradialData = []
 	absSumGrowthData = []
 	####################################################
-	for step in range(1, endStep,stepsize):
+	for step in range(1, endStep+1,10):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return
 		################################################
-		percentStep = int((step)/endStep*100)
-		sys.stdout.write('\r'+"step : "+ str(counter) +" "+"#"*percentStep+' '*(100-percentStep)+"%d%%"%percentStep)
-		sys.stdout.flush()
-		################################################
 		cell1 = sf.loadCellFromFile(step)
-		cell2 = sf.loadCellFromFile(step+stepsize)
-		areaGrowthPoints = plotGrowthAgainstFeedbackPoint(cell1,cell2,targetid,eta,None,color='rebeccapurple' ,large = large,otherplot = None)
-		radialGrowthData.append(areaGrowthPoints[0])
-		orthoradialGrowthData.append(areaGrowthPoints[1])
-		sumAbsRadialOrthoradialData.append(areaGrowthPoints[2])
-		absSumGrowthData.append(areaGrowthPoints[3])
+		cell2 = sf.loadCellFromFile(step+1)
+		################################################
+		if heightPlotStatus:
+			primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
+			if (primordialHeight > targetHeight):
+				for calstep in range(step-1,step-11,-1):
+					cell = sf.loadCellFromFile(calstep)
+					primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
+					if (primordialHeight<=targetHeight):
+						heightGrowthPoints = plotGrowthAgainstFeedbackPoint(cell,targetid,eta,heightplot,color='salmon' ,large = large)
+						heightPlotStatus = False
+						break
+		################################################
+		if (areaPlotStatus):
+			tissueSurfaceArea = sf.getSurfaceArea(cell2)
+			if (tissueSurfaceArea > targetArea):
+				for calstep in range(step-1,step-stepsize-1,-1):
+					cell2 = sf.loadCellFromFile(calstep)
+					tissueSurfaceArea = sf.getSurfaceArea(cell2)
+					if (tissueSurfaceArea <= targetArea):
+						cell1 = sf.loadCellFromFile(calstep-1)
+						areaGrowthPoints = plotGrowthAgainstFeedbackPoint(cell1,cell2,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
+						radialGrowthData.append(areaGrowthPoints[0])
+						orthoradialGrowthData.append(areaGrowthPoints[1])
+						sumAbsRadialOrthoradialData.append(areaGrowthPoints[2])
+						absSumGrowthData.append(areaGrowthPoints[3])
+						areaPlotStatus = False
+						break
+		################################################
+		if not (heightPlotStatus or areaPlotStatus):
+			return
 		################################################
 		gc.collect()
+
 	return [radialGrowthData, orthoradialGrowthData,sumAbsRadialOrthoradialData,absSumGrowthData]
 ################################################################################################
 #        Plotting Part 
@@ -298,8 +320,7 @@ gamma = args.gamma
 anglethreshold = args.angle
 fastkappaOption = args.fastkappa
 maxeta = args.maxeta
-stepsize = stepsize
-#############################################
+
 azim = args.azimuthal
 elev = args.elevation
 norm = args.nonNormalize
@@ -317,15 +338,73 @@ if targetface == None:
 		targetface = 214
 
 #################################################################################
-fig = plt.figure(figsize=(12,6))
+fig = plt.figure(figsize=(18,18))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-plot1 = fig.add_subplot(121,,projection='3d')
-plot2 = fig.add_subplot(122,projection='3d')
+areaplot = fig.add_subplot(331)
+areaplot1 = fig.add_subplot(332)
+areaplot2 = fig.add_subplot(333)
+areaplot3 = fig.add_subplot(334)
 
+heightplot = fig.add_subplot(335)
+
+areaplot4 = fig.add_subplot(336)
+areaplot5 = fig.add_subplot(337)
+areaplot6 = fig.add_subplot(338)
+areaplot7 = fig.add_subplot(339)
+
+
+#fig.set_aspect(aspect='equal', adjustable='box')
+#ax.axis('equal')
 #################################################################################
 # Area plot
 ##################################
+areaplot.set_title(r"$A_t =  %d$"%targetArea)
+areaplot.set_ylabel(r"$\langle g_{max} \rangle$")
+areaplot.set_xlabel(r"$\eta$")
 
+areaplot1.set_title(r"$A_t =  %d$"%targetArea)
+areaplot1.set_ylabel(r"$\langle tr (G) \rangle$")
+areaplot1.set_xlabel(r"$\eta$")
+
+areaplot2.set_title(r"$A_t =  %d$"%targetArea)
+areaplot2.set_ylabel(r"$\langle \sum_i |g_{ii}| \rangle$")
+areaplot2.set_xlabel(r"$\eta$")
+
+areaplot3.set_title(r"$A_t =  %d$"%targetArea)
+areaplot3.set_ylabel(r"$\langle g_{min} \rangle$")
+areaplot3.set_xlabel(r"$\eta$")
+
+areaplot4.set_title(r"$A_t =  %d$"%targetArea)
+areaplot4.set_ylabel(r"$\langle |g_o|+|g_r| \rangle$")
+areaplot4.set_xlabel(r"$\eta$")
+
+# Radial Growth
+areaplot5.set_title(r"$A_t =  %d$"%targetArea)
+areaplot5.set_ylabel(r"$\langle g_{r} \rangle$")
+areaplot5.set_xlabel(r"$\eta$")
+
+# Orthoradial Growth
+areaplot6.set_title(r"$A_t =  %d$"%targetArea)
+areaplot6.set_ylabel(r"$\langle g_{o} \rangle$")
+areaplot6.set_xlabel(r"$\eta$")
+
+# sum of the radial and orthoradial Growth (should be equal to tr(\sigma))
+areaplot7.set_title(r"$A_t =  %d$"%targetArea)
+areaplot7.set_ylabel(r"$\langle g_{r}+g_{o} \rangle$")
+areaplot7.set_xlabel(r"$\eta$")
+
+
+
+
+#ax1.set_ylim(-0.2,0.)
+###################################
+# Height of Primodia
+###################################
+heightplot.set_title(r"$h =  %.2f $"%targetHeight)
+heightplot.set_ylabel(r"$\langle \sigma_{max} \rangle$")
+heightplot.set_xlabel(r"$\eta$")
+###################################
+#########################################
 import sys
 import os
 cwd = os.getcwd()#getting the current working directory
@@ -346,8 +425,31 @@ else:
 #################################################################################
 counter = 0
 plotData = {}
-########################################################
-plotMeanDilation(endStep,plot1 = plot1, plot2 = plot2,large = large,stepsize = stepsize)
+for folder in listdir:
+	# Converting folder name to dictionary
+	#print folder
+	if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
+		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
+	else:
+		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
+	#################################################################################
+	if (maxeta != 0) and (etacurrent > maxeta):
+		continue
+	########################################################
+	os.chdir(folder)
+	########################################################
+	percentStep = int((counter)/float(totalfolders)*100)
+	sys.stdout.write('\r'+"step : "+ str(counter) +" "+"#"*percentStep+' '*(100-percentStep)+"%d%%"%percentStep)
+	sys.stdout.flush()
+	########################################################
+	file_name = sorted((fn for fn in os.listdir('.') if fn.startswith('surface')), key = numericalSort)[-1]
+	endStep = int(numbers.split(file_name)[1])
+	########################################################
+	plotData[etacurrent] = plotGrowthAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
+							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7])
+	########################################################
+	os.chdir("..")
+	counter += 1
 ########################################################
 ### Saving figure and Data
 ########################################################

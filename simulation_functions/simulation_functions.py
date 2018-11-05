@@ -4729,6 +4729,20 @@ def getPrimordiaBoundaryFaceList(cell, targetid, large=False):
             faceList,faceidlist = addFaceList(faceList,faceidlist, edge.Right())
     return faceList
 ########################################################################################
+# Getting list of all cells
+########################################################################################
+def getFaceList(cell):
+    facelist = []
+    faces1 = qd.CellFaceIterator(cell1)
+    face1 = faces1.next()
+    while face1 != None:
+        if face1.getID() == 1:
+            face1 = faces1.next()
+            continue
+        facelist.append(face1)
+        face1 = faces1.next()
+    return facelist
+########################################################################################
 # Getting list of all primordia cells
 ########################################################################################
 def getPrimordiaFaces(cell,targetid, large = False):
