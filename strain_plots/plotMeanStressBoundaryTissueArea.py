@@ -158,7 +158,7 @@ def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False
 ####################################################################################################################
 def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta, 
     meanstress, meandilation,
-    color,startStep=0,stepsize= 1,largerCondition = False,maxarea = None):
+    color,startStep=0,stepsize= 1,largerCondition = False,maxarea = None, areastep = 50):
     import numpy as np
     import matplotlib.pyplot as plt
     import os
@@ -167,7 +167,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     if not os.path.isfile("qdObject_step=001.obj"):
         return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
     cell = sf.loadCellFromFile(1)
-    initialTissueSurfaceArea = sf.gerSurfaceArea(cell)
+    initialTissueSurfaceArea = sf.getSurfaceArea(cell)
     ########################################################################
     faceList = sf.getPrimordiaFaces(cell,targetid, large = largerCondition)
     faceidarray = [xface.getID() for xface in faceList]
@@ -185,20 +185,18 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     if not os.path.isfile("qdObject_step=001.obj"):
         return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
     cell = sf.loadCellFromFile(1)
-    #################################
-    # face area data
-    #################################
-    tfmdet, slowfacearea, fastfacearea,areaPrimodia = getFaceAreaData(cell,faceidarray)
-    ##################################################################
-    areaInitialPrimodia = areaPrimodia
     #######################################################################
     laststep = 1
-    for steparea in range(initialTissueSurfaceArea, 900., 50.):
+    for steparea in range(700, 900, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
+        ########################################################################
+        step2,tissueSurfaceArea2 = getTimeStep(steparea+10, endStep, laststep, stepsize = 10)
         ########################################################################
         if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
             break
         cell = sf.loadCellFromFile(step)
+        cell2 = sf.loadCellFromFile(step2)
+        sf.calculateDilation(cell,cell2)
         ########################################################################
         #  Starting the Calculation of mean growth and mean stress on boundary
         ########################################################################
