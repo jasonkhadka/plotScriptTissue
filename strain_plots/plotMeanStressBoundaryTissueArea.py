@@ -158,7 +158,7 @@ def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False
 ####################################################################################################################
 def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta, 
     meanstress, meandilation,
-    color,startStep=0,stepsize= 1,largerCondition = False,maxarea = None, areastep = 50):
+    color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 50):
     import numpy as np
     import matplotlib.pyplot as plt
     import os
@@ -190,7 +190,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     for steparea in range(700, 900, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
         ########################################################################
-        step2,tissueSurfaceArea2 = getTimeStep(steparea+10, endStep, laststep, stepsize = 10)
+        step2,tissueSurfaceArea2 = getTimeStep(steparea+10, endStep, step, stepsize = 10)
         ########################################################################
         if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
             break
