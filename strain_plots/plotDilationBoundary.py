@@ -337,7 +337,7 @@ gamma = args.gamma
 anglethreshold = args.angle
 fastkappaOption = args.fastkappa
 maxeta = args.maxeta
-areastep = args.stepsize
+areastep = args.areastep
 
 azim = args.azimuthal
 elev = args.elevation
