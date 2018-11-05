@@ -187,6 +187,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     cell = sf.loadCellFromFile(1)
     #######################################################################
     laststep = 1
+    plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
     for steparea in range(700, 900, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
         ########################################################################
@@ -197,6 +198,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         cell = sf.loadCellFromFile(step)
         cell2 = sf.loadCellFromFile(step2)
         sf.calculateDilation(cell,cell2)
+        cell.calculateStressStrain()
         ########################################################################
         #  Starting the Calculation of mean growth and mean stress on boundary
         ########################################################################
@@ -219,16 +221,16 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
             orthoradialGrowth.append(orthGrowth)
         ######################################################
         meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
-            yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color)
+            yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
         meanstress.errorbar(tissueSurfaceArea, np.mean(orthoradialStress),
-            yerr = np.std(orthoradialStress)/float(len(orthoradialStress)),fmt='<',label = r":$\sigma_{o}$",c=color)
+            yerr = np.std(orthoradialStress)/float(len(orthoradialStress)),fmt='<',label = r":$\sigma_{o}$",c=color,**plotargs)
         ########################################################################
         # mean dilation
         ########################################################################
         meandilation.errorbar(tissueSurfaceArea, np.mean(radialGrowth),
-            yerr = np.std(radialGrowth)/float(len(radialGrowth)),fmt='o',label = r":$\sigma_{r}$",c=color)
+            yerr = np.std(radialGrowth)/float(len(radialGrowth)),fmt='o',label = r":$g_{r}$",c=color)
         meandilation.errorbar(tissueSurfaceArea, np.mean(orthoradialGrowth),
-            yerr = np.std(orthoradialGrowth)/float(len(orthoradialGrowth)),fmt='<',label = r":$\sigma_{o}$",c=color)
+            yerr = np.std(orthoradialGrowth)/float(len(orthoradialGrowth)),fmt='<',label = r":$g_{o}$",c=color)
         ########################################################################
         laststep = step
         ########################################################################
@@ -262,7 +264,7 @@ parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneat
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = None, type = int)
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
-parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 10)
+parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 50)
 
 ## Getting the arguments 
 args = parser.parse_args()
@@ -336,7 +338,7 @@ minvalue = min(etalist)
 cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
-fig = plt.figure(figsize=(20,10))
+fig = plt.figure(figsize=(10,5))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 ax1 = fig.add_subplot(121)
 ax2 = fig.add_subplot(122)
@@ -395,7 +397,7 @@ for folder in listdir:
 #color bar fig
 scalarMap._A = []
 fig.subplots_adjust(bottom=0.2)
-cbar_ax = fig.add_axes([0.15, 0.1, 0.7, 0.02])
+cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])
 clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Fast Growth Rate")
@@ -406,8 +408,6 @@ else:
 # Making the legend
 ##########################################################################################
 from collections import OrderedDict
-fig.tight_layout()
-
 handles, labels = ax1.get_legend_handles_labels()
 by_label = OrderedDict(zip(labels,handles))
 ax1.legend(by_label.values(),by_label.keys(),prop={'size': 14})
@@ -433,9 +433,9 @@ clrbar.set_label("$\eta$")"""
 #plt.tight_layout( rect=[0, 0, 1, 1])
 #fig.tight_layout(rect=[0.1,0.1,1.,0.9])
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True)
+	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
 else:
-	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_time=%d.png"%(endStep),transparent = True,)
+	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_time=%d.png"%(endStep),transparent = True, bbox_inches="tight")
 
 
 
