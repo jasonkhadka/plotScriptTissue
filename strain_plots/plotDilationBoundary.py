@@ -233,49 +233,52 @@ def plotGrowthAgainstFeedbackPoint(cell1,cell2, targetid,eta,plot,color='r',larg
 ###	Plotting the Growth magnitude vs feedback
 ###############################################################################################################
 def plotGrowthAgainstFeedback(targetid, targetHeight, targetArea, eta,endStep, 
-	areaplot, heightplot,large = False,otherplot = None,stepsize = 20):
+	areaplot, heightplot,large = False,otherplot = None,stepsize = 10,areastep = 10):
 	####################################################
 	heightPlotStatus = False
 	areaPlotStatus = True
+	cell1Status = False
+	cell2Status = False
 	####################################################
 	radialGrowthData = []
 	orthoradialGrowthData = []
 	sumAbsRadialOrthoradialData = []
 	absSumGrowthData = []
 	####################################################
-	for step in range(1, endStep+1,10):
+	for step in range(1, endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return
 		################################################
-		cell1 = sf.loadCellFromFile(step)
-		cell2 = sf.loadCellFromFile(step+1)
+		cell = sf.loadCellFromFile(step)
 		################################################
-		if heightPlotStatus:
-			primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
-			if (primordialHeight > targetHeight):
-				for calstep in range(step-1,step-11,-1):
-					cell = sf.loadCellFromFile(calstep)
-					primordialHeight = calculatePrimiordiaHeight(cell, targetid, large = large)
-					if (primordialHeight<=targetHeight):
-						heightGrowthPoints = plotGrowthAgainstFeedbackPoint(cell,targetid,eta,heightplot,color='salmon' ,large = large)
-						heightPlotStatus = False
-						break
 		################################################
-		if (areaPlotStatus):
-			tissueSurfaceArea = sf.getSurfaceArea(cell2)
-			if (tissueSurfaceArea > targetArea):
-				for calstep in range(step-1,step-stepsize-1,-1):
+		#cell 1
+		################################################
+		tissueSurfaceArea = sf.getSurfaceArea(cell)
+		if (tissueSurfaceArea > (targetArea-areastep)) and not cell1Status:
+			for calstep in range(step-1,step-stepsize-1,-1):
+				cell = sf.loadCellFromFile(calstep)
+				tissueSurfaceArea = sf.getSurfaceArea(cell)
+				if (tissueSurfaceArea <= (targetArea-areastep)):
+					cell1 = sf.loadCellFromFile(calstep)
+					cell1Status = True
+		################################################
+		#cell 2
+		################################################
+		if (tissueSurfaceArea > (targetArea)) and not cell2Status:
+			for calstep in range(step-1,step-stepsize-1,-1):
+				cell = sf.loadCellFromFile(calstep)
+				tissueSurfaceArea = sf.getSurfaceArea(cell)
+				if (tissueSurfaceArea <= targetArea):
 					cell2 = sf.loadCellFromFile(calstep)
-					tissueSurfaceArea = sf.getSurfaceArea(cell2)
-					if (tissueSurfaceArea <= targetArea):
-						cell1 = sf.loadCellFromFile(calstep-1)
-						areaGrowthPoints = plotGrowthAgainstFeedbackPoint(cell1,cell2,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
-						radialGrowthData.append(areaGrowthPoints[0])
-						orthoradialGrowthData.append(areaGrowthPoints[1])
-						sumAbsRadialOrthoradialData.append(areaGrowthPoints[2])
-						absSumGrowthData.append(areaGrowthPoints[3])
-						areaPlotStatus = False
-						break
+					cell2Status = True
+		if cell1Status and cell2Status:
+			areaGrowthPoints = plotGrowthAgainstFeedbackPoint(cell1,cell2,targetid,eta,areaplot,color='rebeccapurple' ,large = large,otherplot = otherplot)
+			radialGrowthData.append(areaGrowthPoints[0])
+			orthoradialGrowthData.append(areaGrowthPoints[1])
+			sumAbsRadialOrthoradialData.append(areaGrowthPoints[2])
+			absSumGrowthData.append(areaGrowthPoints[3])
+			break
 		################################################
 		if not (heightPlotStatus or areaPlotStatus):
 			return
@@ -299,7 +302,7 @@ parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only 
 parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
 parser.add_argument("-f","--fastkappa", help = "if option is used, the figures are made with respect to chaning fast kappa", action= "store_true")
 parser.add_argument('-e',"--end", help="End of simulation step", type = int)
-parser.add_argument('-d',"--stepsize", help="stepsize for progressing on looking for match of facearea and height", type = int,default = 20)
+parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 10)
 #parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
 parser.add_argument('-l', "--layer", help = "The number of layers in the quadedge cell",default = 10, type=int)
 parser.add_argument("-a","--alpha",help = "value to set for Alpha (weigth of first term of Energy), default = 0",
@@ -334,6 +337,7 @@ gamma = args.gamma
 anglethreshold = args.angle
 fastkappaOption = args.fastkappa
 maxeta = args.maxeta
+areastep = args.stepsize
 
 azim = args.azimuthal
 elev = args.elevation
@@ -372,38 +376,38 @@ areaplot7 = fig.add_subplot(339)
 #################################################################################
 # Area plot
 ##################################
-areaplot.set_title(r"$A_t =  %d$"%targetArea)
+areaplot.set_title(r"$A_T =  %d; \Delta A_T = %d$"%(targetArea,areastep))
 areaplot.set_ylabel(r"$\langle g_{max} \rangle$")
 areaplot.set_xlabel(r"$\eta$")
 
-areaplot1.set_title(r"$A_t =  %d$"%targetArea)
+areaplot1.set_title(r"$A_T =  %d; \Delta A_T = %d$"%(targetArea,areastep))
 areaplot1.set_ylabel(r"$\langle tr (G) \rangle$")
 areaplot1.set_xlabel(r"$\eta$")
 
-areaplot2.set_title(r"$A_t =  %d$"%targetArea)
+areaplot2.set_title(r"$A_T =  %d; \Delta A_T = %d$"%(targetArea,areastep))
 areaplot2.set_ylabel(r"$\langle \sum_i |g_{ii}| \rangle$")
 areaplot2.set_xlabel(r"$\eta$")
 
-areaplot3.set_title(r"$A_t =  %d$"%targetArea)
+areaplot3.set_title(r"$A_T =  %d; \Delta A_T = %d$"%(targetArea,areastep))
 areaplot3.set_ylabel(r"$\langle g_{min} \rangle$")
 areaplot3.set_xlabel(r"$\eta$")
 
-areaplot4.set_title(r"$A_t =  %d$"%targetArea)
+areaplot4.set_title(r"$A_T =  %d; \Delta A_T = %d$"%(targetArea,areastep))
 areaplot4.set_ylabel(r"$\langle |g_o|+|g_r| \rangle$")
 areaplot4.set_xlabel(r"$\eta$")
 
 # Radial Growth
-areaplot5.set_title(r"$A_t =  %d$"%targetArea)
+areaplot5.set_title(r"$A_T =  %d; \Delta A_T = %d$"%(targetArea,areastep))
 areaplot5.set_ylabel(r"$\langle g_{r} \rangle$")
 areaplot5.set_xlabel(r"$\eta$")
 
 # Orthoradial Growth
-areaplot6.set_title(r"$A_t =  %d$"%targetArea)
+areaplot6.set_title(r"$A_T =  %d; \Delta A_T = %d$"%(targetArea,areastep))
 areaplot6.set_ylabel(r"$\langle g_{o} \rangle$")
 areaplot6.set_xlabel(r"$\eta$")
 
 # sum of the radial and orthoradial Growth (should be equal to tr(\sigma))
-areaplot7.set_title(r"$A_t =  %d$"%targetArea)
+areaplot7.set_title(r"$A_T =  %d; \Delta A_T = %d$"%(targetArea,areastep))
 areaplot7.set_ylabel(r"$\langle g_{r}+g_{o} \rangle$")
 areaplot7.set_xlabel(r"$\eta$")
 
@@ -460,7 +464,8 @@ for folder in listdir:
 	endStep = int(numbers.split(file_name)[1])
 	########################################################
 	plotData[etacurrent] = plotGrowthAgainstFeedback(targetface, targetHeight, targetArea,etacurrent, endStep,areaplot=areaplot,
-							 heightplot=heightplot,large = large, otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7])
+							 heightplot=heightplot,large = large,areastep = areastep, 
+					otherplot = [areaplot1,areaplot2,areaplot3,areaplot4,areaplot5,areaplot6,areaplot7])
 	########################################################
 	os.chdir("..")
 	counter += 1
