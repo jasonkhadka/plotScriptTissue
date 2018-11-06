@@ -67,18 +67,29 @@ def getRadialOrthoradialStress(face, radialDict,orthoradialDict, vectors = False
     eigenvec2 = face.getStressEigenVector2()
     eigenvalue1 = face.getStressEigenValue1()
     eigenvalue2 = face.getStressEigenValue2()
-    vec1 =eigenvalue1*np.array([qd.doublearray_getitem(eigenvec1,0),
+    vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
                     qd.doublearray_getitem(eigenvec1,1),
                     qd.doublearray_getitem(eigenvec1,2)])
-    vec2 = eigenvalue2*np.array([qd.doublearray_getitem(eigenvec2,0),
+    vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
                     qd.doublearray_getitem(eigenvec2,1),
                     qd.doublearray_getitem(eigenvec2,2)])
+    vec1 =eigenvalue1*vec1unit
+    vec2 = eigenvalue2*vec2unit
     radialvec = np.copy(radialDict[face.getID()])
     orthoradialvec = np.copy(orthoradialDict[face.getID()])
     #print radialvec,orthoradialvec
     ############################################
-    radialComp = np.dot(radialvec,vec1)+np.dot(radialvec,vec2)
-    orthoradialComp = np.dot(orthoradialvec,vec1)+np.dot(orthoradialvec,vec2)
+    ########################################################################################
+    radsign1 = (np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
+    radsign2 = (np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
+    orthosign1 = (np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
+    orthosign2 = (np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
+    #print radsign1, radsign2, orthosign1, orthosign2
+    ########################################################################################
+    radialComp = np.dot(radialvec,vec1)*radsign1+np.dot(radialvec,vec2)*radsign2
+    orthoradialComp = np.dot(orthoradialvec,vec1)*orthosign1+np.dot(orthoradialvec,vec2)*orthosign2
+    #radialComp = np.dot(radialvec,vec1)+np.dot(radialvec,vec2)
+    #orthoradialComp = np.dot(orthoradialvec,vec1)+np.dot(orthoradialvec,vec2)
     ############################################
     if vectors:
         radialvec = radialComp*radialvec
