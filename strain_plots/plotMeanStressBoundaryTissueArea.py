@@ -451,13 +451,12 @@ from collections import OrderedDict
 handles, labels = ax1.get_legend_handles_labels()
 by_label = OrderedDict(zip(labels,handles))
 ax1.legend(by_label.values(),by_label.keys(),prop={'size': 14})
-"""
 
 
 handles, labels = ax2.get_legend_handles_labels()
 by_label = OrderedDict(zip(labels,handles))
 ax2.legend(by_label.values(),by_label.keys(),prop={'size': 14})
-
+"""
 """###############################################################################
 #color bar fig1
 scalarMap._A = []
