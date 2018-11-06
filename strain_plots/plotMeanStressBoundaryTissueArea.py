@@ -407,7 +407,7 @@ for folder in listdir:
 ###############################################################################
 plotargs = {"linewidth":2}
 for key,data in plotData.iteritems():
-    etacolor = scalarMap.to_rgba(key)
+    color = scalarMap.to_rgba(key)
     ##################################
     #mean stress
     ##################################
