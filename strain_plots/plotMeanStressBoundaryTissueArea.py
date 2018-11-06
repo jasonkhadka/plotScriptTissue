@@ -213,14 +213,15 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         orthoradialStress = []
         radialGrowth = []
         orthoradialGrowth = []
+        dTissueSurfaceArea = tissueSurfaceArea2-tissueSurfaceArea
         for face in faceList:
             radstress, orthstress = getRadialOrthoradialStress(face,radialDict,orthoradialDict)
             radGrowth, orthGrowth = getRadialOrthoradialGrowth(face,radialDict,orthoradialDict)
             #######################################################
             radialStress.append(radstress)
             orthoradialStress.append(orthstress)
-            radialGrowth.append(radGrowth)
-            orthoradialGrowth.append(orthGrowth)
+            radialGrowth.append(radGrowth/dTissueSurfaceArea)
+            orthoradialGrowth.append(orthGrowth/dTissueSurfaceArea)
         ######################################################
         radialStressArray.append(np.mean(radialStress))
         orthoradialStressArray.append(np.mean(orthoradialStress))
@@ -242,6 +243,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         ########################################################################
         laststep = step
         ########################################################################
+        print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
     return [tissueSurfaceAreaArray, radialStressArray, orthoradialStressArray,
             radialGrowthArray, orthoradialGrowthArray]
 ####################################################################################################################################################################################
@@ -347,10 +349,11 @@ minvalue = min(etalist)
 cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
-fig = plt.figure(figsize=(10,5))
+fig = plt.figure(figsize=(10,10))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-ax1 = fig.add_subplot(121)
-ax2 = fig.add_subplot(122)
+ax1 = fig.add_subplot(221)
+ax2 = fig.add_subplot(222)
+ax3 = fig.add_subplot(224)
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
 #################################################################################
@@ -366,6 +369,10 @@ ax1.set_ylabel(r"$\langle \sigma \rangle$")
 ax2.set_title("Mean Growth")
 ax2.set_xlabel(r"$A_T$")
 ax2.set_ylabel(r"$\langle g \rangle$")
+
+ax3.set_title("Mean Growth")
+ax3.set_xlabel(r"$A_T$")
+ax3.set_ylabel(r"$\langle g \rangle$")
 ########################################################
 counter = 0
 totalfolders = len(listdir)
@@ -405,33 +412,34 @@ for folder in listdir:
 ###############################################################################
 #plotting
 ###############################################################################
-plotargs = {"linewidth":2}
+plotargs = {"linewidth":3}
 for key,data in plotData.iteritems():
     color = scalarMap.to_rgba(key)
     ##################################
     #mean stress
     ##################################
     #rad Stress
-    ax1.plot(data[0], data[1],":" ,label=r":$\sigma_{r}$",c=color,**plotargs)
+    ax1.plot(data[0], data[1],"-." ,label=r":$\sigma_{r}$",c=color,**plotargs)
     #ortho Stress
     ax1.plot(data[0], data[2], label=r":$\sigma_{o}$",c=color,**plotargs)
     ##################################
     #mean growth
     ##################################
     #rad Stress
-    ax2.plot(data[0], data[3],":" ,label=r":$g_{r}$",c=color,**plotargs)
+    ax2.plot(data[0], data[3],"-." ,label=r":$g_{r}$",c=color,**plotargs)
     #ortho Stress
-    ax2.plot(data[0], data[4], label=r":$g_{o}$",c=color,**plotargs)
+    ax3.plot(data[0], data[4], label=r":$g_{o}$",c=color,**plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
 from matplotlib.lines import Line2D
-legend_elements = [Line2D([0], [0], linestyle = ":", color='k', label=r":$\sigma_{r}$",lw = 2),
-                   Line2D([0], [0],  color='k', label=r":$\sigma_{o}$",lw = 2),
-                   Line2D([0], [0], linestyle = ":", color='k', label=r":$g_{r}$",lw = 2),
-                   Line2D([0], [0],  color='k', label=r":$g_{o}$",lw = 2)]
+legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r":$\sigma_{r}$",**plotargs),
+                   Line2D([0], [0],  color='k', label=r":$\sigma_{o}$",**plotargs),
+                   Line2D([0], [0], linestyle = "-.", color='k', label=r":$g_{r}$",**plotargs),
+                   Line2D([0], [0],  color='k', label=r":$g_{o}$",**plotargs)]
 ax1.legend(handles = legend_elements[:2])
-ax2.legend(handles = legend_elements[2:])
+ax2.legend(handles = legend_elements[2])
+ax3.legend(handles = legend_elements[2])
 ###############################################################################
 #color bar fig
 ###############################################################################
