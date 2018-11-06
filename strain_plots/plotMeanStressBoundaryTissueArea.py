@@ -412,16 +412,26 @@ for key,data in plotData.iteritems():
     #mean stress
     ##################################
     #rad Stress
-    ax1.plot(data[0], data[1],"--" ,label=r":$\sigma_{r}$",c=color,**plotargs)
+    ax1.plot(data[0], data[1],"-." ,label=r":$\sigma_{r}$",c=color,**plotargs)
     #ortho Stress
     ax1.plot(data[0], data[2], label=r":$\sigma_{o}$",c=color,**plotargs)
     ##################################
     #mean growth
     ##################################
     #rad Stress
-    ax2.plot(data[0], data[3],"--" ,label=r":$g_{r}$",c=color,**plotargs)
+    ax2.plot(data[0], data[3],"-." ,label=r":$g_{r}$",c=color,**plotargs)
     #ortho Stress
     ax2.plot(data[0], data[4], label=r":$g_{o}$",c=color,**plotargs)
+############################################################
+# Legend of the plot
+############################################################
+from matplotlib.lines import Line2D
+legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r":$\sigma_{r}$",**plotargs),
+                   Line2D([0], [0],  color='k', label=r":$\sigma_{o}$",**plotargs ),
+                   Line2D([0], [0], linestyle = "-.", color='k', label=r":$g_{r}$",**plotargs),
+                   Line2D([0], [0],  color='k', label=r":$g_{o}$"),**plotargs ]
+ax1.legend(handles = legend_elements)
+ax2.legend(handles = legend_elements)
 ###############################################################################
 #color bar fig
 ###############################################################################
@@ -434,17 +444,20 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 else:
 	clrbar.set_label(r"$\eta$")
 
-##########################################################################################
+"""##########################################################################################
 # Making the legend
 ##########################################################################################
 from collections import OrderedDict
 handles, labels = ax1.get_legend_handles_labels()
 by_label = OrderedDict(zip(labels,handles))
 ax1.legend(by_label.values(),by_label.keys(),prop={'size': 14})
+"""
+
 
 handles, labels = ax2.get_legend_handles_labels()
 by_label = OrderedDict(zip(labels,handles))
 ax2.legend(by_label.values(),by_label.keys(),prop={'size': 14})
+
 """###############################################################################
 #color bar fig1
 scalarMap._A = []
