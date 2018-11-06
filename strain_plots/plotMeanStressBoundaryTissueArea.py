@@ -157,6 +157,12 @@ def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False
 # Calculate primordia height
 ###############################################################################################################
 def getPrimordiaHeight(cell, targetid):
+    ###################################################################
+    def addMeanVertex(vertex,meanx,meany,meanz):
+        meanx += vertex.getXcoordinate()
+        meany += vertex.getYcoordinate()
+        meanz += vertex.getZcoordinate()
+        return meanx,meany,meanz
     ########################################################################
     # Getting the primordial boundary
     ########################################################################
