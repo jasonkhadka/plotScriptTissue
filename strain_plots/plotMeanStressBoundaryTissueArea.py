@@ -158,7 +158,7 @@ def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False
 ####################################################################################################################
 def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta, 
     meanstress, meandilation,
-    color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 50):
+    color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 25):
     import numpy as np
     import matplotlib.pyplot as plt
     import os
@@ -173,10 +173,6 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     faceidarray = [xface.getID() for xface in faceList]
     primordialFaceNum  = len(faceList)
     #######################################################################
-    # Checking if the files exists if not going to step down
-    #######################################################################
-    tissueSurfaceAreaArray = [initialTissueSurfaceArea]
-    #######################################################################
     # Starting the Calculation
     #######################################################################
     #####################################
@@ -188,7 +184,13 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     #######################################################################
     laststep = 1
     plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
-    for steparea in range(700, 900, int(areastep)):
+    #######################################################################
+    orthoradialStressArray = []
+    radialStressArray = []
+    radialGrowthArray = []
+    orthoradialGrwothArray = []
+    tissueSurfaceAreaArray = []
+    for steparea in range(700, 850, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
         ########################################################################
         step2,tissueSurfaceArea2 = getTimeStep(steparea+10, endStep, step, stepsize = 10)
@@ -220,21 +222,28 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
             radialGrowth.append(radGrowth)
             orthoradialGrowth.append(orthGrowth)
         ######################################################
-        meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
-            yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
-        meanstress.errorbar(tissueSurfaceArea, np.mean(orthoradialStress),
-            yerr = np.std(orthoradialStress)/float(len(orthoradialStress)),fmt='<',label = r":$\sigma_{o}$",c=color,**plotargs)
+        radialStressArray.append(np.mean(radialStress))
+        orthoradialStressArray.append(np.mean(orthoradialStress))
+        radialGrowthArray.append(np.mean(radialGrowth))
+        orthoradialGrowthArray.append(np.mean(orthoradialGrowth))
+        tissueSurfaceAreaArray.append(tissueSurfaceArea)
+        ######################################################
+        #meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
+        #    yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
+        #meanstress.errorbar(tissueSurfaceArea, np.mean(orthoradialStress),
+        #    yerr = np.std(orthoradialStress)/float(len(orthoradialStress)),fmt='<',label = r":$\sigma_{o}$",c=color,**plotargs)
         ########################################################################
         # mean dilation
         ########################################################################
-        meandilation.errorbar(tissueSurfaceArea, np.mean(radialGrowth),
-            yerr = np.std(radialGrowth)/float(len(radialGrowth)),fmt='o',label = r":$g_{r}$",c=color,**plotargs)
-        meandilation.errorbar(tissueSurfaceArea, np.mean(orthoradialGrowth),
-            yerr = np.std(orthoradialGrowth)/float(len(orthoradialGrowth)),fmt='<',label = r":$g_{o}$",c=color,**plotargs)
+        #meandilation.errorbar(tissueSurfaceArea, np.mean(radialGrowth),
+        #    yerr = np.std(radialGrowth)/float(len(radialGrowth)),fmt='o',label = r":$g_{r}$",c=color,**plotargs)
+        #meandilation.errorbar(tissueSurfaceArea, np.mean(orthoradialGrowth),
+        #    yerr = np.std(orthoradialGrowth)/float(len(orthoradialGrowth)),fmt='<',label = r":$g_{o}$",c=color,**plotargs)
         ########################################################################
         laststep = step
         ########################################################################
-    return
+    return [tissueSurfaceAreaArray, radialStressArray, orthoradialStressArray,
+            radialGrowthArray, orthoradialGrowthArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -394,7 +403,28 @@ for folder in listdir:
 	gc.collect()
 	counter+= 1
 ###############################################################################
+#plotting
+###############################################################################
+plotargs = {"linewidth":2}
+for key,data in plotData.iteritems():
+    etacolor = scalarMap.to_rgba(key)
+    ##################################
+    #mean stress
+    ##################################
+    #rad Stress
+    ax1.plot(data[0], data[1],"--" ,label=r":$\sigma_{r}$",c=color,**plotargs)
+    #ortho Stress
+    ax1.plot(data[0], data[2], label=r":$\sigma_{o}$",c=color,**plotargs)
+    ##################################
+    #mean growth
+    ##################################
+    #rad Stress
+    ax2.plot(data[0], data[3],"--" ,label=r":$g_{r}$",c=color,**plotargs)
+    #ortho Stress
+    ax2.plot(data[0], data[4], label=r":$g_{o}$",c=color,**plotargs)
+###############################################################################
 #color bar fig
+###############################################################################
 scalarMap._A = []
 fig.subplots_adjust(bottom=0.2)
 cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])
@@ -445,9 +475,9 @@ else:
 plt.close('all')
 ### Saving Data Dictionary ###
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	np.save('meancurvature_height_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	np.save('meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
 else:
-	np.save('meancurvature_height_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	np.save('meanstress_meangrowth_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
 
 
 ################################################################################
