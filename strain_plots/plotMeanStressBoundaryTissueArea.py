@@ -168,10 +168,6 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
     cell = sf.loadCellFromFile(1)
     initialTissueSurfaceArea = sf.getSurfaceArea(cell)
-    ########################################################################
-    faceList = sf.getPrimordiaFaces(cell,targetid, large = largerCondition)
-    faceidarray = [xface.getID() for xface in faceList]
-    primordialFaceNum  = len(faceList)
     #######################################################################
     # Starting the Calculation
     #######################################################################
@@ -190,6 +186,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     radialGrowthArray = []
     orthoradialGrowthArray = []
     tissueSurfaceAreaArray = []
+    primordiaAreaArray = []
     for steparea in range(680, 800, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
         ########################################################################
@@ -207,6 +204,11 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         # mean stress
         ########################################################################
         faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
+        primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
+        primordiaarea = 0.
+        for face in primordiafacelist:
+            primordiaarea += face.getAreaOfFace()
+        ######################################################
         radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
         ######################################################
         radialStress = []
@@ -228,6 +230,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         radialGrowthArray.append(np.mean(radialGrowth))
         orthoradialGrowthArray.append(np.mean(orthoradialGrowth))
         tissueSurfaceAreaArray.append(tissueSurfaceArea)
+        primordiaAreaArray.append(primordiaarea)
         ######################################################
         #meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
         #    yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
@@ -245,7 +248,8 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         ########################################################################
         print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
     return [tissueSurfaceAreaArray, radialStressArray, orthoradialStressArray,
-            radialGrowthArray, orthoradialGrowthArray]
+            radialGrowthArray, orthoradialGrowthArray,
+            primordiaAreaArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -353,7 +357,9 @@ fig = plt.figure(figsize=(10,10))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 ax1 = fig.add_subplot(221)
 ax2 = fig.add_subplot(222)
-ax3 = fig.add_subplot(224)
+ax3 = fig.add_subplot(223)
+ax4 = fig.add_subplot(224)
+
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
 #################################################################################
@@ -366,13 +372,20 @@ ax1.set_ylabel(r"$\langle \sigma \rangle$")
 ###################################
 # Mean Growth
 ###################################
-ax2.set_title("Mean Growth")
+ax2.set_title("Mean Growth"+r"$\langle g_r \rangle$")
 ax2.set_xlabel(r"$A_T$")
 ax2.set_ylabel(r"$\langle g \rangle$")
 
-ax3.set_title("Mean Growth")
+ax4.set_title("Mean Growth"+r"$\langle g_o \rangle$")
+ax4.set_xlabel(r"$A_T$")
+ax4.set_ylabel(r"$\langle g \rangle$")
+###################################
+# Primordia Area
+###################################
+
+ax3.set_title("Primordia Area")
 ax3.set_xlabel(r"$A_T$")
-ax3.set_ylabel(r"$\langle g \rangle$")
+ax3.set_ylabel(r"$A_P")
 ########################################################
 counter = 0
 totalfolders = len(listdir)
@@ -419,16 +432,20 @@ for key,data in plotData.iteritems():
     #mean stress
     ##################################
     #rad Stress
-    ax1.plot(data[0], data[1],"-." ,label=r":$\sigma_{r}$",c=color,**plotargs)
+    ax1.plot(data[0], data[1],"-." ,label=r"$\sigma_{r}$",c=color,**plotargs)
     #ortho Stress
-    ax1.plot(data[0], data[2], label=r":$\sigma_{o}$",c=color,**plotargs)
+    ax1.plot(data[0], data[2], label=r"$\sigma_{o}$",c=color,**plotargs)
     ##################################
     #mean growth
     ##################################
     #rad Stress
-    ax2.plot(data[0], data[3],"-." ,label=r":$g_{r}$",c=color,**plotargs)
+    ax2.plot(data[0], data[3],"-." ,label=r"$g_{r}$",c=color,**plotargs)
     #ortho Stress
-    ax3.plot(data[0], data[4], label=r":$g_{o}$",c=color,**plotargs)
+    ax4.plot(data[0], data[4], label=r"$g_{o}$",c=color,**plotargs)
+    ##################################
+    # Primordia Area
+    ##################################
+    ax3.plot(data[0], data[5],label = r"A_P",c = color, **plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
@@ -439,7 +456,7 @@ legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r":$\sigm
                    Line2D([0], [0],  color='k', label=r":$g_{o}$",**plotargs)]
 ax1.legend(handles = legend_elements[:2])
 ax2.legend(handles = [legend_elements[2]])
-ax3.legend(handles = [legend_elements[3]])
+ax4.legend(handles = [legend_elements[3]])
 ###############################################################################
 #color bar fig
 ###############################################################################
