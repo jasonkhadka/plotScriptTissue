@@ -437,20 +437,20 @@ ax4.set_ylabel(r"$\langle g_o \rangle$")
 ###################################
 
 ax5.set_title("Primordia Area")
-ax5.set_xlabel(r"$A_T$")
 ax5.set_ylabel(r"$A_P$")
+ax5.set_xlabel(r"$A_T$")
 
 ax6.set_title("height difference")
-ax6.set_xlabel(r"$\frac{\Delta h}{\Delta A_T}$")
-ax6.set_ylabel(r"$A_T$")
+ax6.set_ylabel(r"$\frac{\Delta h}{\Delta A_T}$")
+ax6.set_xlabel(r"$A_T$")
 
 ax7.set_title("height")
-ax7.set_xlabel(r"$h$")
-ax7.set_ylabel(r"$A_T$")
+ax7.set_ylabel(r"$h$")
+ax7.set_xlabel(r"$A_T$")
 
 ax8.set_title("height")
-ax8.set_xlabel(r"$h$")
-ax8.set_ylabel(r"$A_P$")
+ax8.set_ylabel(r"$h$")
+ax8.set_xlabel(r"$A_P$")
 
 ########################################################
 counter = 0
