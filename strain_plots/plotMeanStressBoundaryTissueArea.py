@@ -190,7 +190,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     radialGrowthArray = []
     orthoradialGrowthArray = []
     tissueSurfaceAreaArray = []
-    for steparea in range(680, 825, int(areastep)):
+    for steparea in range(680, 800, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
         ########################################################################
         step2,tissueSurfaceArea2 = getTimeStep(steparea+10, endStep, step, stepsize = 10)
@@ -439,10 +439,11 @@ legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r":$\sigm
                    Line2D([0], [0],  color='k', label=r":$g_{o}$",**plotargs)]
 ax1.legend(handles = legend_elements[:2])
 ax2.legend(handles = [legend_elements[2]])
-ax3.legend(handles = [legend_elements[2]])
+ax3.legend(handles = [legend_elements[3]])
 ###############################################################################
 #color bar fig
 ###############################################################################
+plt.tight_layout()
 scalarMap._A = []
 fig.subplots_adjust(bottom=0.2)
 cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])
