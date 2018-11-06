@@ -188,9 +188,9 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     orthoradialStressArray = []
     radialStressArray = []
     radialGrowthArray = []
-    orthoradialGrwothArray = []
+    orthoradialGrowthArray = []
     tissueSurfaceAreaArray = []
-    for steparea in range(700, 850, int(areastep)):
+    for steparea in range(700, 825, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
         ########################################################################
         step2,tissueSurfaceArea2 = getTimeStep(steparea+10, endStep, step, stepsize = 10)
