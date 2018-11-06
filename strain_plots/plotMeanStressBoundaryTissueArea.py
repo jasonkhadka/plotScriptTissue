@@ -438,8 +438,8 @@ legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r":$\sigm
                    Line2D([0], [0], linestyle = "-.", color='k', label=r":$g_{r}$",**plotargs),
                    Line2D([0], [0],  color='k', label=r":$g_{o}$",**plotargs)]
 ax1.legend(handles = legend_elements[:2])
-ax2.legend(handles = legend_elements[2])
-ax3.legend(handles = legend_elements[2])
+ax2.legend(handles = [legend_elements[2]])
+ax3.legend(handles = [legend_elements[2]])
 ###############################################################################
 #color bar fig
 ###############################################################################
