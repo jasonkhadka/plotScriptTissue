@@ -412,26 +412,26 @@ for key,data in plotData.iteritems():
     #mean stress
     ##################################
     #rad Stress
-    ax1.plot(data[0], data[1],"-." ,label=r":$\sigma_{r}$",c=color,**plotargs)
+    ax1.plot(data[0], data[1],":" ,label=r":$\sigma_{r}$",c=color,**plotargs)
     #ortho Stress
     ax1.plot(data[0], data[2], label=r":$\sigma_{o}$",c=color,**plotargs)
     ##################################
     #mean growth
     ##################################
     #rad Stress
-    ax2.plot(data[0], data[3],"-." ,label=r":$g_{r}$",c=color,**plotargs)
+    ax2.plot(data[0], data[3],":" ,label=r":$g_{r}$",c=color,**plotargs)
     #ortho Stress
     ax2.plot(data[0], data[4], label=r":$g_{o}$",c=color,**plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
 from matplotlib.lines import Line2D
-legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r":$\sigma_{r}$",lw = 2),
+legend_elements = [Line2D([0], [0], linestyle = ":", color='k', label=r":$\sigma_{r}$",lw = 2),
                    Line2D([0], [0],  color='k', label=r":$\sigma_{o}$",lw = 2),
-                   Line2D([0], [0], linestyle = "-.", color='k', label=r":$g_{r}$",lw = 2),
+                   Line2D([0], [0], linestyle = ":", color='k', label=r":$g_{r}$",lw = 2),
                    Line2D([0], [0],  color='k', label=r":$g_{o}$",lw = 2)]
-ax1.legend(handles = legend_elements)
-ax2.legend(handles = legend_elements)
+ax1.legend(handles = legend_elements[:2])
+ax2.legend(handles = legend_elements[2:])
 ###############################################################################
 #color bar fig
 ###############################################################################
