@@ -164,7 +164,7 @@ def getPrimordiaHeight(cell, targetid):
     ##########################################
     # Vertex on primordial boundary
     ##########################################
-    vertexList = getPrimordiaBoundaryVertexList(cell, targetface=targetid)
+    vertexList = sf.getPrimordiaBoundaryVertexList(cell, targetface=targetid)
     vertexNum = len(vertexList)
     ####################################################
     # Calculation of primordial height starts here
