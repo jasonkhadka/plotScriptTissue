@@ -353,13 +353,13 @@ minvalue = min(etalist)
 cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
-fig = plt.figure(figsize=(10,10))
+fig = plt.figure(figsize=(20,10))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-ax1 = fig.add_subplot(221)
-ax2 = fig.add_subplot(222)
-ax3 = fig.add_subplot(223)
-ax4 = fig.add_subplot(224)
-
+ax1 = fig.add_subplot(231)
+ax2 = fig.add_subplot(232)
+ax3 = fig.add_subplot(233)
+ax4 = fig.add_subplot(234)
+ax5 = fig.add_subplot(235)
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
 #################################################################################
@@ -367,25 +367,29 @@ ax4 = fig.add_subplot(224)
 ##################################
 ax1.set_title("Mean Stress")
 ax1.set_xlabel(r"$A_T$")
-ax1.set_ylabel(r"$\langle \sigma \rangle$")
+ax1.set_ylabel(r"$\langle \sigma_r \rangle$")
+
+ax3.set_title("Mean Stress")
+ax3.set_xlabel(r"$A_T$")
+ax3.set_ylabel(r"$\langle \sigma_o \rangle$")
 #ax1.set_ylim(-0.2,0.)
 ###################################
 # Mean Growth
 ###################################
 ax2.set_title("Mean Growth"+r"$\langle g_r \rangle$")
 ax2.set_xlabel(r"$A_T$")
-ax2.set_ylabel(r"$\langle g \rangle$")
+ax2.set_ylabel(r"$\langle g_r \rangle$")
 
 ax4.set_title("Mean Growth"+r"$\langle g_o \rangle$")
 ax4.set_xlabel(r"$A_T$")
-ax4.set_ylabel(r"$\langle g \rangle$")
+ax4.set_ylabel(r"$\langle g_o \rangle$")
 ###################################
 # Primordia Area
 ###################################
 
-ax3.set_title("Primordia Area")
-ax3.set_xlabel(r"$A_T$")
-ax3.set_ylabel(r"$A_P")
+ax5.set_title("Primordia Area")
+ax5.set_xlabel(r"$A_T$")
+ax5.set_ylabel(r"$A_P$")
 ########################################################
 counter = 0
 totalfolders = len(listdir)
@@ -434,7 +438,7 @@ for key,data in plotData.iteritems():
     #rad Stress
     ax1.plot(data[0], data[1],"-." ,label=r"$\sigma_{r}$",c=color,**plotargs)
     #ortho Stress
-    ax1.plot(data[0], data[2], label=r"$\sigma_{o}$",c=color,**plotargs)
+    ax3.plot(data[0], data[2], label=r"$\sigma_{o}$",c=color,**plotargs)
     ##################################
     #mean growth
     ##################################
@@ -445,16 +449,17 @@ for key,data in plotData.iteritems():
     ##################################
     # Primordia Area
     ##################################
-    ax3.plot(data[0], data[5],label = r"A_P",c = color, **plotargs)
+    ax5.plot(data[0], data[5],label = r"A_P",c = color, **plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
 from matplotlib.lines import Line2D
-legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r":$\sigma_{r}$",**plotargs),
-                   Line2D([0], [0],  color='k', label=r":$\sigma_{o}$",**plotargs),
-                   Line2D([0], [0], linestyle = "-.", color='k', label=r":$g_{r}$",**plotargs),
-                   Line2D([0], [0],  color='k', label=r":$g_{o}$",**plotargs)]
-ax1.legend(handles = legend_elements[:2])
+legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{r}$",**plotargs),
+                   Line2D([0], [0],  color='k', label=r"$\sigma_{o}$",**plotargs),
+                   Line2D([0], [0], linestyle = "-.", color='k', label=r"$g_{r}$",**plotargs),
+                   Line2D([0], [0],  color='k', label=r"$g_{o}$",**plotargs)]
+ax1.legend(handles = [legend_elements[0]])
+ax3.legend(handles = [legend_elements[1]])
 ax2.legend(handles = [legend_elements[2]])
 ax4.legend(handles = [legend_elements[3]])
 ###############################################################################
