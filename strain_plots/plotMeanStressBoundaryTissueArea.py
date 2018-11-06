@@ -153,6 +153,40 @@ def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False
         return radialvec, orthoradialvec
     ############################################
     return radialComp, orthoradialComp#radialvec,orthoradialvec
+###############################################################################################################
+# Calculate primordia height
+###############################################################################################################
+def getPrimordiaHeight(cell, targetid):
+    ########################################################################
+    # Getting the primordial boundary
+    ########################################################################
+    facetarget = sf.getFace(cell, targetid)
+    ##########################################
+    # Vertex on primordial boundary
+    ##########################################
+    vertexList = getPrimordiaBoundaryVertexList(cell, targetface=targetid)
+    vertexNum = len(vertexList)
+    ####################################################
+    # Calculation of primordial height starts here
+    # This is for smaller primordia
+    ####################################################
+    meanx = 0.
+    meany = 0.
+    meanz = 0.
+    for vert in vertexList:#while edge.Dest().getID() != targetedge.Dest().getID():
+        meanx,meany,meanz = addMeanVertex(vert,meanx,meany,meanz)
+        gaussianCurvature.append(vert.getGaussianCurvature())
+    ######################################
+    targetx = facetarget.getXCentralised()
+    targety = facetarget.getYCentralised()
+    targetz = facetarget.getZCentralised()
+    meanx /= vertexNum
+    meany /= vertexNum
+    meanz /= vertexNum
+    height = np.sqrt((meanx-targetx)**2+(meany-targety)**2+(meanz-targetz)**2)
+    ######################################
+    return height
+
 ####################################################################################################################
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
@@ -187,6 +221,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     orthoradialGrowthArray = []
     tissueSurfaceAreaArray = []
     primordiaAreaArray = []
+    heightArray = []
     for steparea in range(680, 800, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
         ########################################################################
@@ -232,6 +267,9 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         tissueSurfaceAreaArray.append(tissueSurfaceArea)
         primordiaAreaArray.append(primordiaarea)
         ######################################################
+        height = getPrimordiaHeight(cell,targetid)
+        heightArray.append(height)
+        ######################################################
         #meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
         #    yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
         #meanstress.errorbar(tissueSurfaceArea, np.mean(orthoradialStress),
@@ -249,7 +287,8 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
     return [tissueSurfaceAreaArray, radialStressArray, orthoradialStressArray,
             radialGrowthArray, orthoradialGrowthArray,
-            primordiaAreaArray]
+            primordiaAreaArray,
+            heightArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -353,13 +392,18 @@ minvalue = min(etalist)
 cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
-fig = plt.figure(figsize=(10,15))
+fig = plt.figure(figsize=(10,20))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-ax1 = fig.add_subplot(321)
-ax2 = fig.add_subplot(322)
-ax3 = fig.add_subplot(323)
-ax4 = fig.add_subplot(324)
-ax5 = fig.add_subplot(325)
+ax1 = fig.add_subplot(421)
+ax2 = fig.add_subplot(422)
+ax3 = fig.add_subplot(423)
+ax4 = fig.add_subplot(424)
+ax5 = fig.add_subplot(425)
+##########################
+ax6 = fig.add_subplot(426)
+ax7 = fig.add_subplot(427)
+ax8 = fig.add_subplot(428)
+##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
 #################################################################################
@@ -390,6 +434,19 @@ ax4.set_ylabel(r"$\langle g_o \rangle$")
 ax5.set_title("Primordia Area")
 ax5.set_xlabel(r"$A_T$")
 ax5.set_ylabel(r"$A_P$")
+
+ax6.set_title("height difference")
+ax6.set_xlabel(r"$\frac{\Delta h}{\Delta A_T}$")
+ax6.set_ylabel(r"$A_T$")
+
+ax7.set_title("height")
+ax7.set_xlabel(r"$h$")
+ax7.set_ylabel(r"$A_T$")
+
+ax8.set_title("height")
+ax8.set_xlabel(r"$h$")
+ax8.set_ylabel(r"$A_P$")
+
 ########################################################
 counter = 0
 totalfolders = len(listdir)
@@ -450,6 +507,18 @@ for key,data in plotData.iteritems():
     # Primordia Area
     ##################################
     ax5.plot(data[0], data[5],label = r"A_P",c = color, **plotargs)
+    #######################################
+    # Height vs Primordia Area/Tissue Area
+    #######################################
+    ax7.plot(data[0],data[6],label = r"h",c = color, **plotargs)
+    ax8.plot(data[5],data[6],label = r"h",c = color, **plotargs)
+    #######################################
+    # difference Height vs Tissue Area
+    #######################################
+    dheight = np.diff(np.array(data[6]))
+    dTissueSurfaceArea = np.diff(np.array(data[0]))
+    dheight = np.divide(dheight,dTissueSurfaceArea)
+    ax6.plot(data[0][1:],dheight,label = r"$\Delta h$",c = color, **plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
