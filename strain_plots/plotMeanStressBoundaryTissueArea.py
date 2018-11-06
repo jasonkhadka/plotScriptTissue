@@ -158,7 +158,7 @@ def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False
 ####################################################################################################################
 def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta, 
     meanstress, meandilation,
-    color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 25):
+    color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
     import numpy as np
     import matplotlib.pyplot as plt
     import os
@@ -190,7 +190,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     radialGrowthArray = []
     orthoradialGrowthArray = []
     tissueSurfaceAreaArray = []
-    for steparea in range(700, 825, int(areastep)):
+    for steparea in range(680, 825, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
         ########################################################################
         step2,tissueSurfaceArea2 = getTimeStep(steparea+10, endStep, step, stepsize = 10)
@@ -273,7 +273,7 @@ parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneat
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = None, type = int)
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
-parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 50)
+parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 20)
 
 ## Getting the arguments 
 args = parser.parse_args()
