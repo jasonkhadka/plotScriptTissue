@@ -181,7 +181,6 @@ def getPrimordiaHeight(cell, targetid):
     meanz = 0.
     for vert in vertexList:#while edge.Dest().getID() != targetedge.Dest().getID():
         meanx,meany,meanz = addMeanVertex(vert,meanx,meany,meanz)
-        gaussianCurvature.append(vert.getGaussianCurvature())
     ######################################
     targetx = facetarget.getXCentralised()
     targety = facetarget.getYCentralised()
