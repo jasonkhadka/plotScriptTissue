@@ -426,10 +426,10 @@ for key,data in plotData.iteritems():
 # Legend of the plot
 ############################################################
 from matplotlib.lines import Line2D
-legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r":$\sigma_{r}$",**plotargs),
-                   Line2D([0], [0],  color='k', label=r":$\sigma_{o}$",**plotargs ),
-                   Line2D([0], [0], linestyle = "-.", color='k', label=r":$g_{r}$",**plotargs),
-                   Line2D([0], [0],  color='k', label=r":$g_{o}$"),**plotargs ]
+legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r":$\sigma_{r}$",lw = 2),
+                   Line2D([0], [0],  color='k', label=r":$\sigma_{o}$",lw = 2),
+                   Line2D([0], [0], linestyle = "-.", color='k', label=r":$g_{r}$",lw = 2),
+                   Line2D([0], [0],  color='k', label=r":$g_{o}$"),lw = 2]
 ax1.legend(handles = legend_elements)
 ax2.legend(handles = legend_elements)
 ###############################################################################
