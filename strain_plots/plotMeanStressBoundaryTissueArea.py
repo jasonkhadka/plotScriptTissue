@@ -96,7 +96,7 @@ def getRadialOrthoradialStress(face, radialDict,orthoradialDict, vectors = False
         orthoradialvec = orthoradialComp*orthoradialvec
         return radialvec, orthoradialvec
     ############################################
-    return radialComp, orthoradialComp#radialvec,orthoradialvec
+    return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
 ###################################################################
 ####################################################################################################################
 # Calculating the max time step for target surface area
@@ -163,7 +163,7 @@ def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False
         orthoradialvec = orthoradialComp*orthoradialvec
         return radialvec, orthoradialvec
     ############################################
-    return radialComp, orthoradialComp#radialvec,orthoradialvec
+    return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
 ###############################################################################################################
 # Calculate primordia height
 ###############################################################################################################
@@ -238,6 +238,11 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     tissueSurfaceAreaArray = []
     primordiaAreaArray = []
     heightArray = []
+    meanstressEigenvalue1Array = []
+    meanstressEigenvalue2Array = []
+
+    meangrowthEigenvalue1Array = []
+    meangrowthEigenvalue2Array = []
     for steparea in range(680, 800, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
         ########################################################################
@@ -266,15 +271,23 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         orthoradialStress = []
         radialGrowth = []
         orthoradialGrowth = []
+        stressEigenvalue1Array = []
+        stressEigenvalue2Array = []
+        growthEigenvalue1Array = []
+        growthEigenvalue2Array = []
         dTissueSurfaceArea = tissueSurfaceArea2-tissueSurfaceArea
         for face in faceList:
-            radstress, orthstress = getRadialOrthoradialStress(face,radialDict,orthoradialDict)
-            radGrowth, orthGrowth = getRadialOrthoradialGrowth(face,radialDict,orthoradialDict)
+            radstress, orthstress,stresseigenvalue1, stresseigenvalue2  = getRadialOrthoradialStress(face,radialDict,orthoradialDict)
+            radGrowth, orthGrowth, growtheigenvalue1, growtheigenvalue2 = getRadialOrthoradialGrowth(face,radialDict,orthoradialDict)
             #######################################################
             radialStress.append(radstress)
             orthoradialStress.append(orthstress)
             radialGrowth.append(radGrowth/dTissueSurfaceArea)
             orthoradialGrowth.append(orthGrowth/dTissueSurfaceArea)
+            stressEigenvalue1Array.append(stresseigenvalue1)
+            stressEigenvalue2Array.append(stresseigenvalue2)
+            growthEigenvalue1Array.append(growtheigenvalue1)
+            growthEigenvalue2Array.append(growtheigenvalue2)
         ######################################################
         radialStressArray.append(np.mean(radialStress))
         orthoradialStressArray.append(np.mean(orthoradialStress))
@@ -286,6 +299,10 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         height = getPrimordiaHeight(cell,targetid)
         heightArray.append(height)
         ######################################################
+        meanstressEigenvalue1Array.append(np.mean(stressEigenvalue1Array))
+        meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
+        meangrowthEigenvalue1Array.append(np.mean(growthEigenvalue1Array))
+        meangrowthEigenvalue2Array.append(np.mean(growthEigenvalue2Array))
         #meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
         #    yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
         #meanstress.errorbar(tissueSurfaceArea, np.mean(orthoradialStress),
@@ -304,7 +321,9 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
     return [tissueSurfaceAreaArray, radialStressArray, orthoradialStressArray,
             radialGrowthArray, orthoradialGrowthArray,
             primordiaAreaArray,
-            heightArray]
+            heightArray,
+            meanstressEigenvalue1Array, meanstressEigenvalue2Array,
+            meangrowthEigenvalue1Array, meangrowthEigenvalue2Array]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -408,17 +427,20 @@ minvalue = min(etalist)
 cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
-fig = plt.figure(figsize=(10,20))
+fig = plt.figure(figsize=(15,20))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-ax1 = fig.add_subplot(421)
-ax2 = fig.add_subplot(422)
-ax3 = fig.add_subplot(423)
-ax4 = fig.add_subplot(424)
-ax5 = fig.add_subplot(425)
+ax1 = fig.add_subplot(431)
+ax2 = fig.add_subplot(432)
+ax3 = fig.add_subplot(434)
+ax4 = fig.add_subplot(435)
+ax5 = fig.add_subplot(433)
+ax6 = fig.add_subplot(436)
+ax7 = fig.add_subplot(4,3,10)
+ax8 = fig.add_subplot(4,3,11)
 ##########################
-ax6 = fig.add_subplot(426)
-ax7 = fig.add_subplot(427)
-ax8 = fig.add_subplot(428)
+rawstressplot = fig.add_subplot(437)
+rawgrowthplot = fig.add_subplot(438)
+
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
@@ -463,6 +485,13 @@ ax8.set_title("height")
 ax8.set_ylabel(r"$h$")
 ax8.set_xlabel(r"$A_P$")
 
+rawstressplot.set_title("Stress Eigenvalues")
+rawstressplot.set_ylabel(r"$eigenvalue$")
+rawstressplot.set_xlabel(r"$A_T$")
+
+rawgrowthplot.set_title("Growth Eigenvalues")
+rawgrowthplot.set_ylabel(r"$eigenvalue$")
+rawgrowthplot.set_xlabel(r"$A_T$")
 ########################################################
 counter = 0
 totalfolders = len(listdir)
@@ -535,6 +564,14 @@ for key,data in plotData.iteritems():
     dTissueSurfaceArea = np.diff(np.array(data[0]))
     dheight = np.divide(dheight,dTissueSurfaceArea)
     ax6.plot(data[0][1:],dheight,label = r"$\Delta h$",c = color, **plotargs)
+    #######################################
+    # raw stress/growth eigenvalues
+    #######################################
+    rawstressplot.plot(data[0],data[7],"-." ,label=r"$\lambda_{1}$",c=color,**plotargs)
+    rawstressplot.plot(data[0],data[8],label=r"$\lambda_{2}$",c=color,**plotargs)
+    #growth
+    rawgrowthplot.plot(data[0],data[9],"-." ,label=r"$\lambda_{1}$",c=color,**plotargs)
+    rawgrowthplot.plot(data[0],data[10],label=r"$\lambda_{2}$",c=color,**plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
@@ -542,11 +579,15 @@ from matplotlib.lines import Line2D
 legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{r}$",**plotargs),
                    Line2D([0], [0],  color='k', label=r"$\sigma_{o}$",**plotargs),
                    Line2D([0], [0], linestyle = "-.", color='k', label=r"$g_{r}$",**plotargs),
-                   Line2D([0], [0],  color='k', label=r"$g_{o}$",**plotargs)]
+                   Line2D([0], [0],  color='k', label=r"$g_{o}$",**plotargs),
+                   Line2D([0], [0], linestyle = "-.", color='k', label=r"$\lambda_{1}$",**plotargs),
+                   Line2D([0], [0],  color='k',  label=r"$\lambda_{2}$",**plotargs)]
 ax1.legend(handles = [legend_elements[0]])
 ax3.legend(handles = [legend_elements[1]])
 ax2.legend(handles = [legend_elements[2]])
 ax4.legend(handles = [legend_elements[3]])
+rawstressplot.legend(handles = legend_elements[4:])
+rawgrowthplot.legend(handles = legend_elements[4:])
 ###############################################################################
 #color bar fig
 ###############################################################################
