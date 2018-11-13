@@ -63,10 +63,11 @@ def getRadialOrthoradialDict(cell,targetid, large = False):
 # for a face, projecting its stress eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
 def getRadialOrthoradialStress(face, radialDict,orthoradialDict, vectors = False):
-    eigenvec1 = face.getStressEigenVector1()
-    eigenvec2 = face.getStressEigenVector2()
+    #eigenvec1 = face.getStressEigenVector1()
+    #eigenvec2 = face.getStressEigenVector2()
     eigenvalue1 = face.getStressEigenValue1()
     eigenvalue2 = face.getStressEigenValue2()
+    """
     vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
                     qd.doublearray_getitem(eigenvec1,1),
                     qd.doublearray_getitem(eigenvec1,2)])
@@ -87,7 +88,7 @@ def getRadialOrthoradialStress(face, radialDict,orthoradialDict, vectors = False
     #print radsign1, radsign2, orthosign1, orthosign2
     ########################################################################################
     radialComp = eigenvalue1*np.dot(radialvec,vec1unit)*radsign1+eigenvalue2*np.dot(radialvec,vec2unit)*radsign2
-    orthoradialComp = eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
+    orthoradialComp = #eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
     #radialComp = np.dot(radialvec,vec1)+np.dot(radialvec,vec2)
     #orthoradialComp = np.dot(orthoradialvec,vec1)+np.dot(orthoradialvec,vec2)
     ############################################
@@ -95,6 +96,10 @@ def getRadialOrthoradialStress(face, radialDict,orthoradialDict, vectors = False
         radialvec = radialComp*radialvec
         orthoradialvec = orthoradialComp*orthoradialvec
         return radialvec, orthoradialvec
+    """
+    ############################################
+    radialComp = face.getRadialStress()
+    orthoradialComp = face.getOrthoradialStress()
     ############################################
     return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
 ###################################################################
@@ -127,10 +132,11 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
 # for a face, projecting its Growth eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
 def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False):
-    eigenvec1 = face.getRotGrowthEigenVector1()
-    eigenvec2 = face.getRotGrowthEigenVector2()
+    #eigenvec1 = face.getRotGrowthEigenVector1()
+    #eigenvec2 = face.getRotGrowthEigenVector2()
     eigenvalue1 = face.getRotGrowthEigenValue1()
     eigenvalue2 = face.getRotGrowthEigenValue2()
+    """
     vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
                     qd.doublearray_getitem(eigenvec1,1),
                     qd.doublearray_getitem(eigenvec1,2)])
@@ -160,10 +166,16 @@ def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False
     #radialComp = np.dot(radialvec,vec1)*radsign1+np.dot(radialvec,vec2)*radsign2
     #orthoradialComp = np.dot(orthoradialvec,vec1)*orthosign1+np.dot(orthoradialvec,vec2)*orthosign2
     ############################################
+    
     if vectors:
         radialvec = radialComp*radialvec
         orthoradialvec = orthoradialComp*orthoradialvec
         return radialvec, orthoradialvec
+    """
+    ############################################
+    radialComp = face.getRadialGrowth()
+    orthoradialComp = face.getOrthoradialGrowth()
+    ############################################
     ############################################
     return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
 ###############################################################################################################
@@ -254,8 +266,15 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
             break
         cell = sf.loadCellFromFile(step)
         cell2 = sf.loadCellFromFile(step2)
-        sf.calculateDilation(cell,cell2)
+        ################################################
         cell.calculateStressStrain()
+        ################################################
+        primordialface = sf.getFace(cell, targetid)
+        ################################################
+        cell.setRadialOrthoradialVector(primordialface)
+        cell.setRadialOrthoradialStress()
+        ################################################
+        sf.calculateDilation(cell,cell2)
         ########################################################################
         #  Starting the Calculation of mean growth and mean stress on boundary
         ########################################################################
@@ -267,7 +286,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         for face in primordiafacelist:
             primordiaarea += face.getAreaOfFace()
         ######################################################
-        radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
+        #radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
         ######################################################
         radialStress = []
         orthoradialStress = []
