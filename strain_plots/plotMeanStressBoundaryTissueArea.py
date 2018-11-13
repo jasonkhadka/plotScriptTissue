@@ -461,7 +461,10 @@ ax8 = fig.add_subplot(4,3,11)
 ##########################
 rawstressplot = fig.add_subplot(437)
 rawgrowthplot = fig.add_subplot(438)
+##########################
+sumStresseigenplot = fig.add_subplot(439)
 
+sumGrowtheigenplot = fig.add_subplot(4,3,12)
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
@@ -513,6 +516,8 @@ rawstressplot.set_xlabel(r"$A_T$")
 rawgrowthplot.set_title("Growth Eigenvalues")
 rawgrowthplot.set_ylabel(r"$eigenvalue$")
 rawgrowthplot.set_xlabel(r"$A_T$")
+
+
 ########################################################
 counter = 0
 totalfolders = len(listdir)
@@ -593,6 +598,18 @@ for key,data in plotData.iteritems():
     #growth
     rawgrowthplot.plot(data[0],data[9],"-." ,label=r"$\lambda_{1}$",c=color,**plotargs)
     rawgrowthplot.plot(data[0],data[10],label=r"$\lambda_{2}$",c=color,**plotargs)
+    #######################################
+    # sum eigen values
+    #######################################
+    sumStressradiaOrthoradial = np.add(data[1],data[2])
+    sumStressmeaneigenvalue12 = np.add(data[7],data[8])
+    sumGrowthradiaOrthoradial = np.add(data[3],data[4])
+    sumGrowthmeaneigenvalue12 = np.add(data[9],data[10])
+    sumStresseigenplot.plot(data[0],sumStressradiaOrthoradial,':',lw = 3, label = r'\sigma_r+\sigma_o',c=color)
+    sumStresseigenplot.plot(data[0],sumStressmeaneigenvalue12,lw = 1, label = r'\sigma_1+\sigma_2',c=color)
+    ############################################################
+    sumGrowtheigenplot.plot(data[0],sumGrowthradiaOrthoradial,':',lw = 3, label = r'g_r+g_o',c=color)
+    sumGrowtheigenplot.plot(data[0],sumGrowthmeaneigenvalue12,lw = 1, label = r'\lambda_1+\lambda_2',c=color)
 ############################################################
 # Legend of the plot
 ############################################################
@@ -607,6 +624,10 @@ ax1.legend(handles = [legend_elements[0]])
 ax3.legend(handles = [legend_elements[1]])
 ax2.legend(handles = [legend_elements[2]])
 ax4.legend(handles = [legend_elements[3]])
+sumStresseigenplot.legend(handles = [Line2D([0], [0], linestyle = ":", color='k', label = r'$\sigma_r+\sigma_o$',lw=3),
+                            Line2D([0], [0], , color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
+sumGrowtheigenplot.legend(handles = [Line2D([0], [0], linestyle = ":", color='k', label = r'$g_r+g_o$',lw=3),
+                            Line2D([0], [0], , color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
 rawstressplot.legend(handles = legend_elements[4:])
 rawgrowthplot.legend(handles = legend_elements[4:])
 ###############################################################################
