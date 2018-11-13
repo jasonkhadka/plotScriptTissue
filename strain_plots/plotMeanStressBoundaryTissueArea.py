@@ -655,7 +655,7 @@ clrbar.set_label("$\eta$")"""
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
 else:
-	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_time=%d.png"%(endStep),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
 
 
 
