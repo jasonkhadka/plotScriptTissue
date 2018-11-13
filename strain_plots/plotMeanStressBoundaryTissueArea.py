@@ -62,7 +62,7 @@ def getRadialOrthoradialDict(cell,targetid, large = False):
 ###############################################################################################################
 # for a face, projecting its stress eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
-def getRadialOrthoradialStress(face, radialDict,orthoradialDict, vectors = False):
+def getRadialOrthoradialStress(face, radialDict=None,orthoradialDict=None, vectors = False):
     #eigenvec1 = face.getStressEigenVector1()
     #eigenvec2 = face.getStressEigenVector2()
     eigenvalue1 = face.getStressEigenValue1()
@@ -131,7 +131,7 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
 ###############################################################################################################
 # for a face, projecting its Growth eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
-def getRadialOrthoradialGrowth(face, radialDict,orthoradialDict, vectors = False):
+def getRadialOrthoradialGrowth(face, radialDict=None,orthoradialDict=None, vectors = False):
     #eigenvec1 = face.getRotGrowthEigenVector1()
     #eigenvec2 = face.getRotGrowthEigenVector2()
     eigenvalue1 = face.getRotGrowthEigenValue1()
@@ -298,8 +298,8 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
         growthEigenvalue2Array = []
         dTissueSurfaceArea = tissueSurfaceArea2-tissueSurfaceArea
         for face in faceList:
-            radstress, orthstress,stresseigenvalue1, stresseigenvalue2  = getRadialOrthoradialStress(face,radialDict,orthoradialDict)
-            radGrowth, orthGrowth, growtheigenvalue1, growtheigenvalue2 = getRadialOrthoradialGrowth(face,radialDict,orthoradialDict)
+            radstress, orthstress,stresseigenvalue1, stresseigenvalue2  = getRadialOrthoradialStress(face)
+            radGrowth, orthGrowth, growtheigenvalue1, growtheigenvalue2 = getRadialOrthoradialGrowth(face)
             #######################################################
             radialStress.append(radstress)
             orthoradialStress.append(orthstress)
