@@ -303,8 +303,8 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
             #######################################################
             radialStress.append(radstress)
             orthoradialStress.append(orthstress)
-            radialGrowth.append(radGrowth/dTissueSurfaceArea)
-            orthoradialGrowth.append(orthGrowth/dTissueSurfaceArea)
+            radialGrowth.append(radGrowth)
+            orthoradialGrowth.append(orthGrowth)
             stressEigenvalue1Array.append(stresseigenvalue1)
             stressEigenvalue2Array.append(stresseigenvalue2)
             growthEigenvalue1Array.append(growtheigenvalue1)
@@ -625,9 +625,9 @@ ax3.legend(handles = [legend_elements[1]])
 ax2.legend(handles = [legend_elements[2]])
 ax4.legend(handles = [legend_elements[3]])
 sumStresseigenplot.legend(handles = [Line2D([0], [0], linestyle = ":", color='k', label = r'$\sigma_r+\sigma_o$',lw=3),
-                            Line2D([0], [0], , color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
+                            Line2D([0], [0],  color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
 sumGrowtheigenplot.legend(handles = [Line2D([0], [0], linestyle = ":", color='k', label = r'$g_r+g_o$',lw=3),
-                            Line2D([0], [0], , color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
+                            Line2D([0], [0], color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
 rawstressplot.legend(handles = legend_elements[4:])
 rawgrowthplot.legend(handles = legend_elements[4:])
 ###############################################################################
