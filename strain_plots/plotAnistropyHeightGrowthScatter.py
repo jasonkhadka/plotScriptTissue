@@ -445,13 +445,13 @@ ax4 = fig.add_subplot(224)
 ax1.set_xlabel(r"$\langle\sigma_2 \rangle_c-\langle \sigma_1\rangle_c$")
 ax1.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
-ax2.set_xlabel(r"$\langle g_2 \rangle_c- \langleg_1 \rangle_c$")
+ax2.set_xlabel(r"$\langle g_2 \rangle_c- \langle g_1 \rangle_c$")
 ax2.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
-ax3.set_xlabel(r"$\langle\sigma_2 \rangle_c-\langle \sigma_1\rangle_c$$")
+ax3.set_xlabel(r"$\langle\sigma_2 \rangle_c-\langle \sigma_1\rangle_c$")
 ax3.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
-ax4.set_xlabel(r"$\langle g_2 \rangle_c- \langleg_1 \rangle_c$")
+ax4.set_xlabel(r"$\langle g_2 \rangle_c- \langle g_1 \rangle_c$")
 ax4.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
 
