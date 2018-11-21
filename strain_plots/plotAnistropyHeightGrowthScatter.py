@@ -292,6 +292,8 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
         stressEigenvalue2Array = []
         growthEigenvalue1Array = []
         growthEigenvalue2Array = []
+        stressdiffarray = []
+        growthdiffarray = []
         dTissueSurfaceArea = tissueSurfaceArea2-tissueSurfaceArea
         height = getPrimordiaHeight(cell,targetid)
         height2 = getPrimordiaHeight(cell2,targetid)
@@ -303,6 +305,8 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
             stressEigenvalue2Array.append(stresseigenvalue2)
             growthEigenvalue1Array.append(growtheigenvalue1)
             growthEigenvalue2Array.append(growtheigenvalue2)
+            stressdiffarray.append(stresseigenvalue2-stresseigenvalue1)
+            growthdiffarray.append(growtheigenvalue2-growtheigenvalue1)
         #######################################################
         # plotting
         #######################################################
@@ -319,8 +323,8 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
         stressscatter.scatter(sigma2-sigma1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
         growthscatter.scatter(g2-g1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
         #######################################################
-        stressscatter1.scatter(meanstresseigen2-meanstresseigen1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-        growthscatter1.scatter(meangrowtheigenvalue2-meangrowtheigenvalue1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+        stressscatter1.scatter(np.mean(stressdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+        growthscatter1.scatter(np.mean(growthdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
         #######################################################
         ########################################################################
         laststep = step
@@ -448,10 +452,10 @@ ax1.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 ax2.set_xlabel(r"$\langle g_2 \rangle_c- \langle g_1 \rangle_c$")
 ax2.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
-ax3.set_xlabel(r"$\langle\sigma_2 \rangle_c-\langle \sigma_1\rangle_c$")
+ax3.set_xlabel(r"$\langle\sigma_2 - \sigma_1\rangle_c$")
 ax3.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
-ax4.set_xlabel(r"$\langle g_2 \rangle_c- \langle g_1 \rangle_c$")
+ax4.set_xlabel(r"$\langle g_2 - g_1 \rangle_c$")
 ax4.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
 
