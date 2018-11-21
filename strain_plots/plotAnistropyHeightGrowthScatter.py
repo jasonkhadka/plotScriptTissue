@@ -442,17 +442,17 @@ ax4 = fig.add_subplot(224)
 #################################################################################
 # Stress Scatter plot
 ##################################
-ax1.set_xlabel(r"$\sigma_2-\sigma_1$")
-ax1.set_ylabel(r"$\frac{\Delta h}{\Delta A_T}$")
+ax1.set_xlabel(r"$\langle\sigma_2 \rangle_c-\langle \sigma_1\rangle_c$")
+ax1.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
-ax2.set_xlabel(r"$g_2-g_1$")
-ax2.set_ylabel(r"$\frac{\Delta h}{\Delta A_T}$")
+ax2.set_xlabel(r"$\langle g_2 \rangle_c- \langleg_1 \rangle_c$")
+ax2.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
-ax3.set_xlabel(r"$\sigma_2-\sigma_1$")
-ax3.set_ylabel(r"$\frac{\Delta h}{\Delta A_T}$")
+ax3.set_xlabel(r"$\langle\sigma_2 \rangle_c-\langle \sigma_1\rangle_c$$")
+ax3.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
-ax4.set_xlabel(r"$g_2-g_1$")
-ax4.set_ylabel(r"$\frac{\Delta h}{\Delta A_T}$")
+ax4.set_xlabel(r"$\langle g_2 \rangle_c- \langleg_1 \rangle_c$")
+ax4.set_ylabel(r"$\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
 
 ########################################################
