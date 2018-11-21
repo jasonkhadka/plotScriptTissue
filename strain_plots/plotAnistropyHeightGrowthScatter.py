@@ -222,7 +222,7 @@ def getPrimordiaHeight(cell, targetid):
 ####################################################################################################################
 def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta, 
     stressscatter, growthscatter,stressscatter1, growthscatter1, 
-    color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
+    color,maxeta = 20,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
     import numpy as np
     import matplotlib.pyplot as plt
     import os
@@ -311,11 +311,11 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
             g2 = max(growtheigenvalue1,growtheigenvalue2)
             g1 = min(growtheigenvalue1,growtheigenvalue2)
             #######################################################
-            stressscatter.scatter(sigma2-sigma1, dhdA, c = color,marker = 'o')
-            growthscatter.scatter(g2-g1, dhdA, c = color,marker = 'o')
+            stressscatter.scatter(sigma2-sigma1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+            growthscatter.scatter(g2-g1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
             #######################################################
-            stressscatter1.scatter(stresseigenvalue2-stresseigenvalue1, dhdA, c = color,marker = 'o')
-            growthscatter1.scatter(growtheigenvalue2-growtheigenvalue1, dhdA, c = color,marker = 'o')
+            stressscatter1.scatter(stresseigenvalue2-stresseigenvalue1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+            growthscatter1.scatter(growtheigenvalue2-growtheigenvalue1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
             #######################################################
         ########################################################################
         laststep = step
@@ -479,7 +479,7 @@ for folder in listdir:
 	#print "\n",os.getcwd()
 	plotHeightGrowthScatter(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
 				stressscatter = ax1,growthscatter = ax2,stressscatter1 =ax3,growthscatter1 = ax4,
-                startStep = startStep,  
+                startStep = startStep,  maxeta = maxeta,
 				color = etacolor,stepsize = stepsize,
                 largerCondition = large,maxarea = maxarea, areastep = areastep)
 	#print sys.getsizeof(plotData)
