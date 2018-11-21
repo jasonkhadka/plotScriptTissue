@@ -309,10 +309,10 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
             sigma2 = max(stresseigenvalue1,stresseigenvalue2)
             sigma1  = min(stresseigenvalue1,stresseigenvalue2)
             g2 = max(growtheigenvalue1,growtheigenvalue1)
-            g§ = min(growtheigenvalue1,growtheigenvalue1)
+            g1 = min(growtheigenvalue1,growtheigenvalue1)
             #######################################################
-            ax1.Scatter(sigma2-sigma1, dhdA, c = color,marker = 'o')
-            ax2.Scatter(g2-g1, dhdA, c = color,marker = 'o')
+            stressscatter.Scatter(sigma2-sigma1, dhdA, c = color,marker = 'o')
+            growthscatter.Scatter(g2-g1, dhdA, c = color,marker = 'o')
             #######################################################
         ########################################################################
         laststep = step
@@ -466,7 +466,7 @@ for folder in listdir:
 	os.chdir(folder)
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
-	plotMeanStressGrowth(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
+	plotHeightGrowthScatter(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
 				stressscatter = ax1,growthscatter = ax2,
                 startStep = startStep,  
 				color = etacolor,stepsize = stepsize,
