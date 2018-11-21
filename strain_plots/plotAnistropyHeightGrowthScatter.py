@@ -288,10 +288,6 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
         ######################################################
         #radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
         ######################################################
-        radialStress = []
-        orthoradialStress = []
-        radialGrowth = []
-        orthoradialGrowth = []
         stressEigenvalue1Array = []
         stressEigenvalue2Array = []
         growthEigenvalue1Array = []
@@ -303,20 +299,29 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
         for face in faceList:
             radstress, orthstress,stresseigenvalue1, stresseigenvalue2  = getRadialOrthoradialStress(face)
             radGrowth, orthGrowth, growtheigenvalue1, growtheigenvalue2 = getRadialOrthoradialGrowth(face)
-            #######################################################
-            # plotting
-            #######################################################
-            sigma2 = max(stresseigenvalue1,stresseigenvalue2)
-            sigma1  = min(stresseigenvalue1,stresseigenvalue2)
-            g2 = max(growtheigenvalue1,growtheigenvalue2)
-            g1 = min(growtheigenvalue1,growtheigenvalue2)
-            #######################################################
-            stressscatter.scatter(sigma2-sigma1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-            growthscatter.scatter(g2-g1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-            #######################################################
-            stressscatter1.scatter(stresseigenvalue2-stresseigenvalue1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-            growthscatter1.scatter(growtheigenvalue2-growtheigenvalue1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-            #######################################################
+            stressEigenvalue1Array.append(stresseigenvalue1)
+            stressEigenvalue2Array.append(stresseigenvalue2)
+            growthEigenvalue1Array.append(growtheigenvalue1)
+            growthEigenvalue2Array.append(growtheigenvalue2)
+        #######################################################
+        # plotting
+        #######################################################
+        meanstresseigen1 = np.mean(stressEigenvalue1Array)
+        meanstresseigen2 = np.mean(stressEigenvalue2Array)
+        meangrowtheigenvalue1 = np.mean(growthEigenvalue1Array)
+        meangrowtheigenvalue2 = np.mean(growthEigenvalue2Array)
+
+        sigma2 = max(meanstresseigen1 ,meanstresseigen2)
+        sigma1 = min(meanstresseigen1 ,meanstresseigen2)
+        g2 = max(meangrowtheigenvalue1,meangrowtheigenvalue2)
+        g1 = min(meangrowtheigenvalue1,meangrowtheigenvalue2)
+        #######################################################
+        stressscatter.scatter(sigma2-sigma1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+        growthscatter.scatter(g2-g1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+        #######################################################
+        stressscatter1.scatter(meanstresseigen2-meanstresseigen1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+        growthscatter1.scatter(meangrowtheigenvalue2-meangrowtheigenvalue1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+        #######################################################
         ########################################################################
         laststep = step
         ########################################################################
