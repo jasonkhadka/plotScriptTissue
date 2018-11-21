@@ -260,7 +260,7 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
     for steparea in range(680, 800, int(areastep)):
         step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 5)
         ########################################################################
-        step2,tissueSurfaceArea2 = getTimeStep(steparea+stepsize, endStep, step, stepsize = 5)
+        step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep/2., endStep, step, stepsize = 5)
         ########################################################################
         if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
             break
