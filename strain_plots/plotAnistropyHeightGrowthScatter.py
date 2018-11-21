@@ -221,7 +221,7 @@ def getPrimordiaHeight(cell, targetid):
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
 def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta, 
-    stressscatter, growthscatter, 
+    stressscatter, growthscatter,stressscatter1, growthscatter1, 
     color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
     import numpy as np
     import matplotlib.pyplot as plt
@@ -313,6 +313,9 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
             #######################################################
             stressscatter.scatter(sigma2-sigma1, dhdA, c = color,marker = 'o')
             growthscatter.scatter(g2-g1, dhdA, c = color,marker = 'o')
+            #######################################################
+            stressscatter1.scatter(stresseigenvalue2-stresseigenvalue1, dhdA, c = color,marker = 'o')
+            growthscatter1.scatter(growtheigenvalue2-growtheigenvalue1, dhdA, c = color,marker = 'o')
             #######################################################
         ########################################################################
         laststep = step
@@ -438,6 +441,12 @@ ax1.set_ylabel(r"$\frac{\Delta h}{\Delta A_T}$")
 ax2.set_xlabel(r"$g_2-g_1$")
 ax2.set_ylabel(r"$\frac{\Delta h}{\Delta A_T}$")
 
+ax3.set_xlabel(r"$\sigma_2-\sigma_1$")
+ax3.set_ylabel(r"$\frac{\Delta h}{\Delta A_T}$")
+
+ax4.set_xlabel(r"$g_2-g_1$")
+ax4.set_ylabel(r"$\frac{\Delta h}{\Delta A_T}$")
+
 
 ########################################################
 counter = 0
@@ -467,7 +476,7 @@ for folder in listdir:
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
 	plotHeightGrowthScatter(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
-				stressscatter = ax1,growthscatter = ax2,
+				stressscatter = ax1,growthscatter = ax2,stressscatter1 =ax3,growthscatter1 = ax4,
                 startStep = startStep,  
 				color = etacolor,stepsize = stepsize,
                 largerCondition = large,maxarea = maxarea, areastep = areastep)
