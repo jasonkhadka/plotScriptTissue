@@ -308,8 +308,8 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
             #######################################################
             sigma2 = max(stresseigenvalue1,stresseigenvalue2)
             sigma1  = min(stresseigenvalue1,stresseigenvalue2)
-            g2 = max(growtheigenvalue1,growtheigenvalue1)
-            g1 = min(growtheigenvalue1,growtheigenvalue1)
+            g2 = max(growtheigenvalue1,growtheigenvalue2)
+            g1 = min(growtheigenvalue1,growtheigenvalue2)
             #######################################################
             stressscatter.scatter(sigma2-sigma1, dhdA, c = color,marker = 'o')
             growthscatter.scatter(g2-g1, dhdA, c = color,marker = 'o')
