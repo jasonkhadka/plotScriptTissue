@@ -265,7 +265,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	for steparea in range(680, 800, int(areastep)):
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
-		step2,tissueSurfaceArea2 = getTimeStep(steparea+10, endStep, step, stepsize = 10)
+		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep/2, endStep, step, stepsize = 10)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
@@ -660,11 +660,11 @@ plt.tight_layout()
 ###############################################################################
 scalarMap._A = []
 fig.subplots_adjust(bottom=0.15)
-cbar_ax = fig.add_axes([0.05, 0.05, 0.40, 0.02])
+cbar_ax = fig.add_axes([0.05, 0.1, 0.40, 0.02])
 clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax,ticks=np.linspace(minvalue,maxvalue,3))
 ###############################################################################
 scalarMap2._A = []
-cbar_ax2 = fig.add_axes([0.55, 0.05, 0.40, 0.02])
+cbar_ax2 = fig.add_axes([0.55, 0.1, 0.40, 0.02])
 clrbar2 = plt.colorbar(scalarMap2,orientation='horizontal',cax = cbar_ax2,ticks=np.linspace(minvalue,maxvalue,3))
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
