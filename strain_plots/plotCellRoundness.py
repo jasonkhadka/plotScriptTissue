@@ -23,6 +23,31 @@ plt.rcParams['axes.labelsize'] = 14
 plt.rcParams['legend.fontsize'] =14
 plt.rcParams['axes.titlesize'] = 14.
 ####################################################################################################################
+# Calculating the max time step for target surface area
+####################################################################################################################
+def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
+	####################################################
+	for step in range(startStep, endStep+1,stepsize):
+		if not os.path.isfile("qdObject_step=%03d.obj"%step):
+			return endStep,0.
+		################################################
+		cell = sf.loadCellFromFile(step)
+		################################################
+		tissueSurfaceArea = sf.getSurfaceArea(cell)
+		if (tissueSurfaceArea > targetArea):
+			gc.collect()
+			for calstep in range(step-1,step-stepsize-1,-1):
+					cell = sf.loadCellFromFile(calstep)
+					tissueSurfaceArea = sf.getSurfaceArea(cell)
+					if (tissueSurfaceArea <= targetArea):
+						gc.collect()
+						cell = sf.loadCellFromFile(calstep+1)
+						tissueSurfaceArea = sf.getSurfaceArea(cell)
+						return calstep+1,tissueSurfaceArea
+		################################################
+		gc.collect()
+	return endStep,tissueSurfaceArea
+####################################################################################################################
 # calculating the roundness of the faces
 ####################################################################################################################
 def calculateMeanRoundness(facelist):
