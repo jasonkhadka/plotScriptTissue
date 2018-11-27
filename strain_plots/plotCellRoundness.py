@@ -235,8 +235,8 @@ scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 fig = plt.figure(figsize=(5,5))
 ax1 = fig.add_subplot(111)
 ##########################
-ax1.set_ylabel("Mean Roundness, $\langle R \rangle_c$")
-ax1.set_xlabel("Surface Area, $A_T$")
+ax1.set_ylabel(r"Mean Roundness, $\langle R \rangle_c$")
+ax1.set_xlabel(r"Surface Area, $A_T$")
 #################################################################################
 counter = 0
 totalfolders = len(listdir)
