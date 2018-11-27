@@ -283,16 +283,16 @@ for key,data in plotData.iteritems():
 	#		primordialBoundaryroundnessArray,othertissueroundnessArray]
 	ax1.plot(data[0], data[1],"*-" ,label=r"primordium",c=color,**plotargs)
 	#ortho Stress
-	ax1.plot(data[0], data[2],'<-', label=r"boundary",c=color,**plotargs)
+	ax1.plot(data[0], data[2],'<--', label=r"boundary",c=color,**plotargs)
 	ax1.plot(data[0], data[3],'s:', label=r"meristem",c=color,**plotargs)
 	##################################
 ############################################################
 # Legend of the plot
 ############################################################
 from matplotlib.lines import Line2D
-legend_elements = [Line2D([0], [0], linestyle = "*-", color='k', label=r"primordium",**plotargs),
-				   Line2D([0], [0],  linestyle = "<-", color='k', label=r"boundary",**plotargs),
-				   Line2D([0], [0], linestyle = "s:", color='k', label=r"meristem",**plotargs),
+legend_elements = [Line2D([0], [0], marker = '*', color='k', label=r"primordium",**plotargs),
+				   Line2D([0], [0],  marker = '<',linestyle = "--", color='k', label=r"boundary",**plotargs),
+				   Line2D([0], [0], marker = 's',linestyle = ":", color='k', label=r"meristem",**plotargs),
 				   ]
 ax1.legend(handles = legend_elements)
 ###############################################################################
