@@ -17,11 +17,11 @@ import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 24.
-plt.rcParams['ytick.labelsize'] = 24.
-plt.rcParams['axes.labelsize'] = 24.
-plt.rcParams['legend.fontsize'] = 24.
-plt.rcParams['axes.titlesize'] = 30
+plt.rcParams['xtick.labelsize'] = 20.
+plt.rcParams['ytick.labelsize'] = 20.
+plt.rcParams['axes.labelsize'] = 20
+plt.rcParams['legend.fontsize'] = 20
+plt.rcParams['axes.titlesize'] = 20
 
 ####################################################################################################################
 # Calculating the max time step for target surface area
@@ -296,14 +296,15 @@ legend_elements = [Line2D([0], [0], marker = '*', color='k', label=r"primordium"
 				   Line2D([0], [0], marker = 's',linestyle = ":", color='k', label=r"meristem",**plotargs),
 				   ]
 ax1.legend(handles = legend_elements)
+ax1.set_ylim(0.8,1.0)
 ###############################################################################
 #color bar fig
 ###############################################################################
-plt.tight_layout()
 scalarMap._A = []
 fig.subplots_adjust(bottom=0.2)
 cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])
 clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
+plt.tight_layout()
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Fast Growth Rate")
 else:
