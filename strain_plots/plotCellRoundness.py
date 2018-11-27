@@ -17,11 +17,11 @@ import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 20.
-plt.rcParams['ytick.labelsize'] = 20.
-plt.rcParams['axes.labelsize'] = 20
-plt.rcParams['legend.fontsize'] = 20
-plt.rcParams['axes.titlesize'] = 20
+plt.rcParams['xtick.labelsize'] = 18.
+plt.rcParams['ytick.labelsize'] = 18.
+plt.rcParams['axes.labelsize'] = 18
+plt.rcParams['legend.fontsize'] = 18
+plt.rcParams['axes.titlesize'] = 18
 
 ####################################################################################################################
 # Calculating the max time step for target surface area
@@ -223,7 +223,7 @@ else:
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 etathreshold = 0
-jet = cm = plt.get_cmap('inferno') 
+jet = cm = plt.get_cmap('plasma') 
 ##################################################
 if maxeta == 0.:
 	maxvalue = max(etalist)
@@ -301,7 +301,7 @@ ax1.set_ylim(0.8,1.0)
 #color bar fig
 ###############################################################################
 scalarMap._A = []
-fig.subplots_adjust(bottom=0.2)
+fig.subplots_adjust(bottom=0.235)
 cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])
 clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
 plt.tight_layout()
