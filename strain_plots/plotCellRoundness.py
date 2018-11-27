@@ -235,7 +235,7 @@ scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 fig = plt.figure(figsize=(5,5))
 ax1 = fig.add_subplot(111)
 ##########################
-ax1.set_ylabel("Mean Roundness, $<R>_c$")
+ax1.set_ylabel("Mean Roundness, $\langle R \rangle_c$")
 ax1.set_xlabel("Surface Area, $A_T$")
 #################################################################################
 counter = 0
@@ -281,10 +281,10 @@ for key,data in plotData.iteritems():
 	##################################
 	#data = [tissueSurfaceAreaArray,primordialroundnessArray,
 	#		primordialBoundaryroundnessArray,othertissueroundnessArray]
-	ax1.plot(data[0], data[1],"*-" ,markersize = 20,label=r"primordium",c=color,**plotargs)
+	ax1.plot(data[0], data[1],"*-" ,markersize = 10,label=r"primordium",c=color,**plotargs)
 	#ortho Stress
-	ax1.plot(data[0], data[2],'<--',markersize = 20, label=r"boundary",c=color,**plotargs)
-	ax1.plot(data[0], data[3],'s:', markersize = 20,label=r"meristem",c=color,**plotargs)
+	ax1.plot(data[0], data[2],'<--',markersize = 10, label=r"boundary",c=color,**plotargs)
+	ax1.plot(data[0], data[3],'s:', markersize = 10,label=r"meristem",c=color,**plotargs)
 	##################################
 ############################################################
 # Legend of the plot
@@ -300,7 +300,7 @@ ax1.legend(handles = legend_elements)
 ###############################################################################
 plt.tight_layout()
 scalarMap._A = []
-fig.subplots_adjust(bottom=0.1)
+fig.subplots_adjust(bottom=0.2)
 cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])
 clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
