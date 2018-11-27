@@ -135,7 +135,7 @@ parser.add_argument('-e',"--end", help="End of simulation step", type = int)
 parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only cacluated till this value", type = float, default = 0.0)
 parser.add_argument("-x","--maxarea", help = "if this is given, then plot is only made till this area value value", type = float, default = None)
 parser.add_argument('-c',"--surfaceArea", help="The surface area for which the stress vs feedback plot would need to be plotStrainDifferenceSurface",
-					default =800, type = float)
+					default =800, type = int)
 parser.add_argument('-l', "--layer", help = "The number of layers in the quadedge cell",type=int,default = 8)
 parser.add_argument("-a","--alpha",help = "value to set for Alpha (weigth of first term of Energy), default = 0",
 											  default = 1., type = float)
