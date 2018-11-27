@@ -273,7 +273,7 @@ for folder in listdir:
 ###############################################################################
 #plotting
 ###############################################################################
-plotargs = {"linewidth":3}
+plotargs = {"linewidth":1}
 for key,data in plotData.iteritems():
 	color = scalarMap.to_rgba(key)
 	##################################
@@ -281,10 +281,10 @@ for key,data in plotData.iteritems():
 	##################################
 	#data = [tissueSurfaceAreaArray,primordialroundnessArray,
 	#		primordialBoundaryroundnessArray,othertissueroundnessArray]
-	ax1.plot(data[0], data[1],"*-" ,label=r"primordium",c=color,**plotargs)
+	ax1.plot(data[0], data[1],"*-" ,markersize = 20,label=r"primordium",c=color,**plotargs)
 	#ortho Stress
-	ax1.plot(data[0], data[2],'<--', label=r"boundary",c=color,**plotargs)
-	ax1.plot(data[0], data[3],'s:', label=r"meristem",c=color,**plotargs)
+	ax1.plot(data[0], data[2],'<--',markersize = 20, label=r"boundary",c=color,**plotargs)
+	ax1.plot(data[0], data[3],'s:', markersize = 20,label=r"meristem",c=color,**plotargs)
 	##################################
 ############################################################
 # Legend of the plot
@@ -339,9 +339,9 @@ clrbar.set_label("$\eta$")"""
 #plt.tight_layout( rect=[0, 0, 1, 1])
 #fig.tight_layout(rect=[0.1,0.1,1.,0.9])
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_cell_roundness.png",transparent = True, bbox_inches="tight")
 else:
-	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_cell_roundness.png",transparent = True, bbox_inches="tight")
 
 
 
