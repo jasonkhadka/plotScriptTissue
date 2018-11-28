@@ -143,12 +143,12 @@ radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of
 
 #######################################################
 fig1 = plt.figure(1,figsize=(5,5))
-ax1 = fig.add_subplot(111)
+ax1 = fig1.add_subplot(111)
 ax1.set_ylabel('Volume of tissue, $V_T$')
 ax1.set_xlabel('time step, $t$')
 #######################################################
 fig2 = plt.figure(2,figsize=(5,5))
-ax2 = fig.add_subplot(111)
+ax2 = fig2.add_subplot(111)
 ax2.set_ylabel('Volume of tissue, $V_T$')
 ax2.set_xlabel('Surface area, $A_T$')
 #######################################################
