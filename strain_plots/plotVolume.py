@@ -44,7 +44,7 @@ def plotVolume(endStep, startStep, targetarea,volplot1,volplot2,stepsize = 5):
 		tissueSurfaceArea = sf.getSurfaceArea(cell)
 		tissueVolume = cell.getCartesianVolume()
 		################################################
-		if (tissueSurfaceArea > targetArea):
+		if (tissueSurfaceArea > targetarea):
 			return
 		################################################
 		volumeArray.append(tissueVolume)
