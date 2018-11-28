@@ -29,7 +29,7 @@ plt.rcParams['axes.titlesize'] = 18
 ####################################################################################################################
 # Calculating the max time step for target surface area
 ####################################################################################################################
-def plotVolume(endStep, startStep, targetarea,volplot1,volplot2,stepsize = 5):
+def plotVolume(endStep, startStep, targetarea,volplot1,volplot2,surfaceplot, stepsize = 5):
 	####################################################
 	volumeArray = []
 	surfaceAreaArray = []
@@ -45,17 +45,16 @@ def plotVolume(endStep, startStep, targetarea,volplot1,volplot2,stepsize = 5):
 		tissueVolume = cell.getCartesianVolume()
 		################################################
 		if (tissueSurfaceArea > targetarea):
-			return
+			break
 		################################################
 		volumeArray.append(tissueVolume)
 		surfaceAreaArray.append(tissueSurfaceArea)
 		timeArray.append(step)
 		################################################
 	################################################
-	gc.collect()
-	################################################
-	volplot1.plot(timeArray, volumeArray, linewidth = 3,c='salmon')
-	volplot2.plot(surfaceAreaArray, volumeArray, linewidth = 3,c='c')
+	volplot1.plot(timeArray, volumeArray, linewidth = 3,c='k')
+	volplot2.plot(surfaceAreaArray, volumeArray, linewidth = 3,c='k')
+	surfaceplot.plot(timeArray, surfaceAreaArray,linewidth = 3, c = 'k')
 	################################################
 	return 
 ####################################################################################################################################################################################
@@ -152,7 +151,12 @@ ax2 = fig2.add_subplot(111)
 ax2.set_ylabel('Volume of tissue, $V_T$')
 ax2.set_xlabel('Surface area, $A_T$')
 #######################################################
-plotVolume(endStep, startStep, targetarea=targetarea,volplot1 = ax1,volplot2 = ax2)
+fig3 = plt.figure(3,figsize=(5,5))
+ax3 = fig3.add_subplot(111)
+ax3.set_xlabel('time step, $t$')
+ax3.set_ylabel('Surface area, $A_T$')
+#######################################################
+plotVolume(endStep, startStep, targetarea=targetarea,volplot1 = ax1,volplot2 = ax2,surfaceplot =ax3)
 ################################################################################
 fig1.savefig(surfaceSaveDirectory+'/'+'volumePlot_time=%03d.png'%endStep,
 	bbox_inches='tight',dpi=100,transparent = True)
