@@ -20,212 +20,44 @@ sys.path.append('/home/jkhadka/transferdata/scripts/simulation_functions/')
 import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 24.
-plt.rcParams['ytick.labelsize'] = 24.
-plt.rcParams['axes.labelsize'] = 24.
-plt.rcParams['legend.fontsize'] = 24.
-plt.rcParams['axes.titlesize'] = 30
+plt.rcParams['xtick.labelsize'] = 18.
+plt.rcParams['ytick.labelsize'] = 18.
+plt.rcParams['axes.labelsize'] = 18
+plt.rcParams['legend.fontsize'] = 18
+plt.rcParams['axes.titlesize'] = 18
 
-def getNeighbourFaces(cell,faceid):
-	faces = qd.CellFaceIterator(cell)
-	face = faces.next()
-	faceidarray = [faceid]
-	while face != None:
-		if face.getID() == faceid : 
-			edges = qd.FaceEdgeIterator(face)
-			edge = edges.next()
-			while edge != None:
-				faceidarray.append(edge.Right().getID())
-				edge = edges.next()
-			break
-		face =faces.next()
-	return faceidarray
-########################################################################
-def getAreaGrowthData(cell, areaCellDict, surfaceAreaArray,dAreaCellDict,counter):
-	surfaceAreaArray[counter] = cell.getSurfaceArea()
-	dareaTissue = surfaceAreaArray[counter]-surfaceAreaArray[counter-1]
-	################################################
-	faces = qd.CellFaceIterator(cell)
-	face = faces.next()
-	while face 	!= None:
-		faceid = face.getID()
-		if faceid == 1:
-			face = faces.next()
-			continue
-		########################################
-		areaCellDict[faceid][counter] = face.getAreaOfFace() 
-		dareaCell = areaCellDict[faceid][counter]-areaCellDict[faceid][counter-1]
-		dAreaCellDict[faceid][counter-1] = dareaCell/dareaTissue
-		########################################
-		face = faces.next()
-	########################################
-	return
-########################################################################
-def plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,targetid,colormap = 'cool',alpha = 0.8,
-	azim = -60, elev = 50):
-	###############################################################
-	# Average area growth rate
-	###############################################################
-	if targetid:
-		faceidarray = getNeighbourFaces(cell,targetid)
-	else:
-		faceidarray = []
-	averagedDArea = {}
-	faces = qd.CellFaceIterator(cell)
-	face = faces.next()
-	minMagnitude = 0.
-	maxMagnitude = 0.
-	while (face != None):
-		if ((face.getID()==1) or (face.getID() in faceidarray)):
-			face  = faces.next()
-			continue
-		averagedDArea[face.getID()] = np.mean(dAreaCellDict[face.getID()])
-		if averagedDArea[face.getID()] > maxMagnitude:
-			maxMagnitude = averagedDArea[face.getID()]
-		elif averagedDArea[face.getID()] < minMagnitude:
-			minMagnitude = averagedDArea[face.getID()]
-		###########################################################
-		face = faces.next()
-	###############################################################
-	#                 Plotting the Cell                          #
-	##############################################################
-	jet = cm = plt.get_cmap(colormap) 
-	cNorm  = colors.Normalize(vmin=minMagnitude, vmax=maxMagnitude)
-	scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
-	#########################################################
-	faces = qd.CellFaceIterator(cell)
-	face = faces.next()
-	while (face != None):
-		if face.getID()==1:
-			face  = faces.next()
-			continue
-		faceid = face.getID()#grabbing face id
-		xlist = []
-		ylist = []
-		zlist = []
-		xproj = []
-		yproj = []
-		zproj = []
-		#print "== Face ID : ", faceid, "=="
-		xmean = face.getXCentralised()
-		ymean = face.getYCentralised()
-		zmean = face.getZCentralised()
-		edges = qd.FaceEdgeIterator(face)
-		edge = edges.next()
-		while edge != None:
-			####grabbing the origin of edge####
-			#centralised coordiante
-			vertex = edge.Org()
-			#print vertex.getID()
-			xCoord1 = vertex.getXcoordinate()
-			yCoord1 = vertex.getYcoordinate()
-			zCoord1 = vertex.getZcoordinate()
-			xlist.append(xCoord1)
-			ylist.append(yCoord1)
-			zlist.append(zCoord1)
-			edge = edges.next()
-		xlist.append(xlist[0])
-		ylist.append(ylist[0])
-		zlist.append(zlist[0])
-		verts = [zip(xlist, ylist,zlist)]
-		########################################################################################
-		if face.getID() in faceidarray:
-			color = 'w'
-		else:
-			color = scalarMap.to_rgba(averagedDArea[face.getID()])
-		#print face.getZCentralised(), alpha_fac
-		#ax.add_collection3d(arrow(xcen-0.5,ycen-0.5,zcen-0.5,xcen+0.5,ycen+0.5,zcen+0.5))
-		pc = Poly3DCollection(verts,alpha = alpha,facecolor = color,linewidths=1,zorder=0)
-		pc.set_edgecolor('k')
-		faceAreaDerivativePlot.add_collection3d(pc)
-		#faceAreaDerivativePlot.scatter(xcenarray[-1], ycenarray[-1],zcenarray[-1], 'o',c='r')
-		#ax.text(xcenarray[-1], ycenarray[-1],zcenarray[-1], face.getID())
-		face = faces.next()
-	########################################################################################
-	scalarMap._A = []
-	clrbar1 = plt.colorbar(scalarMap, ax=faceAreaDerivativePlot,shrink = 0.5,aspect = 10,ticks=np.linspace(minMagnitude,maxMagnitude,3))
-	clrbar1.set_label(r"Area Growth Rate")
-	faceAreaDerivativePlot.view_init(azim = azim, elev = elev)
-	#######################################################
-	return 
-########################################################################
-def plotAverageGrowthRate(endStep,areaDerivativePlot, faceAreaDerivativePlot,targetid, startStep=1,norm=True,
-	fastid = 0,azim = -60, 
-	elev = 50,stepsize = 1):
-	import matplotlib.colors as colors
-	import matplotlib.cm as cmx
-	import math
-	######################################################
-	# Getting the first step 
-	######################################################
-	if not os.path.isfile("qdObject_step=%03d.obj"%startStep):
-		return
-	cell = sf.loadCellFromFile(startStep)
-	######################################################
-	# dict of area
-	######################################################
-	dAreaCellDict = {}
-	areaCellDict= {}
-	surfaceAreaArray = np.zeros(endStep-startStep)
-	faces = qd.CellFaceIterator(cell)
-	face = faces.next()
-	surfaceAreaArray[0] = cell.getSurfaceArea()
-	######################################################
-	stepcounter = 0
-	while face != None:
-		if face.getID() == 1 : 
-			face = faces.next()
-			continue
-		areaCellDict[face.getID()] = np.zeros(int(math.ceil((float(endStep)-startStep)/stepsize))+1)
-		dAreaCellDict[face.getID()] = np.zeros(int(math.ceil((float(endStep)-startStep)/stepsize)))
-		areaCellDict[face.getID()][stepcounter] = face.getAreaOfFace() 
-		face =faces.next()
-	######################################################
-	# Gathering face area
-	######################################################
-	stepcounter += 1
-	########################################
-	for i in range(startStep+stepsize,endStep+stepsize,stepsize):
-		if not os.path.isfile("qdObject_step=%03d.obj"%i):#check if file exists
-			break
-		cell = sf.loadCellFromFile(i)
-		######################################
-		getAreaGrowthData(cell, areaCellDict, surfaceAreaArray,dAreaCellDict,stepcounter)
-		######################################################
-		stepcounter += 1
-		######################################################
-	########################
-	# plotting
-	########################
-	plotFaceAreaDerivative(faceAreaDerivativePlot,cell,dAreaCellDict,targetid,azim = azim, 
-		elev = elev)
-	########################
-	return
 ####################################################################################################################
 # Calculating the max time step for target surface area
 ####################################################################################################################
-def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
+def plotVolume(endStep, startStep, targetarea=targetarea,volplot1 = ax1,volplot2 = ax2,stepsize = 5):
+	####################################################
+	volumeArray = []
+	surfaceAreaArray = []
+	timeArray = []
 	####################################################
 	for step in range(startStep, endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
-			return endStep,0.
+			return 
 		################################################
 		cell = sf.loadCellFromFile(step)
 		################################################
 		tissueSurfaceArea = sf.getSurfaceArea(cell)
-		if (tissueSurfaceArea > targetArea):
-			gc.collect()
-			for calstep in range(step-1,step-stepsize-1,-1):
-					cell = sf.loadCellFromFile(calstep)
-					tissueSurfaceArea = sf.getSurfaceArea(cell)
-					if (tissueSurfaceArea <= targetArea):
-						gc.collect()
-						cell = sf.loadCellFromFile(calstep+1)
-						tissueSurfaceArea = sf.getSurfaceArea(cell)
-						return calstep+1,tissueSurfaceArea
+		tissueVolume = cell.getCartesianVolume()
 		################################################
-		gc.collect()
-	return endStep,tissueSurfaceArea
+		if (tissueSurfaceArea > targetArea):
+			return
+		################################################
+		volumeArray.append(tissueVolume)
+		surfaceAreaArray.append(tissueSurfaceArea)
+		timeArray.append(step)
+		################################################
+	################################################
+	gc.collect()
+	################################################
+	volplot1.plot(timeArray, volumeArray, linewidth = 3,c='salmon')
+	volplot2.plot(surfaceAreaArray, volumeArray, linewidth = 3,c='c')
+	################################################
+	return 
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -319,20 +151,12 @@ fig2 = plt.figure(2,figsize=(5,5))
 ax2 = fig.add_subplot(111)
 ax2.set_ylabel('Volume of tissue, $V_T$')
 ax2.set_xlabel('Surface area, $A_T$')
-
-
 #######################################################
-if abs(elev)<20.:
-	ax2.set_zlim((-0.*radius,1.4*radius))
-#################################################################################
-if targetarea:
-	endStep,surfacearea = getTimeStep(targetarea, endStep, startStep=startStep, stepsize = stepsize)
-	ax2.set_title("Surface Area = %d"%surfacearea)
-
 plotVolume(endStep, startStep, targetarea=targetarea,volplot1 = ax1,volplot2 = ax2)
-
 ################################################################################
-fig.savefig(surfaceSaveDirectory+'/'+'volumePlot_time=%03d.png'%endStep,
+fig1.savefig(surfaceSaveDirectory+'/'+'volumePlot_time=%03d.png'%endStep,
+	bbox_inches='tight',dpi=100,transparent = True)
+fig2.savefig(surfaceSaveDirectory+'/'+'volumePlot_area=%d.png'%targetarea,
 	bbox_inches='tight',dpi=100,transparent = True)
 ################################################################################
 print "\n"+ "#"*100
