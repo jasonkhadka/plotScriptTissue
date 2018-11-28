@@ -29,7 +29,7 @@ plt.rcParams['axes.titlesize'] = 18
 ####################################################################################################################
 # Calculating the max time step for target surface area
 ####################################################################################################################
-def plotVolume(endStep, startStep, targetarea=targetarea,volplot1 = ax1,volplot2 = ax2,stepsize = 5):
+def plotVolume(endStep, startStep, targetarea,volplot1,volplot2,stepsize = 5):
 	####################################################
 	volumeArray = []
 	surfaceAreaArray = []
