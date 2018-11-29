@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.optimize as sop
 import sys
 sys.path.append("/home/jkhadka/plantdev")
 import quadedge as qd
@@ -137,7 +138,6 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		cell.setRadialOrthoradialVector(primordialface)
 		cell.setRadialOrthoradialStress()
 		################################################
-		sf.calculateDilation(cell,cell2)
 		########################################################################
 		#  Starting the Calculation of mean growth and mean stress on boundary
 		########################################################################
@@ -294,7 +294,6 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 		#print sys.getsizeof(plotData)
 		os.chdir("..")
 		gc.collect()
-		counter+= 1
 	########################################################
 	maxvalue= max(growthRatio.keys())
 	minvalue = min(growthRatio.keys())
@@ -343,7 +342,7 @@ for folder in listdir:
 ###############################################################################
 plotargs = {"linewidth":3}
 for key,data in plotData.iteritems():
-	color = scalarMap.to_rgba(key)
+	color = scalarMap.to_rgba(growthRatio[key])
 	##################################
 	#mean stress
 	##################################
@@ -372,7 +371,7 @@ else:
 	clrbar.set_label(r"Mechanical Feedback, $\eta$")
 
 
-fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(targetid),transparent = True, bbox_inches="tight")
 
 
 
