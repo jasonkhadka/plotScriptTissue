@@ -342,7 +342,7 @@ for folder in listdir:
 ###############################################################################
 plotargs = {"linewidth":3}
 for key,data in plotData.iteritems():
-	color = scalarMap.to_rgba(growthRatio[key])
+	color = scalarMap.to_rgba(key)
 	##################################
 	#mean stress
 	##################################
