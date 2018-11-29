@@ -26,120 +26,120 @@ plt.rcParams['axes.titlesize'] = 18
 # fit function
 ####################################################################################################################
 def fitLinFunc(t,m,c):
-    return m*t + c
+	return m*t + c
 ####################################################################################################################
 # calculating growth ratio
 ####################################################################################################################
 def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
-    if not os.path.isfile("qdObject_step=001.obj"):
-            return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(1)
-    ########################################################################
-    meanprimordiaArray = []
-    meanrestArray = []
-    timeArray = []
-    ########################################################################
-    fitlen = 50
-    finalstep = startStep + stepsize*fitlen
-    for step in range(startStep, finalstep, stepsize):
-        ########################################################################
-        if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
-            break
-        cell = sf.loadCellFromFile(step)
-        ################################################
-        primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
-        primordiaarea = 0.
-        for face in primordiafacelist:
-            primordiaarea += face.getAreaOfFace()
-        ################################################
-        tissueSurfaceArea = sf.getSurfaceArea(cell)
-        ################################################
-        primordialface = sf.getFace(cell, targetid)
-        restoftissuearea =  tissueSurfaceArea - primordiaarea
-        ################################################
-        numOfPrimordialcell = len(primordiafacelist)
-        numOfrestofcell = cell.countFaces() -1 -numOfPrimordialcell
-        ################################################
-        meanprimordiafacearea = primordiaarea/numOfPrimordialcell
-        meanrestoftissuefacearea = restoftissuearea/(numOfrestofcell)
-        ################################################
-        meanprimordiaArray.append(meanprimordiafacearea)
-        meanrestArray.append(meanrestoftissuefacearea)
-        timeArray.append(step-1)
-        ################################################
-    logfastarea = np.log(meanprimordiaArray)
-    logslowarea = np.log(meanrestArray)
-    ################################################
-    fastareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logfastarea[:fitlen],bounds=([-np.inf,logfastarea[0]-0.000001],[+np.inf,logfastarea[0]]))
-    slowareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logslowarea[:fitlen],bounds=([-np.inf,logslowarea[0]-0.000001],[+np.inf,logslowarea[0]]))
-    ################################################
-    return fastareafit[0]/slowareafit[0]
+	if not os.path.isfile("qdObject_step=001.obj"):
+			return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
+	cell = sf.loadCellFromFile(1)
+	########################################################################
+	meanprimordiaArray = []
+	meanrestArray = []
+	timeArray = []
+	########################################################################
+	fitlen = 50
+	finalstep = startStep + stepsize*fitlen
+	for step in range(startStep, finalstep, stepsize):
+		########################################################################
+		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
+			break
+		cell = sf.loadCellFromFile(step)
+		################################################
+		primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
+		primordiaarea = 0.
+		for face in primordiafacelist:
+			primordiaarea += face.getAreaOfFace()
+		################################################
+		tissueSurfaceArea = sf.getSurfaceArea(cell)
+		################################################
+		primordialface = sf.getFace(cell, targetid)
+		restoftissuearea =  tissueSurfaceArea - primordiaarea
+		################################################
+		numOfPrimordialcell = len(primordiafacelist)
+		numOfrestofcell = cell.countFaces() -1 -numOfPrimordialcell
+		################################################
+		meanprimordiafacearea = primordiaarea/numOfPrimordialcell
+		meanrestoftissuefacearea = restoftissuearea/(numOfrestofcell)
+		################################################
+		meanprimordiaArray.append(meanprimordiafacearea)
+		meanrestArray.append(meanrestoftissuefacearea)
+		timeArray.append(step-1)
+		################################################
+	logfastarea = np.log(meanprimordiaArray)
+	logslowarea = np.log(meanrestArray)
+	################################################
+	fastareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logfastarea[:fitlen],bounds=([-np.inf,logfastarea[0]-0.000001],[+np.inf,logfastarea[0]]))
+	slowareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logslowarea[:fitlen],bounds=([-np.inf,logslowarea[0]-0.000001],[+np.inf,logslowarea[0]]))
+	################################################
+	return fastareafit[0]/slowareafit[0]
 ####################################################################################################################
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
 def plotPrincipalStress(numOfLayer, targetid,endStep,eta, 
-    meanstressplot, 
-    color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import os
-    ########################################################################
-    # faceidarray for Primordia
-    if not os.path.isfile("qdObject_step=001.obj"):
-        return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(1)
-    initialTissueSurfaceArea = sf.getSurfaceArea(cell)
-    #######################################################################
-    # Starting the Calculation
-    #######################################################################
-    laststep = 1
-    plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
-    #######################################################################
-    tissueSurfaceAreaArray = []
-    meanstressEigenvalue1Array = []
-    meanstressEigenvalue2Array = []
-    for steparea in range(680, 850, int(areastep)):
-        step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
-        ########################################################################
-        if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
-            break
-        cell = sf.loadCellFromFile(step)
-        ################################################
-        cell.calculateStressStrain()
-        ################################################
-        primordialface = sf.getFace(cell, targetid)
-        ################################################
-        cell.setRadialOrthoradialVector(primordialface)
-        cell.setRadialOrthoradialStress()
-        ################################################
-        sf.calculateDilation(cell,cell2)
-        ########################################################################
-        #  Starting the Calculation of mean growth and mean stress on boundary
-        ########################################################################
-        # mean stress
-        ########################################################################
-        faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
-        ######################################################
-        #radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
-        ######################################################
-        stressEigenvalue1Array = []
-        stressEigenvalue2Array = []
-        for face in faceList:
-            stresseigenvalue1 = face.getStressEigenValue1()
-            stresseigenvalue2 = face.getStressEigenValue2()
-            #######################################################
-            stressEigenvalue1Array.append(stresseigenvalue1)
-            stressEigenvalue2Array.append(stresseigenvalue2)
-        ######################################################
-        tissueSurfaceAreaArray.append(tissueSurfaceArea)
-        ######################################################
-        meanstressEigenvalue1Array.append(np.mean(stressEigenvalue1Array))
-        meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
-        ########################################################################
-        laststep = step
-        ########################################################################
-    return [tissueSurfaceAreaArray, 
-            meanstressEigenvalue1Array, meanstressEigenvalue2Array]
+	meanstressplot, 
+	color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
+	import numpy as np
+	import matplotlib.pyplot as plt
+	import os
+	########################################################################
+	# faceidarray for Primordia
+	if not os.path.isfile("qdObject_step=001.obj"):
+		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
+	cell = sf.loadCellFromFile(1)
+	initialTissueSurfaceArea = sf.getSurfaceArea(cell)
+	#######################################################################
+	# Starting the Calculation
+	#######################################################################
+	laststep = 1
+	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
+	#######################################################################
+	tissueSurfaceAreaArray = []
+	meanstressEigenvalue1Array = []
+	meanstressEigenvalue2Array = []
+	for steparea in range(680, 850, int(areastep)):
+		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
+		########################################################################
+		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
+			break
+		cell = sf.loadCellFromFile(step)
+		################################################
+		cell.calculateStressStrain()
+		################################################
+		primordialface = sf.getFace(cell, targetid)
+		################################################
+		cell.setRadialOrthoradialVector(primordialface)
+		cell.setRadialOrthoradialStress()
+		################################################
+		sf.calculateDilation(cell,cell2)
+		########################################################################
+		#  Starting the Calculation of mean growth and mean stress on boundary
+		########################################################################
+		# mean stress
+		########################################################################
+		faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
+		######################################################
+		#radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
+		######################################################
+		stressEigenvalue1Array = []
+		stressEigenvalue2Array = []
+		for face in faceList:
+			stresseigenvalue1 = face.getStressEigenValue1()
+			stresseigenvalue2 = face.getStressEigenValue2()
+			#######################################################
+			stressEigenvalue1Array.append(stresseigenvalue1)
+			stressEigenvalue2Array.append(stresseigenvalue2)
+		######################################################
+		tissueSurfaceAreaArray.append(tissueSurfaceArea)
+		######################################################
+		meanstressEigenvalue1Array.append(np.mean(stressEigenvalue1Array))
+		meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
+		########################################################################
+		laststep = step
+		########################################################################
+	return [tissueSurfaceAreaArray, 
+			meanstressEigenvalue1Array, meanstressEigenvalue2Array]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -200,10 +200,10 @@ class NullDevice():
 	def write(self, s):
 		pass
 if targetface == None:
-    if numOfLayer == 8:
-        targetface = 135
-    elif numOfLayer == 10:
-        targetface = 214
+	if numOfLayer == 8:
+		targetface = 135
+	elif numOfLayer == 10:
+		targetface = 214
 
 #print " start "
 #original_stdout = sys.stderr # keep a reference to STDOUT
@@ -259,25 +259,25 @@ ax1.set_ylabel(r"Principal Stress, $\sigma$")
 ########################################################
 growthRatio = {}
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-    for folder in listdir:
-        # Converting folder name to dictionary
-         fkcurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
-        ########################################################
-        os.chdir(folder)
-        ########################################################
-        growthRatio[fkcurrent] = getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,startStep = startStep)
-        #print sys.getsizeof(plotData)
-        os.chdir("..")
-        gc.collect()
-        counter+= 1
-    ########################################################
-    maxvalue= max(growthRatio.keys())
-    minvalue = min(growthRatio.keys())
-    ########################################################
-    ##################################################
-    cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
-    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
-    ##################################################
+	for folder in listdir:
+		# Converting folder name to dictionary
+		fkcurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
+		########################################################
+		os.chdir(folder)
+		########################################################
+		growthRatio[fkcurrent] = getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,startStep = startStep)
+		#print sys.getsizeof(plotData)
+		os.chdir("..")
+		gc.collect()
+		counter+= 1
+	########################################################
+	maxvalue= max(growthRatio.keys())
+	minvalue = min(growthRatio.keys())
+	########################################################
+	##################################################
+	cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
+	scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+	##################################################
 ##################################################
 counter = 0
 totalfolders = len(listdir)
@@ -288,7 +288,7 @@ for folder in listdir:
 	#print folder
 	if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	   etacurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
-       etacurrent= growthRatio[etacurrent]
+	   etacurrent= growthRatio[etacurrent]
 	else:
 	   etacurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
 	etacolor = scalarMap.to_rgba(etacurrent)
@@ -307,8 +307,8 @@ for folder in listdir:
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
 	plotData[etacurrent] = plotPrincipalStress(numOfLayer, targetid,endStep,etacurrent, 
-    meanstressplot=ax1, 
-    color = etacolor,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
+	meanstressplot=ax1, 
+	color = etacolor,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
@@ -318,20 +318,20 @@ for folder in listdir:
 ###############################################################################
 plotargs = {"linewidth":3}
 for key,data in plotData.iteritems():
-    color = scalarMap.to_rgba(key)
-    ##################################
-    #mean stress
-    ##################################
-    #rad Stress
-    ax1.plot(data[0], data[1],"-." ,label=r"$\sigma_{1}$",c=color,**plotargs)
-    #ortho Stress
-    ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
+	color = scalarMap.to_rgba(key)
+	##################################
+	#mean stress
+	##################################
+	#rad Stress
+	ax1.plot(data[0], data[1],"-." ,label=r"$\sigma_{1}$",c=color,**plotargs)
+	#ortho Stress
+	ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
 from matplotlib.lines import Line2D
 legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{1}$",**plotargs),
-                   Line2D([0], [0],  color='k', label=r"$\sigma_{2}$",**plotargs)]
+				   Line2D([0], [0],  color='k', label=r"$\sigma_{2}$",**plotargs)]
 ax1.legend(handles = legend_elements)
 
 ###############################################################################
