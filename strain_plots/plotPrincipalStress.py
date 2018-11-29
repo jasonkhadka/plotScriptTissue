@@ -163,7 +163,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		########################################################################
 		laststep = step
 		########################################################################
-	return [tissueSurfaceAreaArray, 
+	return [tissueSurfaceAreaArray,meanstressEigenvalue1Array, meanstressEigenvalue2Array, 
 			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array)]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
@@ -271,7 +271,10 @@ scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
 fig = plt.figure(figsize=(5,5))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-ax1 = fig.add_subplot(111)
+ax1 = fig.add_subplot(221)
+ax2 = fig.add_subplot(221)
+ax3 = fig.add_subplot(221)
+
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
@@ -350,7 +353,9 @@ for key,data in plotData.iteritems():
 	#mean stress
 	##################################
 	#rad Stress
-	ax1.plot(data[0], data[1],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax1.plot(data[0], data[3],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax2.plot(data[0], data[1],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax3.plot(data[0], data[2],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	#ortho Stress
 	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
@@ -366,7 +371,7 @@ for key,data in plotData.iteritems():
 ###############################################################################
 plt.tight_layout()
 scalarMap._A = []
-clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 3))#,orientation='horizontal',cax = cbar_ax)
+clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))#,orientation='horizontal',cax = cbar_ax)
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Growth ratio, $r_g$")
