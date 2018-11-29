@@ -295,8 +295,8 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 		os.chdir("..")
 		gc.collect()
 	########################################################
-	maxvalue= max(growthRatio.keys())
-	minvalue = min(growthRatio.keys())
+	maxvalue= max(growthRatio.values())
+	minvalue = min(growthRatio.values())
 	########################################################
 	##################################################
 	cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
