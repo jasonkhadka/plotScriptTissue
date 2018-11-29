@@ -124,7 +124,6 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	tissueSurfaceAreaArray = []
 	meanstressEigenvalue1Array = []
 	meanstressEigenvalue2Array = []
-	sumstressEigenvaluearray = []
 	for steparea in range(680, 850, int(areastep)):
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
@@ -156,7 +155,6 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 			#######################################################
 			stressEigenvalue1Array.append(stresseigenvalue1)
 			stressEigenvalue2Array.append(stresseigenvalue2)
-			sumstressEigenvaluearray.append(stresseigenvalue1+stresseigenvalue2)
 		######################################################
 		tissueSurfaceAreaArray.append(tissueSurfaceArea)
 		######################################################
@@ -166,7 +164,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		laststep = step
 		########################################################################
 	return [tissueSurfaceAreaArray, 
-			sumstressEigenvaluearray]
+			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array)]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
