@@ -272,8 +272,8 @@ scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 fig = plt.figure(figsize=(5,5))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 ax1 = fig.add_subplot(221)
-ax2 = fig.add_subplot(221)
-ax3 = fig.add_subplot(221)
+ax2 = fig.add_subplot(222)
+ax3 = fig.add_subplot(223)
 
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
