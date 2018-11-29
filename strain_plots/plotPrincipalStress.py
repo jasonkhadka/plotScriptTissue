@@ -124,6 +124,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	tissueSurfaceAreaArray = []
 	meanstressEigenvalue1Array = []
 	meanstressEigenvalue2Array = []
+	sumstressEigenvaluearray = []
 	for steparea in range(680, 850, int(areastep)):
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
@@ -155,6 +156,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 			#######################################################
 			stressEigenvalue1Array.append(stresseigenvalue1)
 			stressEigenvalue2Array.append(stresseigenvalue2)
+			sumstressEigenvaluearray.append(stresseigenvalue1+stresseigenvalue2)
 		######################################################
 		tissueSurfaceAreaArray.append(tissueSurfaceArea)
 		######################################################
@@ -164,7 +166,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		laststep = step
 		########################################################################
 	return [tissueSurfaceAreaArray, 
-			meanstressEigenvalue1Array+meanstressEigenvalue2Array]
+			sumstressEigenvaluearray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -288,6 +290,9 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 		# Converting folder name to dictionary
 		fkcurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
 		########################################################
+		if (maxeta != 0) and (fkcurrent > maxeta):
+			continue
+		########################################################
 		os.chdir(folder)
 		########################################################
 		growthRatio[fkcurrent] = getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,startStep = startStep)
@@ -381,9 +386,9 @@ fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(targetid),
 plt.close('all')
 ### Saving Data Dictionary ###
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	np.save('meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	np.save('principalstress_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
 else:
-	np.save('meanstress_meangrowth_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	np.save('principalstress_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
 
 
 ################################################################################
