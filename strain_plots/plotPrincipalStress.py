@@ -164,7 +164,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		laststep = step
 		########################################################################
 	return [tissueSurfaceAreaArray, 
-			meanstressEigenvalue1Array, meanstressEigenvalue2Array]
+			meanstressEigenvalue1Array+meanstressEigenvalue2Array]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -347,23 +347,23 @@ for key,data in plotData.iteritems():
 	#mean stress
 	##################################
 	#rad Stress
-	ax1.plot(data[0], data[1],"-." ,label=r"$\sigma_{1}$",c=color,**plotargs)
+	ax1.plot(data[0], data[1],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	#ortho Stress
-	ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
+	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
-from matplotlib.lines import Line2D
-legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{1}$",**plotargs),
-				   Line2D([0], [0],  color='k', label=r"$\sigma_{2}$",**plotargs)]
-ax1.legend(handles = legend_elements)
+#from matplotlib.lines import Line2D
+#legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{1}$",**plotargs),
+#				   Line2D([0], [0],  color='k', label=r"$\sigma_{2}$",**plotargs)]
+#ax1.legend(handles = legend_elements)
 
 ###############################################################################
 #color bar fig
 ###############################################################################
 plt.tight_layout()
 scalarMap._A = []
-clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.65,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 3))#,orientation='horizontal',cax = cbar_ax)
+clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 3))#,orientation='horizontal',cax = cbar_ax)
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Growth ratio, $r_g$")
