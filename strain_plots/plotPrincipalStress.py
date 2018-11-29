@@ -23,6 +23,31 @@ plt.rcParams['axes.labelsize'] = 18
 plt.rcParams['legend.fontsize'] = 18
 plt.rcParams['axes.titlesize'] = 18
 ####################################################################################################################
+# Calculating the max time step for target surface area
+####################################################################################################################
+def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
+    ####################################################
+    for step in range(startStep, endStep+1,stepsize):
+        if not os.path.isfile("qdObject_step=%03d.obj"%step):
+            return endStep,0.
+        ################################################
+        cell = sf.loadCellFromFile(step)
+        ################################################
+        tissueSurfaceArea = sf.getSurfaceArea(cell)
+        if (tissueSurfaceArea > targetArea):
+            gc.collect()
+            for calstep in range(step-1,step-stepsize-1,-1):
+                    cell = sf.loadCellFromFile(calstep)
+                    tissueSurfaceArea = sf.getSurfaceArea(cell)
+                    if (tissueSurfaceArea <= targetArea):
+                        gc.collect()
+                        cell = sf.loadCellFromFile(calstep+1)
+                        tissueSurfaceArea = sf.getSurfaceArea(cell)
+                        return calstep+1,tissueSurfaceArea
+        ################################################
+        gc.collect()
+    return endStep,tissueSurfaceArea
+####################################################################################################################
 # fit function
 ####################################################################################################################
 def fitLinFunc(t,m,c):
@@ -308,7 +333,7 @@ for folder in listdir:
 	#print "\n",os.getcwd()
 	plotData[etacurrent] = plotPrincipalStress(numOfLayer, targetid,endStep,etacurrent, 
 	meanstressplot=ax1, 
-	color = etacolor,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
+	color = etacolor,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
