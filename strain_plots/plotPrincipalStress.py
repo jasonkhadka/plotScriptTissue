@@ -418,8 +418,8 @@ for key,data in plotData.iteritems():
 	ax2.plot(data[0], data[1],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax3.plot(data[0], data[2],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax4.plot(data[0], data[4],"-." ,label=r"$\sigma$",c=color,**plotargs)
-	ax5.plot(data[-1], data[3],"-." ,label=r"$\sigma$",c=color,**plotargs)
-	ax6.plot(data[0], data[4],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax5.plot(data[5], data[3],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax6.plot(data[0], data[5],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	#ortho Stress
 	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
