@@ -370,7 +370,7 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 		os.chdir("..")
 		gc.collect()
 	########################################################
-	maxvalue= max(growthRatio.values())
+	maxvalue= int(max(growthRatio.values()))
 	minvalue = min(growthRatio.values())
 	########################################################
 	##################################################
@@ -444,8 +444,8 @@ for key,data in plotData.iteritems():
 ###############################################################################
 plt.tight_layout()
 scalarMap._A = []
-clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))#,orientation='horizontal',cax = cbar_ax)
-clrbar1 = plt.colorbar(scalarMap, ax=ax7,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))#,orientation='horizontal',cax = cbar_ax)
+clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
+clrbar1 = plt.colorbar(scalarMap, ax=ax7,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Growth ratio, $r_g$")
