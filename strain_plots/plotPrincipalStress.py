@@ -447,6 +447,24 @@ scalarMap._A = []
 clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
 clrbar1 = plt.colorbar(scalarMap, ax=ax7,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
 
+################################################################################
+axpos1 = ax1.get_position()
+axpos7 = ax7.get_position()
+################################################################################
+#print axpos
+fig.set_tight_layout(rect=[0.,0.,.9,.9])
+fig2.set_tight_layout(rect=[0.,0.,.9,.9])
+################################################################################
+clrbarpos1 = [axpos1.x0+axpos1.width,axpos1.y0,0.04,axpos1.height]
+clrbarpos7 = [axpos7.x0+axpos7.width,axpos7.y0,0.04,axpos7.height]
+################################################################################
+cbar_ax1 = fig.add_axes(clrbarpos)
+cbar_ax7 = fig2.add_axes(clrbarpos)
+################################################################################
+clrbar = plt.colorbar(scalarMap,cax = cbar_ax1,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+################################################################################
+
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Growth ratio, $r_g$")
 	clrbar1.set_label(r"Growth ratio, $r_g$")
