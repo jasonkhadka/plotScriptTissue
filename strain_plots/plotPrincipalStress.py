@@ -442,10 +442,10 @@ for key,data in plotData.iteritems():
 ###############################################################################
 #color bar fig
 ###############################################################################
-plt.tight_layout()
+#plt.tight_layout()
 scalarMap._A = []
-clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
-clrbar1 = plt.colorbar(scalarMap, ax=ax7,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
+#clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
+#clrbar1 = plt.colorbar(scalarMap, ax=ax7,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
 
 ################################################################################
 axpos1 = ax1.get_position()
@@ -475,6 +475,7 @@ else:
 
 fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(targetid),transparent = True, bbox_inches="tight")
 fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.png"%(targetid),transparent = True, bbox_inches="tight")
+fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
 
 
 
