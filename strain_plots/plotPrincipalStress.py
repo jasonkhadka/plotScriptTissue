@@ -206,7 +206,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		laststep = step
 		########################################################################
 	return [tissueSurfaceAreaArray,meanstressEigenvalue1Array, meanstressEigenvalue2Array, 
-			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array), np.substract(meanstressEigenvalue2Array, meanstressEigenvalue1Array), heightArray]
+			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array), np.subtract(meanstressEigenvalue2Array, meanstressEigenvalue1Array), heightArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
