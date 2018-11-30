@@ -318,6 +318,7 @@ ax2 = fig.add_subplot(322)
 ax3 = fig.add_subplot(323)
 ax4 = fig.add_subplot(324)
 ax5 = fig.add_subplot(325)
+ax6 = fig.add_subplot(326)
 
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
@@ -340,6 +341,9 @@ ax4.set_ylabel(r"Principal Stresses, $\sigma_2-\sigma_1$")
 
 ax5.set_xlabel(r"Primordial height, $h$")
 ax5.set_ylabel(r"Principal Stresses, $\sigma_1+\sigma_2$")
+
+ax6.set_xlabel(r"Surface Area, $A_T$")
+ax6.set_ylabel(r"Primordial height, $h$")
 
 ########################################################
 growthRatio = {}
@@ -415,6 +419,7 @@ for key,data in plotData.iteritems():
 	ax3.plot(data[0], data[2],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax4.plot(data[0], data[4],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax5.plot(data[-1], data[3],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax6.plot(data[0], data[4],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	#ortho Stress
 	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
