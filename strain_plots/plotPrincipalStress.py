@@ -312,6 +312,8 @@ cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
 fig = plt.figure(figsize=(10,15))
+
+fig2 = plt.figure(figsize=(5,5))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 ax1 = fig.add_subplot(321)
 ax2 = fig.add_subplot(322)
@@ -319,6 +321,8 @@ ax3 = fig.add_subplot(323)
 ax4 = fig.add_subplot(324)
 ax5 = fig.add_subplot(325)
 ax6 = fig.add_subplot(326)
+
+ax7 = fig2.add_subplot(111)
 
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
@@ -344,6 +348,10 @@ ax5.set_ylabel(r"Principal Stresses, $\sigma_1+\sigma_2$")
 
 ax6.set_xlabel(r"Surface Area, $A_T$")
 ax6.set_ylabel(r"Primordial height, $h$")
+
+
+ax7.set_xlabel(r"Surface Area, $A_T$")
+ax7.set_ylabel(r"Primordial height, $h$")
 
 ########################################################
 growthRatio = {}
@@ -420,6 +428,7 @@ for key,data in plotData.iteritems():
 	ax4.plot(data[0], data[4],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax5.plot(data[5], data[3],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax6.plot(data[0], data[5],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax7.plot(data[0], data[5],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	#ortho Stress
 	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
@@ -436,14 +445,18 @@ for key,data in plotData.iteritems():
 plt.tight_layout()
 scalarMap._A = []
 clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))#,orientation='horizontal',cax = cbar_ax)
+clrbar1 = plt.colorbar(scalarMap, ax=ax7,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))#,orientation='horizontal',cax = cbar_ax)
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Growth ratio, $r_g$")
+	clrbar1.set_label(r"Growth ratio, $r_g$")
+
 else:
 	clrbar.set_label(r"Mechanical Feedback, $\eta$")
 
 
 fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(targetid),transparent = True, bbox_inches="tight")
+fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.png"%(targetid),transparent = True, bbox_inches="tight")
 
 
 
