@@ -48,6 +48,44 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
         ################################################
         gc.collect()
     return endStep,tissueSurfaceArea
+###############################################################################################################
+# Calculate primordia height
+###############################################################################################################
+def getPrimordiaHeight(cell, targetid):
+    ###################################################################
+    def addMeanVertex(vertex,meanx,meany,meanz):
+        meanx += vertex.getXcoordinate()
+        meany += vertex.getYcoordinate()
+        meanz += vertex.getZcoordinate()
+        return meanx,meany,meanz
+    ########################################################################
+    # Getting the primordial boundary
+    ########################################################################
+    facetarget = sf.getFace(cell, targetid)
+    ##########################################
+    # Vertex on primordial boundary
+    ##########################################
+    vertexList = sf.getPrimordiaBoundaryVertexList(cell, targetid)
+    vertexNum = len(vertexList)
+    ####################################################
+    # Calculation of primordial height starts here
+    # This is for smaller primordia
+    ####################################################
+    meanx = 0.
+    meany = 0.
+    meanz = 0.
+    for vert in vertexList:#while edge.Dest().getID() != targetedge.Dest().getID():
+        meanx,meany,meanz = addMeanVertex(vert,meanx,meany,meanz)
+    ######################################
+    targetx = facetarget.getXCentralised()
+    targety = facetarget.getYCentralised()
+    targetz = facetarget.getZCentralised()
+    meanx /= vertexNum
+    meany /= vertexNum
+    meanz /= vertexNum
+    height = np.sqrt((meanx-targetx)**2+(meany-targety)**2+(meanz-targetz)**2)
+    ######################################
+    return height
 ####################################################################################################################
 # fit function
 ####################################################################################################################
@@ -124,6 +162,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	tissueSurfaceAreaArray = []
 	meanstressEigenvalue1Array = []
 	meanstressEigenvalue2Array = []
+	heightArray = []
 	for steparea in range(680, 850, int(areastep)):
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
@@ -144,6 +183,8 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		# mean stress
 		########################################################################
 		faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
+		height = getPrimordiaHeight(cell,targetid)
+
 		######################################################
 		#radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
 		######################################################
@@ -157,6 +198,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 			stressEigenvalue2Array.append(stresseigenvalue2)
 		######################################################
 		tissueSurfaceAreaArray.append(tissueSurfaceArea)
+		heightArray.append(height)
 		######################################################
 		meanstressEigenvalue1Array.append(np.mean(stressEigenvalue1Array))
 		meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
@@ -164,7 +206,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		laststep = step
 		########################################################################
 	return [tissueSurfaceAreaArray,meanstressEigenvalue1Array, meanstressEigenvalue2Array, 
-			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array)]
+			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array), np.substract(meanstressEigenvalue2Array, meanstressEigenvalue1Array), heightArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -269,11 +311,13 @@ minvalue = min(etalist)
 cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
-fig = plt.figure(figsize=(5,5))
+fig = plt.figure(figsize=(15,10))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
-ax1 = fig.add_subplot(221)
-ax2 = fig.add_subplot(222)
-ax3 = fig.add_subplot(223)
+ax1 = fig.add_subplot(321)
+ax2 = fig.add_subplot(322)
+ax3 = fig.add_subplot(323)
+ax4 = fig.add_subplot(324)
+ax5 = fig.add_subplot(325)
 
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
@@ -282,7 +326,20 @@ ax3 = fig.add_subplot(223)
 # Min Stress
 ##################################
 ax1.set_xlabel(r"Surface Area, $A_T$")
-ax1.set_ylabel(r"Principal Stress, $\sigma$")
+ax1.set_ylabel(r"Principal Stresses, $\sigma_1+\sigma_2$")
+
+
+ax2.set_xlabel(r"Surface Area, $A_T$")
+ax2.set_ylabel(r"Principal Stresses, $\sigma_1$")
+
+ax3.set_xlabel(r"Surface Area, $A_T$")
+ax3.set_ylabel(r"Principal Stresses, $\sigma_2$")
+
+ax4.set_xlabel(r"Surface Area, $A_T$")
+ax4.set_ylabel(r"Principal Stresses, $\sigma_2-\sigma_1$")
+
+ax5.set_xlabel(r"Primordial height, $h$")
+ax5.set_ylabel(r"Principal Stresses, $\sigma_1+\sigma_2$")
 
 ########################################################
 growthRatio = {}
@@ -356,6 +413,8 @@ for key,data in plotData.iteritems():
 	ax1.plot(data[0], data[3],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax2.plot(data[0], data[1],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax3.plot(data[0], data[2],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax4.plot(data[0], data[4],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax5.plot(data[-1], data[3],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	#ortho Stress
 	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
