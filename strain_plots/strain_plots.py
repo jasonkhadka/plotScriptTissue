@@ -691,6 +691,7 @@ def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.
 	eigenvalue1array = []
 	eigenvalue2array = []
 	eigenvalueratioarray = []
+	eigenvaluedifferencearray = []
 	faces = qd.CellFaceIterator(cell)
 	face = faces.next()
 	while face != None:
@@ -712,7 +713,9 @@ def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.
 		eigen2 = eigenvalue2
 		#ratio = (max(eigen1,eigen2)- min(eigen1,eigen2))/max(eigen1,eigen2)
 		ratio = getAbsAnistropy(eigen1,eigen2)#(max(eigen1,eigen2)- min(eigen1,eigen2))/(eigen1+eigen2)
+		diff = getDifference(eigen1,eigen2)
 		eigenvalueratioarray.append(ratio)
+		eigenvaluedifferencearray.append(diff)
 		#########~~~ EIGEN VEC 1 ~~~#########
 		#getting the centralised coordinate of centroid
 		X.append(face.getXCentralised())
@@ -737,6 +740,8 @@ def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.
 	maxEigenValueRatio = (max(eigenvalueratioarray))
 	minEigenValueRatio = (min(eigenvalueratioarray))
 	maxEigenValue = max(map(abs,eigenvalue))
+	maxEigendiff = max(eigenvaluedifferencearray)
+	minEigendiff = min(eigenvaluedifferencearray)
 	#print "Max Eigen Value Ration :", maxEigenValueRatio
 	#print "Min Eigen Value Ratio :", minEigenValueRatio
 	############################################
@@ -744,15 +749,15 @@ def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.
 	############################################
 	######### Color Map A ######################
 	jet1 = cm1 = plt.get_cmap(colormap) 
-	maxvalue = 1.
+	maxvalue = 1.0
 	minvalue = 0.
 	normMax = 1 # value to normalize by
 	cNorm1  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 	scalarMap1 = cmx.ScalarMappable(norm=cNorm1, cmap=jet1)
 	######### Color Map B ######################
 	jet2 = cm2 = plt.get_cmap(colormap) 
-	maxvalue = maxEigenValueRatio
-	minvalue = minEigenValueRatio
+	maxvalue = maxEigendiff
+	minvalue = minEigendiff
 	normMax = 1 # value to normalize by
 	cNorm2  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 	scalarMap2 = cmx.ScalarMappable(norm=cNorm2, cmap=jet2)
@@ -800,8 +805,6 @@ def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.
 		xcenarray.append(face.getXCentralised())
 		ycenarray.append(face.getYCentralised())
 		zcenarray.append(face.getZCentralised())
-		#ratio = (max(eigen1,eigen2)- min(eigen1,eigen2))/(max(eigen1,eigen2))
-		ratio = (max(eigen1,eigen2)- min(eigen1,eigen2))/(eigen1+eigen2)
 		eigenvec1 = face.getStressEigenVector1()
 		eigenvec2 = face.getStressEigenVector2()
 		eigenvalue1 = face.getStressEigenValue1()
@@ -816,7 +819,6 @@ def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.
 		absratio = getAbsAnistropy(eigen1,eigen2)#(max(eigen1,eigen2)- min(eigen1,eigen2))/(eigen1+eigen2)
 		diffratio = getDifference(eigen1,eigen2)#(max(eigen1,eigen2)- min(eigen1,eigen2))/(eigen1+eigen2)
 		#####################################################################
-		eigenvalueratioarray.append(ratio)
 		if sf.checkExternalFace(face):
 			absratio = 0.
 			diffratio = 0.
