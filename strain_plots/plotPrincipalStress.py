@@ -28,7 +28,7 @@ plt.rcParams['axes.titlesize'] = 22
 # Add subplot annotation
 ####################################################################################################################
 def addAnnotation(subplot,n = 1):
-	subplot.text(-0.1,1.1,string.ascii_lowercase[n],transform = ax.transAxes,size = 20, weight = 'bold')
+	subplot.text(-0.1,1.1,string.ascii_lowercase[n],transform = subplot.transAxes,size = 20, weight = 'bold')
 	return
 ####################################################################################################################
 # Calculating the max time step for target surface area
@@ -281,7 +281,7 @@ fastkappaOption = args.fastkappa
 large  = args.Large
 stepsize = 10
 maxarea = args.maxarea
-startarea = 680
+startarea = None
 endarea = 850
 # For surpressing err
 class NullDevice():
@@ -344,7 +344,8 @@ ax6 = fig.add_subplot(326)
 
 ax8 = fig2.add_subplot(121)
 ax7 = fig2.add_subplot(122)
-
+addAnnotation(ax8, 0)
+addAnnotation(ax7, 1)
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
