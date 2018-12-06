@@ -388,8 +388,7 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 		os.chdir(folder)
 		########################################################
 		growthRatio[fkcurrent] = getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,
-			endStep = endStep,startStep = startStep,startarea = startarea,
-			endarea = endarea)
+			endStep = endStep,startStep = startStep)
 		#print sys.getsizeof(plotData)
 		os.chdir("..")
 		gc.collect()
@@ -431,7 +430,9 @@ for folder in listdir:
 	#print "\n",os.getcwd()
 	plotData[etacurrent] = plotPrincipalStress(numOfLayer, targetid,endStep,etacurrent, 
 	meanstressplot=ax1, 
-	color = etacolor,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20)
+	color = etacolor,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20,
+	startarea = startarea,
+	endarea = endarea)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
