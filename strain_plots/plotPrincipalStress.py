@@ -279,8 +279,8 @@ fastkappaOption = args.fastkappa
 large  = args.Large
 stepsize = 10
 maxarea = args.maxarea
-startarea = 680.
-endarea = 850.
+startarea = 680
+endarea = 850
 # For surpressing err
 class NullDevice():
 	def write(self, s):
