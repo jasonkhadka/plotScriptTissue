@@ -151,7 +151,7 @@ def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
 def plotPrincipalStress(numOfLayer, targetid,endStep,eta, 
 	meanstressplot, 
 	color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20,
-	startarea = 680,
+	startarea = None,
 	endarea = 850):
 	import numpy as np
 	import matplotlib.pyplot as plt
@@ -173,6 +173,8 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	meanstressEigenvalue2Array = []
 	heightArray = []
 	primordialAreaArray = []
+	if not startarea:#no startarea given
+		startarea = initialTissueSurfaceArea
 	for steparea in range(startarea, endarea, int(areastep)):
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
@@ -474,6 +476,7 @@ scalarMap._A = []
 #clrbar = plt.colorbar(scalarMap, ax=ax1,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
 #clrbar1 = plt.colorbar(scalarMap, ax=ax7,shrink = 0.9,aspect = 8,ticks=np.linspace(minvalue, maxvalue, 4).astype('int'))#,orientation='horizontal',cax = cbar_ax)
 
+
 ################################################################################
 axpos1 = ax1.get_position()
 axpos7 = ax7.get_position()
@@ -493,8 +496,13 @@ cbar_ax1 = fig.add_axes(clrbarpos1)
 clrbar = plt.colorbar(scalarMap,cax = cbar_ax1,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 ################################################################################
-ax7.set_xticks(np.linspace(startarea,endarea,3))
-ax8.set_xticks(np.linspace(startarea,endarea,3))
+minarea = min(plotData.values()[0][0])
+if startarea:#start area != none
+	ax7.set_xticks(np.linspace(startarea,endarea,3))
+	ax8.set_xticks(np.linspace(startarea,endarea,3))
+else:
+	ax7.set_xticks(np.linspace(minarea,endarea,3))
+	ax8.set_xticks(np.linspace(minarea,endarea,3))
 ################################################################################
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
