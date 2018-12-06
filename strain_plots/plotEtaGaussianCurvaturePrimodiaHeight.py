@@ -17,12 +17,11 @@ import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 14
-plt.rcParams['ytick.labelsize'] = 14
-plt.rcParams['axes.labelsize'] = 14
-plt.rcParams['legend.fontsize'] =14
-plt.rcParams['axes.titlesize'] = 14.
-
+plt.rcParams['xtick.labelsize'] = 18.
+plt.rcParams['ytick.labelsize'] = 18.
+plt.rcParams['axes.labelsize'] = 18
+plt.rcParams['legend.fontsize'] = 18
+plt.rcParams['axes.titlesize'] = 18
 
 def getEdge(cell, vert1id, vert2id):
 	vertices = qd.CellVertexIterator(cell)

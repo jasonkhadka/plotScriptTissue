@@ -644,7 +644,7 @@ def getDifference(lambda1, lambda2):
 	return (lambdamax-lambdamin)#/(lambdamax+lambdamin)
 ################################################################
 def plotAbsAnisotropyStress(cell, numOfLayer,step = None, alpha = 0.8, Length=1.0,save=False,azim = -60, elev=50,
-                      colormap = 'magma'):
+					  colormap = 'magma'):
 	import matplotlib.colors as colors
 	import matplotlib.cm as cmx
 	#import the libraries
@@ -918,9 +918,10 @@ def plotFaceArea(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0,save = F
 	 fig = plt.figure(frameon=False,figsize=(10,10))
 	 fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
 	 ax = Axes3D(fig)
-	 ax.set_xlim((-0.5*radius,0.9*radius))
-	 ax.set_ylim((-0.5*radius,0.9*radius))
-	 ax.set_zlim((-0.5*radius,1.*radius))
+	 xlim = 0.5
+	 ax.set_xlim((-xlim*radius,xlim*radius))
+	 ax.set_ylim((-xlim*radius,xlim*radius))
+	 ax.set_zlim((-0.3*radius,0.7*radius))
 	 ax.axis('off')
 	 ax.xaxis.pane.set_edgecolor('black')
 	 ax.yaxis.pane.set_edgecolor('black')

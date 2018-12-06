@@ -17,12 +17,19 @@ sys.path.append('/home/jkhadka/transferdata/scripts/plotscript/')
 import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
+import string
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 18.
-plt.rcParams['ytick.labelsize'] = 18.
-plt.rcParams['axes.labelsize'] = 18
-plt.rcParams['legend.fontsize'] = 18
-plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['xtick.labelsize'] = 22
+plt.rcParams['ytick.labelsize'] = 22
+plt.rcParams['axes.labelsize'] = 22
+plt.rcParams['legend.fontsize'] = 22
+plt.rcParams['axes.titlesize'] = 22
+####################################################################################################################
+# Add subplot annotation
+####################################################################################################################
+def addAnnotation(subplot,n = 1):
+	subplot.text(-0.1,1.1,string.ascii_lowercase[n],transform = ax.transAxes,size = 20, weight = 'bold')
+	return
 ####################################################################################################################
 # Calculating the max time step for target surface area
 ####################################################################################################################
@@ -163,6 +170,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	meanstressEigenvalue1Array = []
 	meanstressEigenvalue2Array = []
 	heightArray = []
+	primordialAreaArray = []
 	for steparea in range(680, 850, int(areastep)):
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
@@ -184,7 +192,11 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		########################################################################
 		faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
 		height = getPrimordiaHeight(cell,targetid)
-
+		###############################################
+		primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
+		primordiaarea = 0.
+		for face in primordiafacelist:
+			primordiaarea += face.getAreaOfFace()
 		######################################################
 		#radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
 		######################################################
@@ -202,11 +214,14 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		######################################################
 		meanstressEigenvalue1Array.append(np.mean(stressEigenvalue1Array))
 		meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
+		primordialAreaArray.append(primordiaarea)
 		########################################################################
 		laststep = step
 		########################################################################
 	return [tissueSurfaceAreaArray,meanstressEigenvalue1Array, meanstressEigenvalue2Array, 
-			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array), np.subtract(meanstressEigenvalue2Array, meanstressEigenvalue1Array), heightArray]
+			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array), 
+			np.subtract(meanstressEigenvalue2Array,meanstressEigenvalue1Array),
+			heightArray,primordialAreaArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -312,8 +327,7 @@ cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
 fig = plt.figure(figsize=(10,15))
-
-fig2 = plt.figure(figsize=(5,5))
+fig2 = plt.figure(figsize=(11,5))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 ax1 = fig.add_subplot(321)
 ax2 = fig.add_subplot(322)
@@ -322,7 +336,8 @@ ax4 = fig.add_subplot(324)
 ax5 = fig.add_subplot(325)
 ax6 = fig.add_subplot(326)
 
-ax7 = fig2.add_subplot(111)
+ax7 = fig2.add_subplot(121)
+ax8 = fig2.add_subplot(122)
 
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
@@ -428,7 +443,9 @@ for key,data in plotData.iteritems():
 	ax4.plot(data[0], data[4],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax5.plot(data[5], data[3],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax6.plot(data[0], data[5],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	##################################
 	ax7.plot(data[0], data[5],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax8.plot(data[0], data[6],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	#ortho Stress
 	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
@@ -452,14 +469,16 @@ axpos1 = ax1.get_position()
 axpos7 = ax7.get_position()
 ################################################################################
 #print axpos
+fig.subplots_adjust(right=0.8)
 fig.tight_layout(rect=[0.,0.,.9,.9])
-fig2.tight_layout(rect=[0.,0.,.9,.9])
+#fig2.tight_layout(rect=[0.,0.,.9,.9])
+cbar_ax7 = fig.add_axes([0.85, 0.15, 0.05, 0.7])
 ################################################################################
 clrbarpos1 = [axpos1.x0+axpos1.width,axpos1.y0,0.04,axpos1.height]
-clrbarpos7 = [axpos7.x0+axpos7.width,axpos7.y0,0.04,axpos7.height]
+#clrbarpos7 = [axpos7.x0+axpos7.width,axpos7.y0,0.04,axpos7.height]
 ################################################################################
 cbar_ax1 = fig.add_axes(clrbarpos1)
-cbar_ax7 = fig2.add_axes(clrbarpos7)
+#cbar_ax7 = fig2.add_axes(clrbarpos7)
 ################################################################################
 clrbar = plt.colorbar(scalarMap,cax = cbar_ax1,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
