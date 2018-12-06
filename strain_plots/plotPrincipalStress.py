@@ -336,8 +336,8 @@ ax4 = fig.add_subplot(324)
 ax5 = fig.add_subplot(325)
 ax6 = fig.add_subplot(326)
 
-ax7 = fig2.add_subplot(121)
-ax8 = fig2.add_subplot(122)
+ax8 = fig2.add_subplot(121)
+ax7 = fig2.add_subplot(122)
 
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
@@ -364,6 +364,9 @@ ax5.set_ylabel(r"Principal Stresses, $\sigma_1+\sigma_2$")
 ax6.set_xlabel(r"Surface Area, $A_T$")
 ax6.set_ylabel(r"Primordial height, $h$")
 
+
+ax8.set_xlabel(r"Surface Area, $A_T$")
+ax8.set_ylabel(r"Primordial Area, $A_P$")
 
 ax7.set_xlabel(r"Surface Area, $A_T$")
 ax7.set_ylabel(r"Primordial height, $h$")
@@ -469,11 +472,11 @@ axpos1 = ax1.get_position()
 axpos7 = ax7.get_position()
 ################################################################################
 #print axpos
-fig.subplots_adjust(right=0.8)
-fig.tight_layout(rect=[0.,0.,.9,.9])
+fig2.subplots_adjust(right=0.9)
+fig2.tight_layout(rect=[0.,0.,.9,.9])
 #fig2.tight_layout(rect=[0.,0.,.9,.9])
-cbar_ax7 = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-################################################################################
+cbar_ax7 = fig2.add_axes([0.9, 0.15, 0.03, 0.7])
+clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbarpos1 = [axpos1.x0+axpos1.width,axpos1.y0,0.04,axpos1.height]
 #clrbarpos7 = [axpos7.x0+axpos7.width,axpos7.y0,0.04,axpos7.height]
 ################################################################################
