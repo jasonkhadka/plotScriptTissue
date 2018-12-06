@@ -150,7 +150,9 @@ def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
 ####################################################################################################################
 def plotPrincipalStress(numOfLayer, targetid,endStep,eta, 
 	meanstressplot, 
-	color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
+	color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20,
+	startarea = 680,
+	endarea = 850):
 	import numpy as np
 	import matplotlib.pyplot as plt
 	import os
@@ -171,7 +173,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	meanstressEigenvalue2Array = []
 	heightArray = []
 	primordialAreaArray = []
-	for steparea in range(680, 850, int(areastep)):
+	for steparea in range(startarea, endarea, int(areastep)):
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
@@ -277,6 +279,8 @@ fastkappaOption = args.fastkappa
 large  = args.Large
 stepsize = 10
 maxarea = args.maxarea
+startarea = 680.
+endarea = 850.
 # For surpressing err
 class NullDevice():
 	def write(self, s):
@@ -383,7 +387,9 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 		########################################################
 		os.chdir(folder)
 		########################################################
-		growthRatio[fkcurrent] = getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,startStep = startStep)
+		growthRatio[fkcurrent] = getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,
+			endStep = endStep,startStep = startStep,startarea = startarea,
+			endarea = endarea)
 		#print sys.getsizeof(plotData)
 		os.chdir("..")
 		gc.collect()
@@ -447,8 +453,8 @@ for key,data in plotData.iteritems():
 	ax5.plot(data[5], data[3],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	ax6.plot(data[0], data[5],"-." ,label=r"$\sigma$",c=color,**plotargs)
 	##################################
-	ax7.plot(data[0], data[5],"-." ,label=r"$\sigma$",c=color,**plotargs)
-	ax8.plot(data[0], data[6],"-." ,label=r"$\sigma$",c=color,**plotargs)
+	ax7.plot(data[0], data[5] ,label=r"$\sigma$",c=color,**plotargs)
+	ax8.plot(data[0], data[6],"--" ,label=r"$\sigma$",c=color,**plotargs)
 	#ortho Stress
 	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
@@ -485,6 +491,9 @@ cbar_ax1 = fig.add_axes(clrbarpos1)
 ################################################################################
 clrbar = plt.colorbar(scalarMap,cax = cbar_ax1,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+################################################################################
+ax7.set_xticks(np.linspace(startarea,endarea,3))
+ax8.set_xticks(np.linspace(startarea,endarea,3))
 ################################################################################
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
