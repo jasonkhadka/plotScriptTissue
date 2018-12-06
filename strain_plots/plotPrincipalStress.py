@@ -482,7 +482,7 @@ axpos7 = ax7.get_position()
 fig2.subplots_adjust(right=0.9)
 fig2.tight_layout(rect=[0.,0.,.9,.9])
 #fig2.tight_layout(rect=[0.,0.,.9,.9])
-cbar_ax7 = fig2.add_axes([0.9, 0.15, 0.03, 0.7])
+cbar_ax7 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbarpos1 = [axpos1.x0+axpos1.width,axpos1.y0,0.04,axpos1.height]
 #clrbarpos7 = [axpos7.x0+axpos7.width,axpos7.y0,0.04,axpos7.height]
