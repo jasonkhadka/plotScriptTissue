@@ -459,9 +459,9 @@ scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
 fig = plt.figure(figsize=(15,20))
 ##########################
-fig2 = plt1.figure(figsize=(5.5,5))#mean growth plots RO
-fig3 = plt1.figure(figsize=(5.5,5))#mean growth plots 12
-fig4 = plt1.figure(figsize=(5.5,5))#boundary area over Tissue area
+fig2 = plt.figure(2,figsize=(5.5,5))#mean growth plots RO
+fig3 = plt.figure(3,figsize=(5.5,5))#mean growth plots 12
+fig4 = plt.figure(4,figsize=(5.5,5))#boundary area over Tissue area
 ##########################
 meangrowthROplot = fig2.add_subplot(111)
 meangrowthROplot.set_xlabel(r"Surface Area, $A_T$")
