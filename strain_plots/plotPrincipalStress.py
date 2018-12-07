@@ -526,17 +526,16 @@ fig2.subplots_adjust(right=0.9)
 fig2.tight_layout(rect=[0.,0.,.9,.9])
 
 fig3.subplots_adjust(right=0.9)
-fig3.tight_layout(rect=[0.,0.,.9,.9])
-
-
 fig4.subplots_adjust(right=0.9)
-fig4.tight_layout(rect=[0.,0.,.9,.9])
 
 #fig2.tight_layout(rect=[0.,0.,.9,.9])
 cbar_ax7 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
 
 stressplotax = fig3.add_axes([0.85, 0.15, 0.04, 0.7])
 stressplotax1 = fig4.add_axes([0.85, 0.15, 0.04, 0.7])
+
+fig3.tight_layout(rect=[0.,0.,.9,.9])
+fig4.tight_layout(rect=[0.,0.,.9,.9])
 
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbarpos1 = [axpos1.x0+axpos1.width,axpos1.y0,0.04,axpos1.height]
