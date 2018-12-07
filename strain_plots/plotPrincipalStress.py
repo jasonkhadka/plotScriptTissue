@@ -28,7 +28,7 @@ plt.rcParams['axes.titlesize'] = 22
 # Add subplot annotation
 ####################################################################################################################
 def addAnnotation(subplot,n = 1):
-	subplot.text(-0.1,1.0,string.ascii_lowercase[n],transform = subplot.transAxes,size = 24, weight = 'bold')
+	subplot.text(-0.1,1.05,string.ascii_lowercase[n],transform = subplot.transAxes,size = 26, weight = 'bold')
 	return
 ####################################################################################################################
 # Calculating the max time step for target surface area
@@ -512,12 +512,17 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 
 else:
 	clrbar.set_label(r"Mechanical Feedback, $\eta$")
+	clrbar1.set_label(r"Mechanical Feedback, $\eta$")
 
 
 fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(targetid),transparent = True, bbox_inches="tight")
-fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.png"%(targetid),transparent = True, bbox_inches="tight")
-fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
 
+if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
+	fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.png"%(targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
+else:
+	fig2.savefig(saveDirectory+r"/plot_eta_primordialGrowth_targetid=%d.png"%(targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_eta_primordialGrowth_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
 
 
 #fig1.savefig(saveDirectory+r"/plot_eta_vs_curvature_height_areaPrimodia_%d.png"%endStep,transparent = True)
