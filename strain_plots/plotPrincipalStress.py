@@ -34,65 +34,65 @@ def addAnnotation(subplot,n = 1):
 # Calculating the max time step for target surface area
 ####################################################################################################################
 def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
-    ####################################################
-    for step in range(startStep, endStep+1,stepsize):
-        if not os.path.isfile("qdObject_step=%03d.obj"%step):
-            return endStep,0.
-        ################################################
-        cell = sf.loadCellFromFile(step)
-        ################################################
-        tissueSurfaceArea = sf.getSurfaceArea(cell)
-        if (tissueSurfaceArea > targetArea):
-            gc.collect()
-            for calstep in range(step-1,step-stepsize-1,-1):
-                    cell = sf.loadCellFromFile(calstep)
-                    tissueSurfaceArea = sf.getSurfaceArea(cell)
-                    if (tissueSurfaceArea <= targetArea):
-                        gc.collect()
-                        cell = sf.loadCellFromFile(calstep+1)
-                        tissueSurfaceArea = sf.getSurfaceArea(cell)
-                        return calstep+1,tissueSurfaceArea
-        ################################################
-        gc.collect()
-    return endStep,tissueSurfaceArea
+	####################################################
+	for step in range(startStep, endStep+1,stepsize):
+		if not os.path.isfile("qdObject_step=%03d.obj"%step):
+			return endStep,0.
+		################################################
+		cell = sf.loadCellFromFile(step)
+		################################################
+		tissueSurfaceArea = sf.getSurfaceArea(cell)
+		if (tissueSurfaceArea > targetArea):
+			gc.collect()
+			for calstep in range(step-1,step-stepsize-1,-1):
+					cell = sf.loadCellFromFile(calstep)
+					tissueSurfaceArea = sf.getSurfaceArea(cell)
+					if (tissueSurfaceArea <= targetArea):
+						gc.collect()
+						cell = sf.loadCellFromFile(calstep+1)
+						tissueSurfaceArea = sf.getSurfaceArea(cell)
+						return calstep+1,tissueSurfaceArea
+		################################################
+		gc.collect()
+	return endStep,tissueSurfaceArea
 ###############################################################################################################
 # Calculate primordia height
 ###############################################################################################################
 def getPrimordiaHeight(cell, targetid):
-    ###################################################################
-    def addMeanVertex(vertex,meanx,meany,meanz):
-        meanx += vertex.getXcoordinate()
-        meany += vertex.getYcoordinate()
-        meanz += vertex.getZcoordinate()
-        return meanx,meany,meanz
-    ########################################################################
-    # Getting the primordial boundary
-    ########################################################################
-    facetarget = sf.getFace(cell, targetid)
-    ##########################################
-    # Vertex on primordial boundary
-    ##########################################
-    vertexList = sf.getPrimordiaBoundaryVertexList(cell, targetid)
-    vertexNum = len(vertexList)
-    ####################################################
-    # Calculation of primordial height starts here
-    # This is for smaller primordia
-    ####################################################
-    meanx = 0.
-    meany = 0.
-    meanz = 0.
-    for vert in vertexList:#while edge.Dest().getID() != targetedge.Dest().getID():
-        meanx,meany,meanz = addMeanVertex(vert,meanx,meany,meanz)
-    ######################################
-    targetx = facetarget.getXCentralised()
-    targety = facetarget.getYCentralised()
-    targetz = facetarget.getZCentralised()
-    meanx /= vertexNum
-    meany /= vertexNum
-    meanz /= vertexNum
-    height = np.sqrt((meanx-targetx)**2+(meany-targety)**2+(meanz-targetz)**2)
-    ######################################
-    return height
+	###################################################################
+	def addMeanVertex(vertex,meanx,meany,meanz):
+		meanx += vertex.getXcoordinate()
+		meany += vertex.getYcoordinate()
+		meanz += vertex.getZcoordinate()
+		return meanx,meany,meanz
+	########################################################################
+	# Getting the primordial boundary
+	########################################################################
+	facetarget = sf.getFace(cell, targetid)
+	##########################################
+	# Vertex on primordial boundary
+	##########################################
+	vertexList = sf.getPrimordiaBoundaryVertexList(cell, targetid)
+	vertexNum = len(vertexList)
+	####################################################
+	# Calculation of primordial height starts here
+	# This is for smaller primordia
+	####################################################
+	meanx = 0.
+	meany = 0.
+	meanz = 0.
+	for vert in vertexList:#while edge.Dest().getID() != targetedge.Dest().getID():
+		meanx,meany,meanz = addMeanVertex(vert,meanx,meany,meanz)
+	######################################
+	targetx = facetarget.getXCentralised()
+	targety = facetarget.getYCentralised()
+	targetz = facetarget.getZCentralised()
+	meanx /= vertexNum
+	meany /= vertexNum
+	meanz /= vertexNum
+	height = np.sqrt((meanx-targetx)**2+(meany-targety)**2+(meanz-targetz)**2)
+	######################################
+	return height
 ####################################################################################################################
 # fit function
 ####################################################################################################################
@@ -174,7 +174,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	heightArray = []
 	primordialAreaArray = []
 	radialStressArray = []
-    orthoradialStressArray = []
+	orthoradialStressArray = []
 	if not startarea:#no startarea given
 		startarea = int(initialTissueSurfaceArea)
 	for steparea in range(startarea, endarea, int(areastep)):
@@ -209,14 +209,14 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		stressEigenvalue1Array = []
 		stressEigenvalue2Array = []
 		radialStress = []
-        orthoradialStress = []
+		orthoradialStress = []
 		for face in faceList:
 			radstress = face.getRadialStress()
-    		orthstress = face.getOrthoradialStress()
+			orthstress = face.getOrthoradialStress()
 			stresseigenvalue1 = face.getStressEigenValue1()
 			stresseigenvalue2 = face.getStressEigenValue2()
 			radialStress.append(radstress)
-            orthoradialStress.append(orthstress)
+			orthoradialStress.append(orthstress)
 			#######################################################
 			stressEigenvalue1Array.append(stresseigenvalue1)
 			stressEigenvalue2Array.append(stresseigenvalue2)
@@ -235,7 +235,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	return [tissueSurfaceAreaArray,meanstressEigenvalue1Array, meanstressEigenvalue2Array, 
 			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array), 
 			np.subtract(meanstressEigenvalue2Array,meanstressEigenvalue1Array),
-			heightArray,primordialAreaArray,radialstressArray,orthoradialStressArray]
+			heightArray,primordialAreaArray,radialStressArray,orthoradialStressArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -349,6 +349,7 @@ fig = plt.figure(figsize=(10,15))
 fig2 = plt.figure(figsize=(11,5))
 
 fig3 = plt.figure(figsize=(5.5,5))
+fig4 = plt.figure(figsize=(5.5,5))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 ax1 = fig.add_subplot(321)
 ax2 = fig.add_subplot(322)
@@ -363,7 +364,8 @@ addAnnotation(ax8, 0)
 addAnnotation(ax7, 1)
 
 
-stressplot = fig2.add_subplot(111)
+stressplot = fig3.add_subplot(111)
+stressplot1 = fig3.add_subplot(111)
 
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
@@ -400,6 +402,9 @@ ax7.set_ylabel(r"Primordial height, $h$")
 
 stressplot.set_xlabel(r'Surface Area, $A_T$')
 stressplot.set_ylabel(r'Principal Stresses')
+
+stressplot1.set_xlabel(r'Surface Area, $A_T$')
+stressplot1.set_ylabel(r'Principal Stresses')
 
 
 ########################################################
@@ -486,6 +491,9 @@ for key,data in plotData.iteritems():
 	##################################
 	stressplot.plot(data[0], data[7],'-.',label=r'$\sigma_r',c = color, **plotargs)
 	stressplot.plot(data[0], data[8],label=r'$\sigma_o',c = color, **plotargs)
+	##################################
+	stressplot1.plot(data[0], data[1],'-.',label=r'$\sigma_1',c = color, **plotargs)
+	stressplot1.plot(data[0], data[2],label=r'$\sigma_2',c = color, **plotargs)
 	#ortho Stress
 	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
@@ -495,6 +503,10 @@ from matplotlib.lines import Line2D
 legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{r}$",**plotargs),
 				   Line2D([0], [0],  color='k', label=r"$\sigma_{o}$",**plotargs)]
 stressplot.legend(handles = legend_elements)
+
+legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{1}$",**plotargs),
+				   Line2D([0], [0],  color='k', label=r"$\sigma_{2}$",**plotargs)]
+stressplot1.legend(handles = legend_elements)
 
 ###############################################################################
 #color bar fig
@@ -517,10 +529,14 @@ fig3.subplots_adjust(right=0.9)
 fig3.tight_layout(rect=[0.,0.,.9,.9])
 
 
+fig4.subplots_adjust(right=0.9)
+fig4.tight_layout(rect=[0.,0.,.9,.9])
+
 #fig2.tight_layout(rect=[0.,0.,.9,.9])
 cbar_ax7 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
 
 stressplotax = fig3.add_axes([0.85, 0.15, 0.04, 0.7])
+stressplotax1 = fig4.add_axes([0.85, 0.15, 0.04, 0.7])
 
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbarpos1 = [axpos1.x0+axpos1.width,axpos1.y0,0.04,axpos1.height]
@@ -532,6 +548,7 @@ cbar_ax1 = fig.add_axes(clrbarpos1)
 clrbar = plt.colorbar(scalarMap,cax = cbar_ax1,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 stressplotclrbar = plt.colorbar(scalarMap,cax = stressplotax,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+stressplotclrbar1 = plt.colorbar(scalarMap,cax = stressplotax1,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 
 ################################################################################
 minarea = min(plotData.values()[0][0])
@@ -539,21 +556,25 @@ if startarea:#start area != none
 	ax7.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	ax8.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	stressplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+	stressplot1.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 else:
 	ax7.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	ax8.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	stressplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+	stressplot1.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 ################################################################################
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Growth ratio, $r_g$")
 	clrbar1.set_label(r"Growth ratio, $r_g$")
 	stressplotclrbar.set_label(r"Growth ratio, $r_g$")
+	stressplotclrbar1.set_label(r"Growth ratio, $r_g$")
 
 else:
 	clrbar.set_label(r"Mechanical Feedback, $\eta$")
 	clrbar1.set_label(r"Mechanical Feedback, $\eta$")
 	stressplotclrbar.set_label(r"Mechanical Feedback, $\eta$")
+	stressplotclrbar1.set_label(r"Mechanical Feedback, $\eta$")
 
 
 
@@ -563,10 +584,12 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 	fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.png"%(targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
 	fig3.savefig(saveDirectory+r"/plot_growthRatio_rostresses_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
+	fig4.savefig(saveDirectory+r"/plot_growthRatio_12stresses_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
 else:
 	fig2.savefig(saveDirectory+r"/plot_eta%d_primordialGrowth_targetid=%d.png"%(maxeta,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_eta%d_primordialGrowth_targetid=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
 	fig3.savefig(saveDirectory+r"/plot_eta%d_rostresses_targetid=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
+	fig4.savefig(saveDirectory+r"/plot_eta%d_12stresses_targetid=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
 
 
 #fig1.savefig(saveDirectory+r"/plot_eta_vs_curvature_height_areaPrimodia_%d.png"%endStep,transparent = True)
