@@ -365,7 +365,7 @@ addAnnotation(ax7, 1)
 
 
 stressplot = fig3.add_subplot(111)
-stressplot1 = fig3.add_subplot(111)
+stressplot1 = fig4.add_subplot(111)
 
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
@@ -504,9 +504,9 @@ legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma
 				   Line2D([0], [0],  color='k', label=r"$\sigma_{o}$",**plotargs)]
 stressplot.legend(handles = legend_elements)
 
-legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{1}$",**plotargs),
+legend_elements1 = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{1}$",**plotargs),
 				   Line2D([0], [0],  color='k', label=r"$\sigma_{2}$",**plotargs)]
-stressplot1.legend(handles = legend_elements)
+stressplot1.legend(handles = legend_elements1)
 
 ###############################################################################
 #color bar fig
