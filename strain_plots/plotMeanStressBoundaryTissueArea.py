@@ -685,9 +685,17 @@ fig2.subplots_adjust(right=0.9)
 fig3.subplots_adjust(right=0.9)
 fig4.subplots_adjust(right=0.9)
 
+
+
+
 cbar_ax2 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
 cbar_ax3 = fig3.add_axes([0.91, 0.15, 0.025, 0.7])
 cbar_ax4 = fig4.add_axes([0.91, 0.15, 0.025, 0.7])
+
+
+fig2.tight_layout()
+fig3.tight_layout()
+fig4.tight_layout()
 
 
 clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
@@ -715,9 +723,7 @@ else:
 	boundaryareaplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 ################################################################################
 
-fig2.tight_layout()
-fig3.tight_layout()
-fig4.tight_layout()
+
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
