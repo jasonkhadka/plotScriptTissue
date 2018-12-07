@@ -686,8 +686,8 @@ fig3.subplots_adjust(right=0.9)
 fig4.subplots_adjust(right=0.9)
 
 cbar_ax2 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
-cbar_ax3 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
-cbar_ax4 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
+cbar_ax3 = fig3.add_axes([0.91, 0.15, 0.025, 0.7])
+cbar_ax4 = fig4.add_axes([0.91, 0.15, 0.025, 0.7])
 
 
 clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
@@ -719,41 +719,13 @@ fig2.tight_layout()
 fig3.tight_layout()
 fig4.tight_layout()
 
-
-"""##########################################################################################
-# Making the legend
-##########################################################################################
-from collections import OrderedDict
-handles, labels = ax1.get_legend_handles_labels()
-by_label = OrderedDict(zip(labels,handles))
-ax1.legend(by_label.values(),by_label.keys(),prop={'size': 14})
-
-
-handles, labels = ax2.get_legend_handles_labels()
-by_label = OrderedDict(zip(labels,handles))
-ax2.legend(by_label.values(),by_label.keys(),prop={'size': 14})
-"""
-"""###############################################################################
-#color bar fig1
-scalarMap._A = []
-fig1.subplots_adjust(bottom=0.2)
-cbar_ax = fig1.add_axes([0.15, 0.05, 0.7, 0.02])
-clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
-clrbar.set_label("$\eta$")
-###############################################################################
-#color bar fig2
-scalarMap._A = []
-fig2.subplots_adjust(bottom=0.2)
-cbar_ax = fig2.add_axes([0.15, 0.05, 0.7, 0.02])
-clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
-clrbar.set_label("$\eta$")"""
-#plt.tight_layout()
-#plt.tight_layout( rect=[0, 0, 1, 1])
-#fig.tight_layout(rect=[0.1,0.1,1.,0.9])
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
 else:
 	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowth_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
+	fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowth_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
+	fig4.savefig(saveDirectory+r"/plot_eta%d_boundaryarea_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
 
 
 
