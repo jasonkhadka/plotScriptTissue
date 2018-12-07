@@ -675,7 +675,7 @@ meangrowthROplot.legend(handles = legend_elements[2:4])
 ###############################################################################
 #color bar fig
 ###############################################################################
-plt.tight_layout()
+fig.tight_layout()
 scalarMap._A = []
 fig.subplots_adjust(bottom=0.2)
 cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])

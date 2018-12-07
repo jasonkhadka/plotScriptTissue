@@ -17,13 +17,11 @@ import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 14
-plt.rcParams['ytick.labelsize'] = 14
-plt.rcParams['axes.labelsize'] = 14
-plt.rcParams['legend.fontsize'] =14
-plt.rcParams['axes.titlesize'] = 14.
-
-
+plt.rcParams['xtick.labelsize'] = 22
+plt.rcParams['ytick.labelsize'] = 22
+plt.rcParams['axes.labelsize'] = 22
+plt.rcParams['legend.fontsize'] = 16
+plt.rcParams['axes.titlesize'] = 22
 ###############################################################################################################
 # Get 2 dictionaries one with radialDirection vectors for each face and 
 # another with orthoradialDirection vectors for each face
@@ -440,6 +438,12 @@ ax1 = fig.add_subplot(221)
 ax2 = fig.add_subplot(222)
 ax3 = fig.add_subplot(223)
 ax4 = fig.add_subplot(224)
+
+fig2 = plt.figure(2,figsize=(5.5,5))
+anisotropyplot = fig.add_subplot(111)
+anisotropyplot.set_xlabel(r"Stress ansiotropy, $\langle\sigma_2 - \sigma_1\rangle_c$")
+anisotropyplot.set_ylabel(r"Height growth rate, $\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
+
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
@@ -498,46 +502,30 @@ for folder in listdir:
 ###############################################################################
 #color bar fig
 ###############################################################################
-plt.tight_layout()
+fig.tight_layout()
 scalarMap._A = []
 fig.subplots_adjust(bottom=0.2)
 cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])
 clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
+
+fig2.subplots_adjust(right=0.9)
+
+cbar_ax2 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
+
+
+clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	clrbar.set_label(r"Fast Growth Rate")
+    clrbar.set_label(r"Fast Growth Rate")
 else:
-	clrbar.set_label(r"$\eta$")
+    clrbar.set_label(r"Mechanical Feedback, $\eta$")
+    clrbar2.set_label(r"Mechanical Feedback, $\eta$")
 
-"""##########################################################################################
-# Making the legend
-##########################################################################################
-from collections import OrderedDict
-handles, labels = ax1.get_legend_handles_labels()
-by_label = OrderedDict(zip(labels,handles))
-ax1.legend(by_label.values(),by_label.keys(),prop={'size': 14})
+################################################################################
+
+fig2.tight_layout()
 
 
-handles, labels = ax2.get_legend_handles_labels()
-by_label = OrderedDict(zip(labels,handles))
-ax2.legend(by_label.values(),by_label.keys(),prop={'size': 14})
-"""
-"""###############################################################################
-#color bar fig1
-scalarMap._A = []
-fig1.subplots_adjust(bottom=0.2)
-cbar_ax = fig1.add_axes([0.15, 0.05, 0.7, 0.02])
-clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
-clrbar.set_label("$\eta$")
-###############################################################################
-#color bar fig2
-scalarMap._A = []
-fig2.subplots_adjust(bottom=0.2)
-cbar_ax = fig2.add_axes([0.15, 0.05, 0.7, 0.02])
-clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
-clrbar.set_label("$\eta$")"""
-#plt.tight_layout()
-#plt.tight_layout( rect=[0, 0, 1, 1])
-#fig.tight_layout(rect=[0.1,0.1,1.,0.9])
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
 else:
