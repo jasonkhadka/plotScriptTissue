@@ -512,6 +512,8 @@ fig2.subplots_adjust(right=0.9)
 
 cbar_ax2 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
 
+fig2.tight_layout(rect=[0.,0.,.9,.9])
+
 
 clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 
@@ -523,7 +525,6 @@ else:
 
 ################################################################################
 
-fig2.tight_layout()
 
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta

@@ -534,7 +534,8 @@ cbar_ax7 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
 stressplotax = fig3.add_axes([0.85, 0.2, 0.04, 0.65])
 stressplotax1 = fig4.add_axes([0.85, 0.2, 0.04, 0.65])
 
-
+fig3.tight_layout(rect=[0.,0.,.9,.9])
+fig4.tight_layout(rect=[0.,0.,.9,.9])
 
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbarpos1 = [axpos1.x0+axpos1.width,axpos1.y0,0.04,axpos1.height]
@@ -574,8 +575,6 @@ else:
 	stressplotclrbar.set_label(r"Mechanical Feedback, $\eta$")
 	stressplotclrbar1.set_label(r"Mechanical Feedback, $\eta$")
 
-fig3.tight_layout()
-fig4.tight_layout()
 
 
 fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(targetid),transparent = True, bbox_inches="tight")

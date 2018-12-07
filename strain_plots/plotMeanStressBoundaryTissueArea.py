@@ -693,9 +693,10 @@ cbar_ax3 = fig3.add_axes([0.91, 0.15, 0.025, 0.7])
 cbar_ax4 = fig4.add_axes([0.91, 0.15, 0.025, 0.7])
 
 
-fig2.tight_layout()
-fig3.tight_layout()
-fig4.tight_layout()
+
+fig2.tight_layout(rect=[0.,0.,.9,.9])
+fig3.tight_layout(rect=[0.,0.,.9,.9])
+fig4.tight_layout(rect=[0.,0.,.9,.9])
 
 
 clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
