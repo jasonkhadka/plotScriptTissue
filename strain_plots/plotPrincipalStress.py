@@ -22,7 +22,7 @@ import string
 plt.rcParams['xtick.labelsize'] = 22
 plt.rcParams['ytick.labelsize'] = 22
 plt.rcParams['axes.labelsize'] = 22
-plt.rcParams['legend.fontsize'] = 22
+plt.rcParams['legend.fontsize'] = 16
 plt.rcParams['axes.titlesize'] = 22
 ####################################################################################################################
 # Add subplot annotation
@@ -502,7 +502,7 @@ for key,data in plotData.iteritems():
 from matplotlib.lines import Line2D
 legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{r}$",**plotargs),
 				   Line2D([0], [0],  color='k', label=r"$\sigma_{o}$",**plotargs)]
-stressplot.legend(handles = legend_elements)
+stressplot.legend(handles = legend_elements,)
 
 legend_elements1 = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{1}$",**plotargs),
 				   Line2D([0], [0],  color='k', label=r"$\sigma_{2}$",**plotargs)]
@@ -531,8 +531,8 @@ fig4.subplots_adjust(right=0.9)
 #fig2.tight_layout(rect=[0.,0.,.9,.9])
 cbar_ax7 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
 
-stressplotax = fig3.add_axes([0.85, 0.15, 0.04, 0.7])
-stressplotax1 = fig4.add_axes([0.85, 0.15, 0.04, 0.7])
+stressplotax = fig3.add_axes([0.85, 0.2, 0.04, 0.65])
+stressplotax1 = fig4.add_axes([0.85, 0.2, 0.04, 0.65])
 
 fig3.tight_layout(rect=[0.,0.,.9,.9])
 fig4.tight_layout(rect=[0.,0.,.9,.9])
