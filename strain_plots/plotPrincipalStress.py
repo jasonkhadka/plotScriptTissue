@@ -173,6 +173,8 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	meanstressEigenvalue2Array = []
 	heightArray = []
 	primordialAreaArray = []
+	radialStressArray = []
+    orthoradialStressArray = []
 	if not startarea:#no startarea given
 		startarea = int(initialTissueSurfaceArea)
 	for steparea in range(startarea, endarea, int(areastep)):
@@ -206,9 +208,15 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		######################################################
 		stressEigenvalue1Array = []
 		stressEigenvalue2Array = []
+		radialStress = []
+        orthoradialStress = []
 		for face in faceList:
+			radstress = face.getRadialStress()
+    		orthstress = face.getOrthoradialStress()
 			stresseigenvalue1 = face.getStressEigenValue1()
 			stresseigenvalue2 = face.getStressEigenValue2()
+			radialStress.append(radstress)
+            orthoradialStress.append(orthstress)
 			#######################################################
 			stressEigenvalue1Array.append(stresseigenvalue1)
 			stressEigenvalue2Array.append(stresseigenvalue2)
@@ -218,6 +226,8 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 		######################################################
 		meanstressEigenvalue1Array.append(np.mean(stressEigenvalue1Array))
 		meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
+		radialStressArray.append(np.mean(radialStress))
+		orthoradialStressArray.append(np.mean(orthoradialStress))
 		primordialAreaArray.append(primordiaarea)
 		########################################################################
 		laststep = step
@@ -225,7 +235,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 	return [tissueSurfaceAreaArray,meanstressEigenvalue1Array, meanstressEigenvalue2Array, 
 			np.add(meanstressEigenvalue1Array, meanstressEigenvalue2Array), 
 			np.subtract(meanstressEigenvalue2Array,meanstressEigenvalue1Array),
-			heightArray,primordialAreaArray]
+			heightArray,primordialAreaArray,radialstressArray,orthoradialStressArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -337,6 +347,8 @@ scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
 fig = plt.figure(figsize=(10,15))
 fig2 = plt.figure(figsize=(11,5))
+
+fig3 = plt.figure(figsize=(5.5,5))
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 ax1 = fig.add_subplot(321)
 ax2 = fig.add_subplot(322)
@@ -349,6 +361,10 @@ ax8 = fig2.add_subplot(121)
 ax7 = fig2.add_subplot(122)
 addAnnotation(ax8, 0)
 addAnnotation(ax7, 1)
+
+
+stressplot = fig2.add_subplot(111)
+
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
@@ -380,6 +396,11 @@ ax8.set_ylabel(r"Primordial Area, $A_P$")
 
 ax7.set_xlabel(r"Surface Area, $A_T$")
 ax7.set_ylabel(r"Primordial height, $h$")
+
+
+stressplot.set_xlabel(r'Surface Area, $A_T$')
+stressplot.set_ylabel(r'Principal Stresses')
+
 
 ########################################################
 growthRatio = {}
@@ -462,15 +483,18 @@ for key,data in plotData.iteritems():
 	##################################
 	ax7.plot(data[0], data[5] ,label=r"$\sigma$",c=color,**plotargs)
 	ax8.plot(data[0], data[6],"--" ,label=r"$\sigma$",c=color,**plotargs)
+	##################################
+	stressplot.plot(data[0], data[7],'-.',label=r'$\sigma_r',c = color, **plotargs)
+	stressplot.plot(data[0], data[8],label=r'$\sigma_o',c = color, **plotargs)
 	#ortho Stress
 	#ax1.plot(data[0], data[2], label=r"$\sigma_{2}$",c=color,**plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
-#from matplotlib.lines import Line2D
-#legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{1}$",**plotargs),
-#				   Line2D([0], [0],  color='k', label=r"$\sigma_{2}$",**plotargs)]
-#ax1.legend(handles = legend_elements)
+from matplotlib.lines import Line2D
+legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{r}$",**plotargs),
+				   Line2D([0], [0],  color='k', label=r"$\sigma_{o}$",**plotargs)]
+stressplot.legend(handles = legend_elements)
 
 ###############################################################################
 #color bar fig
@@ -488,8 +512,16 @@ axpos7 = ax7.get_position()
 #print axpos
 fig2.subplots_adjust(right=0.9)
 fig2.tight_layout(rect=[0.,0.,.9,.9])
+
+fig3.subplots_adjust(right=0.9)
+fig3.tight_layout(rect=[0.,0.,.9,.9])
+
+
 #fig2.tight_layout(rect=[0.,0.,.9,.9])
 cbar_ax7 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
+
+stressplotax = fig3.add_axes([0.85, 0.15, 0.04, 0.7])
+
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbarpos1 = [axpos1.x0+axpos1.width,axpos1.y0,0.04,axpos1.height]
 #clrbarpos7 = [axpos7.x0+axpos7.width,axpos7.y0,0.04,axpos7.height]
@@ -499,23 +531,30 @@ cbar_ax1 = fig.add_axes(clrbarpos1)
 ################################################################################
 clrbar = plt.colorbar(scalarMap,cax = cbar_ax1,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+stressplotclrbar = plt.colorbar(scalarMap,cax = stressplotax,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+
 ################################################################################
 minarea = min(plotData.values()[0][0])
 if startarea:#start area != none
 	ax7.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	ax8.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+	stressplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 else:
 	ax7.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	ax8.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+	stressplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 ################################################################################
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Growth ratio, $r_g$")
 	clrbar1.set_label(r"Growth ratio, $r_g$")
+	stressplotclrbar.set_label(r"Growth ratio, $r_g$")
 
 else:
 	clrbar.set_label(r"Mechanical Feedback, $\eta$")
 	clrbar1.set_label(r"Mechanical Feedback, $\eta$")
+	stressplotclrbar.set_label(r"Mechanical Feedback, $\eta$")
+
 
 
 fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(targetid),transparent = True, bbox_inches="tight")
@@ -523,9 +562,11 @@ fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(targetid),
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.png"%(targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
+	fig3.savefig(saveDirectory+r"/plot_growthRatio_rostresses_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
 else:
 	fig2.savefig(saveDirectory+r"/plot_eta%d_primordialGrowth_targetid=%d.png"%(maxeta,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_eta%d_primordialGrowth_targetid=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
+	fig3.savefig(saveDirectory+r"/plot_eta%d_rostresses_targetid=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
 
 
 #fig1.savefig(saveDirectory+r"/plot_eta_vs_curvature_height_areaPrimodia_%d.png"%endStep,transparent = True)
