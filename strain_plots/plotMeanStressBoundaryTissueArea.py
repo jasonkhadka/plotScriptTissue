@@ -17,334 +17,341 @@ import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 14
-plt.rcParams['ytick.labelsize'] = 14
-plt.rcParams['axes.labelsize'] = 14
-plt.rcParams['legend.fontsize'] =14
-plt.rcParams['axes.titlesize'] = 14.
-
+plt.rcParams['xtick.labelsize'] = 22
+plt.rcParams['ytick.labelsize'] = 22
+plt.rcParams['axes.labelsize'] = 22
+plt.rcParams['legend.fontsize'] = 16
+plt.rcParams['axes.titlesize'] = 22
 
 ###############################################################################################################
 # Get 2 dictionaries one with radialDirection vectors for each face and 
 # another with orthoradialDirection vectors for each face
 ###############################################################################################################
 def getRadialOrthoradialDict(cell,targetid, large = False):
-    primordiafacelist= sf.getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=large)
-    orthoradialDict = {}
-    radialDict = {}
-    targetface = sf.getFace(cell,targetid)
-    targetcentroid = np.array([targetface.getXCentralised(), targetface.getYCentralised(),targetface.getZCentralised()])
-    ############################################################
-    for listiter in range(len(primordiafacelist)):
-        facelist = primordiafacelist[listiter]
-        ########################################################
-        for count in range(len(facelist)):
-            face = facelist[count]
-            #nextface = facelist[(count+1)%len(facelist)]
-            normal = face.getNormal()
-            normalvec = np.array([qd.doublearray_getitem(normal,0),
-                            qd.doublearray_getitem(normal,1),
-                            qd.doublearray_getitem(normal,2)])
-            ########################################################
-            facecentroid = np.array([face.getXCentralised(), face.getYCentralised(),face.getZCentralised()])
-            #Calculating direction Vector to primordia centroid
-            direcvec = np.subtract(targetcentroid,facecentroid)
-            direcvec = direcvec/np.linalg.norm(direcvec)
-            #Radial Vec to on-plane unitvector
-            radialvec = direcvec - normalvec*(np.dot(direcvec,normalvec))
-            radialvec = radialvec/np.linalg.norm(radialvec)
-            ########################################################
-            crossvec = np.cross(radialvec,normalvec)
-            crossvec = crossvec/np.linalg.norm(crossvec)
-            orthoradialDict[face.getID()] = crossvec
-            radialDict[face.getID()]= radialvec
-    return radialDict,orthoradialDict
+	primordiafacelist= sf.getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=large)
+	orthoradialDict = {}
+	radialDict = {}
+	targetface = sf.getFace(cell,targetid)
+	targetcentroid = np.array([targetface.getXCentralised(), targetface.getYCentralised(),targetface.getZCentralised()])
+	############################################################
+	for listiter in range(len(primordiafacelist)):
+		facelist = primordiafacelist[listiter]
+		########################################################
+		for count in range(len(facelist)):
+			face = facelist[count]
+			#nextface = facelist[(count+1)%len(facelist)]
+			normal = face.getNormal()
+			normalvec = np.array([qd.doublearray_getitem(normal,0),
+							qd.doublearray_getitem(normal,1),
+							qd.doublearray_getitem(normal,2)])
+			########################################################
+			facecentroid = np.array([face.getXCentralised(), face.getYCentralised(),face.getZCentralised()])
+			#Calculating direction Vector to primordia centroid
+			direcvec = np.subtract(targetcentroid,facecentroid)
+			direcvec = direcvec/np.linalg.norm(direcvec)
+			#Radial Vec to on-plane unitvector
+			radialvec = direcvec - normalvec*(np.dot(direcvec,normalvec))
+			radialvec = radialvec/np.linalg.norm(radialvec)
+			########################################################
+			crossvec = np.cross(radialvec,normalvec)
+			crossvec = crossvec/np.linalg.norm(crossvec)
+			orthoradialDict[face.getID()] = crossvec
+			radialDict[face.getID()]= radialvec
+	return radialDict,orthoradialDict
 ###############################################################################################################
 # for a face, projecting its stress eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
 def getRadialOrthoradialStress(face, radialDict=None,orthoradialDict=None, vectors = False):
-    #eigenvec1 = face.getStressEigenVector1()
-    #eigenvec2 = face.getStressEigenVector2()
-    eigenvalue1 = face.getStressEigenValue1()
-    eigenvalue2 = face.getStressEigenValue2()
-    """
-    vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
-                    qd.doublearray_getitem(eigenvec1,1),
-                    qd.doublearray_getitem(eigenvec1,2)])
-    vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
-                    qd.doublearray_getitem(eigenvec2,1),
-                    qd.doublearray_getitem(eigenvec2,2)])
-    vec1 =eigenvalue1*vec1unit
-    vec2 = eigenvalue2*vec2unit
-    radialvec = np.copy(radialDict[face.getID()])
-    orthoradialvec = np.copy(orthoradialDict[face.getID()])
-    #print radialvec,orthoradialvec
-    ############################################
-    ########################################################################################
-    radsign1 = 1.#(np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
-    radsign2 = 1.#(np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
-    orthosign1 = 1.#(np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
-    orthosign2 = 1.#(np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
-    #print radsign1, radsign2, orthosign1, orthosign2
-    ########################################################################################
-    radialComp = eigenvalue1*np.dot(radialvec,vec1unit)*radsign1+eigenvalue2*np.dot(radialvec,vec2unit)*radsign2
-    orthoradialComp = #eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
-    #radialComp = np.dot(radialvec,vec1)+np.dot(radialvec,vec2)
-    #orthoradialComp = np.dot(orthoradialvec,vec1)+np.dot(orthoradialvec,vec2)
-    ############################################
-    if vectors:
-        radialvec = radialComp*radialvec
-        orthoradialvec = orthoradialComp*orthoradialvec
-        return radialvec, orthoradialvec
-    """
-    ############################################
-    radialComp = face.getRadialStress()
-    orthoradialComp = face.getOrthoradialStress()
-    ############################################
-    return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
+	#eigenvec1 = face.getStressEigenVector1()
+	#eigenvec2 = face.getStressEigenVector2()
+	eigenvalue1 = face.getStressEigenValue1()
+	eigenvalue2 = face.getStressEigenValue2()
+	"""
+	vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
+					qd.doublearray_getitem(eigenvec1,1),
+					qd.doublearray_getitem(eigenvec1,2)])
+	vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
+					qd.doublearray_getitem(eigenvec2,1),
+					qd.doublearray_getitem(eigenvec2,2)])
+	vec1 =eigenvalue1*vec1unit
+	vec2 = eigenvalue2*vec2unit
+	radialvec = np.copy(radialDict[face.getID()])
+	orthoradialvec = np.copy(orthoradialDict[face.getID()])
+	#print radialvec,orthoradialvec
+	############################################
+	########################################################################################
+	radsign1 = 1.#(np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
+	radsign2 = 1.#(np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
+	orthosign1 = 1.#(np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
+	orthosign2 = 1.#(np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
+	#print radsign1, radsign2, orthosign1, orthosign2
+	########################################################################################
+	radialComp = eigenvalue1*np.dot(radialvec,vec1unit)*radsign1+eigenvalue2*np.dot(radialvec,vec2unit)*radsign2
+	orthoradialComp = #eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
+	#radialComp = np.dot(radialvec,vec1)+np.dot(radialvec,vec2)
+	#orthoradialComp = np.dot(orthoradialvec,vec1)+np.dot(orthoradialvec,vec2)
+	############################################
+	if vectors:
+		radialvec = radialComp*radialvec
+		orthoradialvec = orthoradialComp*orthoradialvec
+		return radialvec, orthoradialvec
+	"""
+	############################################
+	radialComp = face.getRadialStress()
+	orthoradialComp = face.getOrthoradialStress()
+	############################################
+	return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
 ###################################################################
 ####################################################################################################################
 # Calculating the max time step for target surface area
 ####################################################################################################################
 def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
-    ####################################################
-    for step in range(startStep, endStep+1,stepsize):
-        if not os.path.isfile("qdObject_step=%03d.obj"%step):
-            return endStep,0.
-        ################################################
-        cell = sf.loadCellFromFile(step)
-        ################################################
-        tissueSurfaceArea = sf.getSurfaceArea(cell)
-        if (tissueSurfaceArea > targetArea):
-            gc.collect()
-            for calstep in range(step-1,step-stepsize-1,-1):
-                    cell = sf.loadCellFromFile(calstep)
-                    tissueSurfaceArea = sf.getSurfaceArea(cell)
-                    if (tissueSurfaceArea <= targetArea):
-                        gc.collect()
-                        cell = sf.loadCellFromFile(calstep+1)
-                        tissueSurfaceArea = sf.getSurfaceArea(cell)
-                        return calstep+1,tissueSurfaceArea
-        ################################################
-        gc.collect()
-    return endStep,tissueSurfaceArea
+	####################################################
+	for step in range(startStep, endStep+1,stepsize):
+		if not os.path.isfile("qdObject_step=%03d.obj"%step):
+			return endStep,0.
+		################################################
+		cell = sf.loadCellFromFile(step)
+		################################################
+		tissueSurfaceArea = sf.getSurfaceArea(cell)
+		if (tissueSurfaceArea > targetArea):
+			gc.collect()
+			for calstep in range(step-1,step-stepsize-1,-1):
+					cell = sf.loadCellFromFile(calstep)
+					tissueSurfaceArea = sf.getSurfaceArea(cell)
+					if (tissueSurfaceArea <= targetArea):
+						gc.collect()
+						cell = sf.loadCellFromFile(calstep+1)
+						tissueSurfaceArea = sf.getSurfaceArea(cell)
+						return calstep+1,tissueSurfaceArea
+		################################################
+		gc.collect()
+	return endStep,tissueSurfaceArea
 ###############################################################################################################
 # for a face, projecting its Growth eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
 def getRadialOrthoradialGrowth(face, radialDict=None,orthoradialDict=None, vectors = False):
-    #eigenvec1 = face.getRotGrowthEigenVector1()
-    #eigenvec2 = face.getRotGrowthEigenVector2()
-    eigenvalue1 = face.getRotGrowthEigenValue1()
-    eigenvalue2 = face.getRotGrowthEigenValue2()
-    """
-    vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
-                    qd.doublearray_getitem(eigenvec1,1),
-                    qd.doublearray_getitem(eigenvec1,2)])
-    vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
-                    qd.doublearray_getitem(eigenvec2,1),
-                    qd.doublearray_getitem(eigenvec2,2)])
-    vec1 =eigenvalue1*vec1unit
-    vec2 = eigenvalue2*vec2unit
-    #print vec1unit
-    radialvec = np.copy(radialDict[face.getID()])
-    orthoradialvec = np.copy(orthoradialDict[face.getID()])
-    #print radialvec,orthoradialvec
-    ########################################################################################
-    # sign change if needed : 
-    #       if EigenVector and RadialVec are opposite facing
-    ########################################################################################
-    #print "rad.vec1 :",np.dot(radialvec, vec1unit), 'rad.vec2',np.dot(radialvec, vec2unit), np.dot(vec1unit,vec2unit)
-    ########################################################################################
-    radsign1 = 1.#(np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
-    radsign2 = 1.#(np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
-    orthosign1 = 1.#(np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
-    orthosign2 = 1.#(np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
-    #print radsign1, radsign2, orthosign1, orthosign2
-    ########################################################################################
-    radialComp = eigenvalue1*np.dot(radialvec,vec1unit)*radsign1+eigenvalue2*np.dot(radialvec,vec2unit)*radsign2
-    orthoradialComp = eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
-    #radialComp = np.dot(radialvec,vec1)*radsign1+np.dot(radialvec,vec2)*radsign2
-    #orthoradialComp = np.dot(orthoradialvec,vec1)*orthosign1+np.dot(orthoradialvec,vec2)*orthosign2
-    ############################################
-    
-    if vectors:
-        radialvec = radialComp*radialvec
-        orthoradialvec = orthoradialComp*orthoradialvec
-        return radialvec, orthoradialvec
-    """
-    ############################################
-    radialComp = face.getRadialGrowth()
-    orthoradialComp = face.getOrthoradialGrowth()
-    ############################################
-    ############################################
-    return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
+	#eigenvec1 = face.getRotGrowthEigenVector1()
+	#eigenvec2 = face.getRotGrowthEigenVector2()
+	eigenvalue1 = face.getRotGrowthEigenValue1()
+	eigenvalue2 = face.getRotGrowthEigenValue2()
+	"""
+	vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
+					qd.doublearray_getitem(eigenvec1,1),
+					qd.doublearray_getitem(eigenvec1,2)])
+	vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
+					qd.doublearray_getitem(eigenvec2,1),
+					qd.doublearray_getitem(eigenvec2,2)])
+	vec1 =eigenvalue1*vec1unit
+	vec2 = eigenvalue2*vec2unit
+	#print vec1unit
+	radialvec = np.copy(radialDict[face.getID()])
+	orthoradialvec = np.copy(orthoradialDict[face.getID()])
+	#print radialvec,orthoradialvec
+	########################################################################################
+	# sign change if needed : 
+	#       if EigenVector and RadialVec are opposite facing
+	########################################################################################
+	#print "rad.vec1 :",np.dot(radialvec, vec1unit), 'rad.vec2',np.dot(radialvec, vec2unit), np.dot(vec1unit,vec2unit)
+	########################################################################################
+	radsign1 = 1.#(np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
+	radsign2 = 1.#(np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
+	orthosign1 = 1.#(np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
+	orthosign2 = 1.#(np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
+	#print radsign1, radsign2, orthosign1, orthosign2
+	########################################################################################
+	radialComp = eigenvalue1*np.dot(radialvec,vec1unit)*radsign1+eigenvalue2*np.dot(radialvec,vec2unit)*radsign2
+	orthoradialComp = eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
+	#radialComp = np.dot(radialvec,vec1)*radsign1+np.dot(radialvec,vec2)*radsign2
+	#orthoradialComp = np.dot(orthoradialvec,vec1)*orthosign1+np.dot(orthoradialvec,vec2)*orthosign2
+	############################################
+	
+	if vectors:
+		radialvec = radialComp*radialvec
+		orthoradialvec = orthoradialComp*orthoradialvec
+		return radialvec, orthoradialvec
+	"""
+	############################################
+	radialComp = face.getRadialGrowth()
+	orthoradialComp = face.getOrthoradialGrowth()
+	############################################
+	############################################
+	return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
 ###############################################################################################################
 # Calculate primordia height
 ###############################################################################################################
 def getPrimordiaHeight(cell, targetid):
-    ###################################################################
-    def addMeanVertex(vertex,meanx,meany,meanz):
-        meanx += vertex.getXcoordinate()
-        meany += vertex.getYcoordinate()
-        meanz += vertex.getZcoordinate()
-        return meanx,meany,meanz
-    ########################################################################
-    # Getting the primordial boundary
-    ########################################################################
-    facetarget = sf.getFace(cell, targetid)
-    ##########################################
-    # Vertex on primordial boundary
-    ##########################################
-    vertexList = sf.getPrimordiaBoundaryVertexList(cell, targetid)
-    vertexNum = len(vertexList)
-    ####################################################
-    # Calculation of primordial height starts here
-    # This is for smaller primordia
-    ####################################################
-    meanx = 0.
-    meany = 0.
-    meanz = 0.
-    for vert in vertexList:#while edge.Dest().getID() != targetedge.Dest().getID():
-        meanx,meany,meanz = addMeanVertex(vert,meanx,meany,meanz)
-    ######################################
-    targetx = facetarget.getXCentralised()
-    targety = facetarget.getYCentralised()
-    targetz = facetarget.getZCentralised()
-    meanx /= vertexNum
-    meany /= vertexNum
-    meanz /= vertexNum
-    height = np.sqrt((meanx-targetx)**2+(meany-targety)**2+(meanz-targetz)**2)
-    ######################################
-    return height
+	###################################################################
+	def addMeanVertex(vertex,meanx,meany,meanz):
+		meanx += vertex.getXcoordinate()
+		meany += vertex.getYcoordinate()
+		meanz += vertex.getZcoordinate()
+		return meanx,meany,meanz
+	########################################################################
+	# Getting the primordial boundary
+	########################################################################
+	facetarget = sf.getFace(cell, targetid)
+	##########################################
+	# Vertex on primordial boundary
+	##########################################
+	vertexList = sf.getPrimordiaBoundaryVertexList(cell, targetid)
+	vertexNum = len(vertexList)
+	####################################################
+	# Calculation of primordial height starts here
+	# This is for smaller primordia
+	####################################################
+	meanx = 0.
+	meany = 0.
+	meanz = 0.
+	for vert in vertexList:#while edge.Dest().getID() != targetedge.Dest().getID():
+		meanx,meany,meanz = addMeanVertex(vert,meanx,meany,meanz)
+	######################################
+	targetx = facetarget.getXCentralised()
+	targety = facetarget.getYCentralised()
+	targetz = facetarget.getZCentralised()
+	meanx /= vertexNum
+	meany /= vertexNum
+	meanz /= vertexNum
+	height = np.sqrt((meanx-targetx)**2+(meany-targety)**2+(meanz-targetz)**2)
+	######################################
+	return height
 
 ####################################################################################################################
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
 def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta, 
-    meanstress, meandilation,
-    color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import os
-    ########################################################################
-    # faceidarray for Primordia
-    if not os.path.isfile("qdObject_step=001.obj"):
-        return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(1)
-    initialTissueSurfaceArea = sf.getSurfaceArea(cell)
-    #######################################################################
-    # Starting the Calculation
-    #######################################################################
-    #####################################
-    #Getting initial area of primodial
-    #####################################
-    if not os.path.isfile("qdObject_step=001.obj"):
-        return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(1)
-    #######################################################################
-    laststep = 1
-    plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
-    #######################################################################
-    orthoradialStressArray = []
-    radialStressArray = []
-    radialGrowthArray = []
-    orthoradialGrowthArray = []
-    tissueSurfaceAreaArray = []
-    primordiaAreaArray = []
-    heightArray = []
-    meanstressEigenvalue1Array = []
-    meanstressEigenvalue2Array = []
-
-    meangrowthEigenvalue1Array = []
-    meangrowthEigenvalue2Array = []
-    for steparea in range(680, 800, int(areastep)):
-        step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
-        ########################################################################
-        step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep/2, endStep, step, stepsize = 10)
-        ########################################################################
-        if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
-            break
-        cell = sf.loadCellFromFile(step)
-        cell2 = sf.loadCellFromFile(step2)
-        ################################################
-        cell.calculateStressStrain()
-        ################################################
-        primordialface = sf.getFace(cell, targetid)
-        ################################################
-        cell.setRadialOrthoradialVector(primordialface)
-        cell.setRadialOrthoradialStress()
-        ################################################
-        sf.calculateDilation(cell,cell2)
-        ########################################################################
-        #  Starting the Calculation of mean growth and mean stress on boundary
-        ########################################################################
-        # mean stress
-        ########################################################################
-        faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
-        primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
-        primordiaarea = 0.
-        for face in primordiafacelist:
-            primordiaarea += face.getAreaOfFace()
-        ######################################################
-        #radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
-        ######################################################
-        radialStress = []
-        orthoradialStress = []
-        radialGrowth = []
-        orthoradialGrowth = []
-        stressEigenvalue1Array = []
-        stressEigenvalue2Array = []
-        growthEigenvalue1Array = []
-        growthEigenvalue2Array = []
-        dTissueSurfaceArea = tissueSurfaceArea2-tissueSurfaceArea
-        for face in faceList:
-            radstress, orthstress,stresseigenvalue1, stresseigenvalue2  = getRadialOrthoradialStress(face)
-            radGrowth, orthGrowth, growtheigenvalue1, growtheigenvalue2 = getRadialOrthoradialGrowth(face)
-            #######################################################
-            radialStress.append(radstress)
-            orthoradialStress.append(orthstress)
-            radialGrowth.append(radGrowth)
-            orthoradialGrowth.append(orthGrowth)
-            stressEigenvalue1Array.append(stresseigenvalue1)
-            stressEigenvalue2Array.append(stresseigenvalue2)
-            growthEigenvalue1Array.append(growtheigenvalue1)
-            growthEigenvalue2Array.append(growtheigenvalue2)
-        ######################################################
-        radialStressArray.append(np.mean(radialStress))
-        orthoradialStressArray.append(np.mean(orthoradialStress))
-        radialGrowthArray.append(np.mean(radialGrowth))
-        orthoradialGrowthArray.append(np.mean(orthoradialGrowth))
-        tissueSurfaceAreaArray.append(tissueSurfaceArea)
-        primordiaAreaArray.append(primordiaarea)
-        ######################################################
-        height = getPrimordiaHeight(cell,targetid)
-        heightArray.append(height)
-        ######################################################
-        meanstressEigenvalue1Array.append(np.mean(stressEigenvalue1Array))
-        meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
-        meangrowthEigenvalue1Array.append(np.mean(growthEigenvalue1Array))
-        meangrowthEigenvalue2Array.append(np.mean(growthEigenvalue2Array))
-        #meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
-        #    yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
-        #meanstress.errorbar(tissueSurfaceArea, np.mean(orthoradialStress),
-        #    yerr = np.std(orthoradialStress)/float(len(orthoradialStress)),fmt='<',label = r":$\sigma_{o}$",c=color,**plotargs)
-        ########################################################################
-        # mean dilation
-        ########################################################################
-        #meandilation.errorbar(tissueSurfaceArea, np.mean(radialGrowth),
-        #    yerr = np.std(radialGrowth)/float(len(radialGrowth)),fmt='o',label = r":$g_{r}$",c=color,**plotargs)
-        #meandilation.errorbar(tissueSurfaceArea, np.mean(orthoradialGrowth),
-        #    yerr = np.std(orthoradialGrowth)/float(len(orthoradialGrowth)),fmt='<',label = r":$g_{o}$",c=color,**plotargs)
-        ########################################################################
-        laststep = step
-        ########################################################################
-        print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
-    return [tissueSurfaceAreaArray, radialStressArray, orthoradialStressArray,
-            radialGrowthArray, orthoradialGrowthArray,
-            primordiaAreaArray,
-            heightArray,
-            meanstressEigenvalue1Array, meanstressEigenvalue2Array,
-            meangrowthEigenvalue1Array, meangrowthEigenvalue2Array]
+	meanstress, meandilation,
+	color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20,
+	startarea = None,
+	endarea = 850):
+	import numpy as np
+	import matplotlib.pyplot as plt
+	import os
+	########################################################################
+	# faceidarray for Primordia
+	if not os.path.isfile("qdObject_step=001.obj"):
+		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
+	cell = sf.loadCellFromFile(1)
+	initialTissueSurfaceArea = sf.getSurfaceArea(cell)
+	#######################################################################
+	# Starting the Calculation
+	#######################################################################
+	#####################################
+	#Getting initial area of primodial
+	#####################################
+	if not os.path.isfile("qdObject_step=001.obj"):
+		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
+	cell = sf.loadCellFromFile(1)
+	#######################################################################
+	laststep = 1
+	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
+	#######################################################################
+	orthoradialStressArray = []
+	radialStressArray = []
+	radialGrowthArray = []
+	orthoradialGrowthArray = []
+	tissueSurfaceAreaArray = []
+	primordiaAreaArray = []
+	boundaryAreaArray = []
+	heightArray = []
+	meanstressEigenvalue1Array = []
+	meanstressEigenvalue2Array = []
+	meangrowthEigenvalue1Array = []
+	meangrowthEigenvalue2Array = []
+	if not startarea:#no startarea given
+		startarea = int(initialTissueSurfaceArea)
+	for steparea in range(startarea, endarea, int(areastep)):
+		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
+		########################################################################
+		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep/2, endStep, step, stepsize = 10)
+		########################################################################
+		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
+			break
+		cell = sf.loadCellFromFile(step)
+		cell2 = sf.loadCellFromFile(step2)
+		################################################
+		cell.calculateStressStrain()
+		################################################
+		primordialface = sf.getFace(cell, targetid)
+		################################################
+		cell.setRadialOrthoradialVector(primordialface)
+		cell.setRadialOrthoradialStress()
+		################################################
+		sf.calculateDilation(cell,cell2)
+		########################################################################
+		#  Starting the Calculation of mean growth and mean stress on boundary
+		########################################################################
+		# mean stress
+		########################################################################
+		faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
+		primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
+		primordiaarea = 0.
+		for face in primordiafacelist:
+			primordiaarea += face.getAreaOfFace()
+		######################################################
+		#radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
+		######################################################
+		radialStress = []
+		orthoradialStress = []
+		radialGrowth = []
+		orthoradialGrowth = []
+		stressEigenvalue1Array = []
+		stressEigenvalue2Array = []
+		growthEigenvalue1Array = []
+		growthEigenvalue2Array = []
+		dTissueSurfaceArea = tissueSurfaceArea2-tissueSurfaceArea
+		boundaryarea = 0.
+		for face in faceList:
+			boundaryarea += face.getAreaOfFace()
+			#######################################################
+			radstress, orthstress,stresseigenvalue1, stresseigenvalue2  = getRadialOrthoradialStress(face)
+			radGrowth, orthGrowth, growtheigenvalue1, growtheigenvalue2 = getRadialOrthoradialGrowth(face)
+			#######################################################
+			radialStress.append(radstress)
+			orthoradialStress.append(orthstress)
+			radialGrowth.append(radGrowth)
+			orthoradialGrowth.append(orthGrowth)
+			stressEigenvalue1Array.append(stresseigenvalue1)
+			stressEigenvalue2Array.append(stresseigenvalue2)
+			growthEigenvalue1Array.append(growtheigenvalue1)
+			growthEigenvalue2Array.append(growtheigenvalue2)
+		######################################################
+		radialStressArray.append(np.mean(radialStress))
+		orthoradialStressArray.append(np.mean(orthoradialStress))
+		radialGrowthArray.append(np.mean(radialGrowth))
+		orthoradialGrowthArray.append(np.mean(orthoradialGrowth))
+		tissueSurfaceAreaArray.append(tissueSurfaceArea)
+		primordiaAreaArray.append(primordiaarea)
+		boundaryAreaArray.append(boundaryarea)
+		######################################################
+		height = getPrimordiaHeight(cell,targetid)
+		heightArray.append(height)
+		######################################################
+		meanstressEigenvalue1Array.append(np.mean(stressEigenvalue1Array))
+		meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
+		meangrowthEigenvalue1Array.append(np.mean(growthEigenvalue1Array))
+		meangrowthEigenvalue2Array.append(np.mean(growthEigenvalue2Array))
+		#meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
+		#    yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
+		#meanstress.errorbar(tissueSurfaceArea, np.mean(orthoradialStress),
+		#    yerr = np.std(orthoradialStress)/float(len(orthoradialStress)),fmt='<',label = r":$\sigma_{o}$",c=color,**plotargs)
+		########################################################################
+		# mean dilation
+		########################################################################
+		#meandilation.errorbar(tissueSurfaceArea, np.mean(radialGrowth),
+		#    yerr = np.std(radialGrowth)/float(len(radialGrowth)),fmt='o',label = r":$g_{r}$",c=color,**plotargs)
+		#meandilation.errorbar(tissueSurfaceArea, np.mean(orthoradialGrowth),
+		#    yerr = np.std(orthoradialGrowth)/float(len(orthoradialGrowth)),fmt='<',label = r":$g_{o}$",c=color,**plotargs)
+		########################################################################
+		laststep = step
+		########################################################################
+		print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
+	return [tissueSurfaceAreaArray, radialStressArray, orthoradialStressArray,
+			radialGrowthArray, orthoradialGrowthArray,
+			primordiaAreaArray,
+			heightArray,
+			meanstressEigenvalue1Array, meanstressEigenvalue2Array,
+			meangrowthEigenvalue1Array, meangrowthEigenvalue2Array, boundaryAreaArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -400,15 +407,17 @@ fastkappaOption = args.fastkappa
 large  = args.Large
 stepsize = 10
 maxarea = args.maxarea
+startarea = None
+endarea = 850
 # For surpressing err
 class NullDevice():
 	def write(self, s):
 		pass
 if targetface == None:
-    if numOfLayer == 8:
-        targetface = 135
-    elif numOfLayer == 10:
-        targetface = 214
+	if numOfLayer == 8:
+		targetface = 135
+	elif numOfLayer == 10:
+		targetface = 214
 
 #print " start "
 #original_stdout = sys.stderr # keep a reference to STDOUT
@@ -449,6 +458,25 @@ cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
 fig = plt.figure(figsize=(15,20))
+##########################
+fig2 = plt1.figure(figsize=(5.5,5))#mean growth plots RO
+fig3 = plt1.figure(figsize=(5.5,5))#mean growth plots 12
+fig4 = plt1.figure(figsize=(5.5,5))#boundary area over Tissue area
+##########################
+meangrowthROplot = fig2.add_subplot(111)
+meangrowthROplot.set_xlabel(r"Surface Area, $A_T$")
+meangrowthROplot.set_ylabel(r"Mean Growth")
+
+meangrowth12plot = fig3.add_subplot(111)
+meangrowth12plot.set_xlabel(r"Surface Area, $A_T$")
+meangrowth12plot.set_ylabel(r"Mean Growth")
+
+
+boundaryareaplot = fig3.add_subplot(111)
+boundaryareaplot.set_xlabel(r"Surface Area, $A_T$")
+boundaryareaplot.set_ylabel(r"Boundary Area, $A_B$")
+
+##########################
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 ax1 = fig.add_subplot(431)
 ax2 = fig.add_subplot(432)
@@ -547,9 +575,11 @@ for folder in listdir:
 	#print "\n",os.getcwd()
 	plotData[etacurrent] = plotMeanStressGrowth(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
 				meanstress = ax1,startStep = startStep,  
-                meandilation=ax2,
+				meandilation=ax2,
 				color = etacolor,stepsize = stepsize,
-                largerCondition = large,maxarea = maxarea, areastep = areastep)
+				largerCondition = large,maxarea = maxarea, areastep = areastep,
+				startarea = startarea,
+				endarea = endarea)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
@@ -559,77 +589,89 @@ for folder in listdir:
 ###############################################################################
 plotargs = {"linewidth":3}
 for key,data in plotData.iteritems():
-    color = scalarMap.to_rgba(key)
-    ##################################
-    #mean stress
-    ##################################
-    #rad Stress
-    ax1.plot(data[0], data[1],"-." ,label=r"$\sigma_{r}$",c=color,**plotargs)
-    #ortho Stress
-    ax3.plot(data[0], data[2], label=r"$\sigma_{o}$",c=color,**plotargs)
-    ##################################
-    #mean growth
-    ##################################
-    #rad Stress
-    ax2.plot(data[0], data[3],"-." ,label=r"$g_{r}$",c=color,**plotargs)
-    #ortho Stress
-    ax4.plot(data[0], data[4], label=r"$g_{o}$",c=color,**plotargs)
-    ##################################
-    # Primordia Area
-    ##################################
-    ax5.plot(data[0], data[5],label = r"A_P",c = color, **plotargs)
-    #######################################
-    # Height vs Primordia Area/Tissue Area
-    #######################################
-    ax7.plot(data[0],data[6],label = r"h",c = color, **plotargs)
-    ax8.plot(data[5],data[6],label = r"h",c = color, **plotargs)
-    #######################################
-    # difference Height vs Tissue Area
-    #######################################
-    dheight = np.diff(np.array(data[6]))
-    dTissueSurfaceArea = np.diff(np.array(data[0]))
-    dheight = np.divide(dheight,dTissueSurfaceArea)
-    ax6.plot(data[0][1:],dheight,label = r"$\Delta h$",c = color, **plotargs)
-    #######################################
-    # raw stress/growth eigenvalues
-    #######################################
-    rawstressplot.plot(data[0],data[7],"-." ,label=r"$\lambda_{1}$",c=color,**plotargs)
-    rawstressplot.plot(data[0],data[8],label=r"$\lambda_{2}$",c=color,**plotargs)
-    #growth
-    rawgrowthplot.plot(data[0],data[9],"-." ,label=r"$\lambda_{1}$",c=color,**plotargs)
-    rawgrowthplot.plot(data[0],data[10],label=r"$\lambda_{2}$",c=color,**plotargs)
-    #######################################
-    # sum eigen values
-    #######################################
-    sumStressradiaOrthoradial = np.add(data[1],data[2])
-    sumStressmeaneigenvalue12 = np.add(data[7],data[8])
-    sumGrowthradiaOrthoradial = np.add(data[3],data[4])
-    sumGrowthmeaneigenvalue12 = np.add(data[9],data[10])
-    sumStresseigenplot.plot(data[0],sumStressradiaOrthoradial,':',lw = 3, label = r'\sigma_r+\sigma_o',c=color)
-    sumStresseigenplot.plot(data[0],sumStressmeaneigenvalue12,lw = 1, label = r'\sigma_1+\sigma_2',c=color)
-    ############################################################
-    sumGrowtheigenplot.plot(data[0],sumGrowthradiaOrthoradial,':',lw = 3, label = r'g_r+g_o',c=color)
-    sumGrowtheigenplot.plot(data[0],sumGrowthmeaneigenvalue12,lw = 1, label = r'\lambda_1+\lambda_2',c=color)
+	color = scalarMap.to_rgba(key)
+	##################################
+	#mean stress
+	##################################
+	#rad Stress
+	ax1.plot(data[0], data[1],"-." ,label=r"$\sigma_{r}$",c=color,**plotargs)
+	#ortho Stress
+	ax3.plot(data[0], data[2], label=r"$\sigma_{o}$",c=color,**plotargs)
+	##################################
+	#mean growth
+	##################################
+	#rad Stress
+	ax2.plot(data[0], data[3],"-." ,label=r"$g_{r}$",c=color,**plotargs)
+	#ortho Stress
+	ax4.plot(data[0], data[4], label=r"$g_{o}$",c=color,**plotargs)
+	##################################
+	# Primordia Area
+	##################################
+	ax5.plot(data[0], data[5],label = r"A_P",c = color, **plotargs)
+	#######################################
+	# Height vs Primordia Area/Tissue Area
+	#######################################
+	ax7.plot(data[0],data[6],label = r"h",c = color, **plotargs)
+	ax8.plot(data[5],data[6],label = r"h",c = color, **plotargs)
+	#######################################
+	# difference Height vs Tissue Area
+	#######################################
+	dheight = np.diff(np.array(data[6]))
+	dTissueSurfaceArea = np.diff(np.array(data[0]))
+	dheight = np.divide(dheight,dTissueSurfaceArea)
+	ax6.plot(data[0][1:],dheight,label = r"$\Delta h$",c = color, **plotargs)
+	#######################################
+	# raw stress/growth eigenvalues
+	#######################################
+	rawstressplot.plot(data[0],data[7],"-." ,label=r"$\lambda_{1}$",c=color,**plotargs)
+	rawstressplot.plot(data[0],data[8],label=r"$\lambda_{2}$",c=color,**plotargs)
+	#growth
+	rawgrowthplot.plot(data[0],data[9],"-." ,label=r"$\lambda_{1}$",c=color,**plotargs)
+	rawgrowthplot.plot(data[0],data[10],label=r"$\lambda_{2}$",c=color,**plotargs)
+	#######################################
+	# sum eigen values
+	#######################################
+	sumStressradiaOrthoradial = np.add(data[1],data[2])
+	sumStressmeaneigenvalue12 = np.add(data[7],data[8])
+	sumGrowthradiaOrthoradial = np.add(data[3],data[4])
+	sumGrowthmeaneigenvalue12 = np.add(data[9],data[10])
+	sumStresseigenplot.plot(data[0],sumStressradiaOrthoradial,':',lw = 3, label = r'\sigma_r+\sigma_o',c=color)
+	sumStresseigenplot.plot(data[0],sumStressmeaneigenvalue12,lw = 1, label = r'\sigma_1+\sigma_2',c=color)
+	############################################################
+	sumGrowtheigenplot.plot(data[0],sumGrowthradiaOrthoradial,':',lw = 3, label = r'g_r+g_o',c=color)
+	sumGrowtheigenplot.plot(data[0],sumGrowthmeaneigenvalue12,lw = 1, label = r'\lambda_1+\lambda_2',c=color)
+	############################################################
+	meangrowthROplot.plot(data[0],data[3],"-.",c=color,**plotargs)
+	meangrowthROplot.plot(data[0],data[4],c=color,**plotargs)
+	############################################################
+	meangrowth12plot.plot(data[0],data[9],"-.",c=color,**plotargs)
+	meangrowth12plot.plot(data[0],data[10],c=color,**plotargs)
+	############################################################
+	boundaryareaplot.plot(data[0],data[11],c=color,**plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
 from matplotlib.lines import Line2D
 legend_elements = [Line2D([0], [0], linestyle = "-.", color='k', label=r"$\sigma_{r}$",**plotargs),
-                   Line2D([0], [0],  color='k', label=r"$\sigma_{o}$",**plotargs),
-                   Line2D([0], [0], linestyle = "-.", color='k', label=r"$g_{r}$",**plotargs),
-                   Line2D([0], [0],  color='k', label=r"$g_{o}$",**plotargs),
-                   Line2D([0], [0], linestyle = "-.", color='k', label=r"$\lambda_{1}$",**plotargs),
-                   Line2D([0], [0],  color='k',  label=r"$\lambda_{2}$",**plotargs)]
+				   Line2D([0], [0],  color='k', label=r"$\sigma_{o}$",**plotargs),
+				   Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle g_{r} \rangle_c $",**plotargs),
+				   Line2D([0], [0],  color='k', label=r"$\langle g_{o} \rangle_c $",**plotargs),
+				   Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle g_{1} \rangle_c $",**plotargs),
+				   Line2D([0], [0],  color='k',  label=r"$\langle g_{2} \rangle_c $",**plotargs)]
 ax1.legend(handles = [legend_elements[0]])
 ax3.legend(handles = [legend_elements[1]])
 ax2.legend(handles = [legend_elements[2]])
 ax4.legend(handles = [legend_elements[3]])
 sumStresseigenplot.legend(handles = [Line2D([0], [0], linestyle = ":", color='k', label = r'$\sigma_r+\sigma_o$',lw=3),
-                            Line2D([0], [0],  color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
+							Line2D([0], [0],  color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
 sumGrowtheigenplot.legend(handles = [Line2D([0], [0], linestyle = ":", color='k', label = r'$g_r+g_o$',lw=3),
-                            Line2D([0], [0], color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
+							Line2D([0], [0], color='k', label = r'$\lambda_1+\lambda_2$',lw=1)])
 rawstressplot.legend(handles = legend_elements[4:])
 rawgrowthplot.legend(handles = legend_elements[4:])
+
+meangrowth12plot.legend(handles = legend_elements[4:])
+meangrowthROplot.legend(handles = legend_elements[2:4])
+
 ###############################################################################
 #color bar fig
 ###############################################################################
@@ -638,10 +680,45 @@ scalarMap._A = []
 fig.subplots_adjust(bottom=0.2)
 cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])
 clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
+
+fig2.subplots_adjust(right=0.9)
+fig3.subplots_adjust(right=0.9)
+fig4.subplots_adjust(right=0.9)
+
+cbar_ax2 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
+cbar_ax3 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
+cbar_ax4 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
+
+
+clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+clrbar3 = plt.colorbar(scalarMap,cax = cbar_ax3,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+clrbar4 = plt.colorbar(scalarMap,cax = cbar_ax4,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
+
+
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Fast Growth Rate")
 else:
-	clrbar.set_label(r"$\eta$")
+	clrbar.set_label(r"Mechanical Feedback, $\eta$")
+	clrbar2.set_label(r"Mechanical Feedback, $\eta$")
+	clrbar3.set_label(r"Mechanical Feedback, $\eta$")
+	clrbar4.set_label(r"Mechanical Feedback, $\eta$")
+
+################################################################################
+minarea = min(plotData.values()[0][0])
+if startarea:#start area != none
+	meangrowth12plot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+	meangrowthROplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+	boundaryareaplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+else:
+	meangrowth12plot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+	meangrowthROplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+	boundaryareaplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+################################################################################
+
+fig2.tight_layout()
+fig3.tight_layout()
+fig4.tight_layout()
+
 
 """##########################################################################################
 # Making the legend
