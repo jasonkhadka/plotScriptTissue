@@ -472,7 +472,7 @@ meangrowth12plot.set_xlabel(r"Surface Area, $A_T$")
 meangrowth12plot.set_ylabel(r"Mean Growth")
 
 
-boundaryareaplot = fig3.add_subplot(111)
+boundaryareaplot = fig4.add_subplot(111)
 boundaryareaplot.set_xlabel(r"Surface Area, $A_T$")
 boundaryareaplot.set_ylabel(r"Boundary Area, $A_B$")
 
@@ -688,9 +688,9 @@ fig4.subplots_adjust(right=0.9)
 
 
 
-cbar_ax2 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
-cbar_ax3 = fig3.add_axes([0.91, 0.15, 0.025, 0.7])
-cbar_ax4 = fig4.add_axes([0.91, 0.15, 0.025, 0.7])
+cbar_ax2 = fig2.add_axes([0.85, 0.2, 0.04, 0.65])
+cbar_ax3 = fig3.add_axes([0.85, 0.2, 0.04, 0.65])
+cbar_ax4 = fig4.add_axes([0.85, 0.2, 0.04, 0.65])
 
 
 
