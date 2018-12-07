@@ -322,7 +322,10 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 ##################################################
 etathreshold = 0
-jet = cm = plt.get_cmap('plasma') 
+if fastkappaOption:
+	jet = cm = plt.get_cmap('plasma') 
+else:
+	jet = cm = plt.get_cmap('viridis') 
 ##################################################
 if maxeta == 0.:
 	maxvalue = max(etalist)
@@ -521,8 +524,8 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 	fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.png"%(targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_growthRatio_primordialGrowth_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
 else:
-	fig2.savefig(saveDirectory+r"/plot_eta_primordialGrowth_targetid=%d.png"%(targetid),transparent = True, bbox_inches="tight")
-	fig2.savefig(saveDirectory+r"/plot_eta_primordialGrowth_targetid=%d.eps"%(targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_eta%d_primordialGrowth_targetid=%d.png"%(maxeta,targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_eta%d_primordialGrowth_targetid=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
 
 
 #fig1.savefig(saveDirectory+r"/plot_eta_vs_curvature_height_areaPrimodia_%d.png"%endStep,transparent = True)
