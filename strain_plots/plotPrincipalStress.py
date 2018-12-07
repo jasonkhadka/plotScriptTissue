@@ -499,11 +499,11 @@ clrbar1 = plt.colorbar(scalarMap,cax = cbar_ax7,ticks=np.linspace(minvalue, maxv
 ################################################################################
 minarea = min(plotData.values()[0][0])
 if startarea:#start area != none
-	ax7.set_xticks(np.linspace(startarea,endarea,3).astype('int')))
-	ax8.set_xticks(np.linspace(startarea,endarea,3).astype('int')))
+	ax7.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+	ax8.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 else:
-	ax7.set_xticks(np.linspace(minarea,endarea,3).astype('int')))
-	ax8.set_xticks(np.linspace(minarea,endarea,3).astype('int')))
+	ax7.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+	ax8.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 ################################################################################
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
