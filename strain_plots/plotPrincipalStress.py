@@ -28,7 +28,7 @@ plt.rcParams['axes.titlesize'] = 22
 # Add subplot annotation
 ####################################################################################################################
 def addAnnotation(subplot,n = 1):
-	subplot.text(-0.1,1.1,string.ascii_lowercase[n],transform = subplot.transAxes,size = 20, weight = 'bold')
+	subplot.text(-0.1,1.0,string.ascii_lowercase[n],transform = subplot.transAxes,size = 22, weight = 'bold')
 	return
 ####################################################################################################################
 # Calculating the max time step for target surface area
