@@ -558,7 +558,8 @@ else:
 
 ################################################################################
 
-
+if startarea == None:
+	startarea = 650
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_area=%d-%d_targetface=%d.png"%(startarea, endarea,targetid),transparent = True, bbox_inches="tight")
