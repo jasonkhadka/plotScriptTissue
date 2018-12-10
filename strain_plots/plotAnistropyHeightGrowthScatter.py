@@ -354,7 +354,7 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 		interpolatex, interpolatey = interpolatedata(hull_pts)
 		anisotropyplot.plot(interpolatex, interpolatey, c = color,ls= '--',lw=2)
 	########################################################################
-	return 
+	return [meanstressdiffarray, areadiffarray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -523,7 +523,7 @@ for folder in listdir:
 	os.chdir(folder)
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
-	plotHeightGrowthScatter(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
+	plotData[eta] = plotHeightGrowthScatter(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
 				stressscatter = ax1,growthscatter = ax2,stressscatter1 =ax3,growthscatter1 = ax4,
 				anisotropyplot = anisotropyplot,
 				startStep = startStep,  maxeta = maxeta,
@@ -564,10 +564,12 @@ if startarea == None:
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_area=%d-%d_targetface=%d.png"%(startarea, endarea,targetid),transparent = True, bbox_inches="tight")
+	np.save('anistropy_heightgrowth_fk_eta=%d_targetface=%d.npy'%(maxeta,targetid),plotData)
 else:
 	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_area=%d-%d_targetface=%d.png"%(startarea,endarea,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_area=%d-%d_eta=%d_targetface=%d.png"%(startarea, endarea,maxeta,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_area=%d-%d_eta=%d_targetface=%d.eps"%(startarea, endarea,maxeta,targetid),transparent = True, bbox_inches="tight")
+	np.save('anistropy_heightgrowth_eta=%d_targetface=%d.npy'%(maxeta,targetid),plotData)
 
 
 
