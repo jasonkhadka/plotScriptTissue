@@ -147,7 +147,7 @@ azim = args.azimuthal
 elev = args.elevation
 norm = args.nonNormalize
 
-
+fastkappaOption = args.fastkappa
 
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
