@@ -51,7 +51,7 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
 ##########################################################################################
 #       Function to Plot Magnitude of Normal Forces on the Faces of the Cell
 ##########################################################################################
-def plotSurface(cell,ax,color):
+def plotSurface(cell,ax,color,surface=False,alpha = 0.6):
 	 from mpl_toolkits.mplot3d import Axes3D
 	 import matplotlib as mpl
 	 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -93,8 +93,13 @@ def plotSurface(cell,ax,color):
 		  xlist.append(xlist[0])
 		  ylist.append(ylist[0])
 		  zlist.append(zlist[0])
-		  #adding to 3d plot
-		  ax.plot(xlist,ylist,zlist, c = color, lw = 3)
+		  verts = [zip(xlist, ylist,zlist)]
+		  if surface:
+		  	pc = Poly3DCollection(verts,alpha = alpha,facecolor = color,linewidths=1,zorder=0)
+		  	pc.set_edgecolor(color)
+		  	ax.add_collection3d(pc)
+		  else:
+		  	ax.plot(xlist,ylist,zlist, c = color, lw = 3)
 		  face = faces.next()
 		  faceCounter+= 1
 	 return
@@ -127,6 +132,8 @@ parser.add_argument("-t","--target", help = "Target face for faster growth", def
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument("-f","--fastkappa", help = "if option is used, the figures are made with respect to chaning fast kappa", action= "store_true")
+parser.add_argument("-x","--surface", help = "if option is used, surface will be plotted", action= "store_true")
+
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
@@ -144,7 +151,7 @@ targetface = args.target
 azim = args.azimuthal
 elev = args.elevation
 norm = args.nonNormalize
-
+surface  = args.surface
 fastkappaOption = args.fastkappa
 
 import matplotlib.colors as colors
@@ -167,10 +174,10 @@ radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of
 fig = plt.figure(frameon=False,figsize=(10,10))
 fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
 ax = Axes3D(fig)
-xlim = 0.4
+xlim = 0.5
 ax.set_xlim((-xlim*radius,xlim*radius))
 ax.set_ylim((-xlim*radius,xlim*radius))
-ax.set_zlim((-0.1*radius,0.7*radius))
+ax.set_zlim((-0.1*radius,0.9*radius))
 ax.axis('off')
 ax.xaxis.pane.set_edgecolor('black')
 ax.yaxis.pane.set_edgecolor('black')
@@ -203,7 +210,7 @@ counter = 0
 totalfolders = len(listdir)
 plotData = {}
 #print listdir
-colors = ['r','b']
+colors = ['magenta','beige']
 targeteta = [0.,8.]
 from matplotlib.lines import Line2D
 legenditems = []
@@ -227,12 +234,13 @@ for folder in listdir:
 	os.chdir(folder)
 	step,tissueSurfaceArea = getTimeStep(targetArea, endStep, startStep, stepsize = stepsize)
 	cell = sf.loadCellFromFile(step)
-	plotSurface(cell,ax,color)
+	plotSurface(cell,ax,color,surface)
 	legenditems.append(Line2D([0], [0], color=color, label=r"$\eta=%d$"%etacurrent,lw='3'))
 	os.chdir("..")
 	gc.collect()
 	counter+= 1
 
+ax.legend(handles = legenditems)
 ax.view_init(azim = azim, elev = elev)
 fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.png"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
 fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.eps"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
