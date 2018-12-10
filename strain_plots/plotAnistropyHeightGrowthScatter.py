@@ -546,7 +546,7 @@ ax3 = fig.add_subplot(223)
 ax4 = fig.add_subplot(224)
 
 fig2 = plt.figure(2,figsize=(5.5,5))
-anisotropyplot = fig.add_subplot(111)
+anisotropyplot = fig2.add_subplot(111)
 anisotropyplot.set_xlabel(r"Stress ansiotropy, $\langle\sigma_2 - \sigma_1\rangle_c$")
 anisotropyplot.set_ylabel(r"Height growth rate, $\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
 
