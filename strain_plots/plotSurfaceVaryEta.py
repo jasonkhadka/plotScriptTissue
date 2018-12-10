@@ -51,7 +51,7 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
 ##########################################################################################
 #       Function to Plot Magnitude of Normal Forces on the Faces of the Cell
 ##########################################################################################
-def plotSurface(cell,ax,color,surface=False,alpha = 0.6):
+def plotSurface(cell,ax,color,surface=False,alpha = 0.6,zorder= 10):
 	 from mpl_toolkits.mplot3d import Axes3D
 	 import matplotlib as mpl
 	 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -95,7 +95,7 @@ def plotSurface(cell,ax,color,surface=False,alpha = 0.6):
 		  zlist.append(zlist[0])
 		  verts = [zip(xlist, ylist,zlist)]
 		  if surface:
-		  	pc = Poly3DCollection(verts,alpha = alpha,facecolor = color,linewidths=1,zorder=0)
+		  	pc = Poly3DCollection(verts,alpha = alpha,facecolor = color,linewidths=1,zorder=zorder)
 		  	pc.set_edgecolor(color)
 		  	ax.add_collection3d(pc)
 		  else:
