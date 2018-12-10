@@ -467,7 +467,6 @@ parser.add_argument('-d',"--areastep", help="area step for calculating the growt
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
-endStep = args.end
 cylinder = args.cylinder
 alpha = args.alpha
 beta = args.beta
