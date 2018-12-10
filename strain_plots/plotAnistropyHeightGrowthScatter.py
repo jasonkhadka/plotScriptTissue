@@ -426,7 +426,7 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 		print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
 	########################################################################
 	if cloudCondition:
-		points = np.vstack((areadiffarray,meanstressdiffarray))
+		points = np.vstack((meanstressdiffarray,areadiffarray))
 		hull_pts = convex_hull(points)
 		hull_pts = np.vstack((hull_pts,hull_pts[0]))
 		interpolatex, interpolatey = interpolatedata(hull_pts)
@@ -437,8 +437,8 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
 #parser.add_argument('-l','--location', help="The location of targetformmatrix and coordinate file",type = string)
-parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
-parser.add_argument('-e',"--end", help="End of simulation step", type = int)
+parser.add_argument('-s',"--startarea", help="Start of simulation area",default =None, type = int)
+parser.add_argument('-e',"--endarea", help="End of simulation area",default =850,  type = int)
 parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only cacluated till this value", type = float, default = 0.0)
 parser.add_argument("-x","--maxarea", help = "if this is given, then plot is only made till this area value value", type = float, default = None)
 parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
@@ -468,7 +468,6 @@ parser.add_argument('-d',"--areastep", help="area step for calculating the growt
 args = parser.parse_args()
 #location = args.location
 endStep = args.end
-startStep = args.start
 cylinder = args.cylinder
 alpha = args.alpha
 beta = args.beta
@@ -488,8 +487,10 @@ fastkappaOption = args.fastkappa
 large  = args.Large
 stepsize = 10
 maxarea = args.maxarea
-startarea = None
-endarea = 850
+startarea = args.startarea
+endarea = args.endarea
+startStep = 1
+endStep = 2000
 # For surpressing err
 class NullDevice():
 	def write(self, s):
@@ -622,7 +623,7 @@ clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
 
 fig2.subplots_adjust(right=0.9)
 
-cbar_ax2 = fig2.add_axes([0.85, 0.2, 0.04, 0.65])
+cbar_ax2 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
 
 fig2.tight_layout(rect=[0.,0.,.9,.9])
 
@@ -640,9 +641,9 @@ else:
 
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_area=%d-%d_targetface=%d.png"%(startarea, endarea,targetid),transparent = True, bbox_inches="tight")
 else:
-	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_area=%d-%d_targetface=%d.png"%(startarea,endarea,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_eta=%d_targetface=%d.png"%(maxeta,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_eta=%d_targetface=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
 
