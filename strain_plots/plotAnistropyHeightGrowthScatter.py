@@ -427,7 +427,7 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 	########################################################################
 	if cloudCondition:
 		points = np.vstack((areadiffarray,meanstressdiffarray))
-		hullpts = convex_hull(points)
+		hull_pts = convex_hull(points)
 		hull_pts = np.vstack((hull_pts,hull_pts[0]))
 		interpolatex, interpolatey = interpolatedata(hull_pts)
 		anisotropyplot.plot(interpolatex, interpolatey, c = color,ls= '--',lw=2)
