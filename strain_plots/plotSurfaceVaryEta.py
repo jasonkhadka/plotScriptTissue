@@ -127,7 +127,7 @@ parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneat
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = 10, type = float)
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
-
+parser.add_argument("-f","--fastkappa", help = "if option is used, the figures are made with respect to chaning fast kappa", action= "store_true")
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
