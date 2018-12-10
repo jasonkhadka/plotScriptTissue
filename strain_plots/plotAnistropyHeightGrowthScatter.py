@@ -566,8 +566,8 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_area=%d-%d_targetface=%d.png"%(startarea, endarea,targetid),transparent = True, bbox_inches="tight")
 else:
 	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_area=%d-%d_targetface=%d.png"%(startarea,endarea,targetid),transparent = True, bbox_inches="tight")
-	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_eta=%d_targetface=%d.png"%(maxeta,targetid),transparent = True, bbox_inches="tight")
-	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_eta=%d_targetface=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_area=%d-%d_eta=%d_targetface=%d.png"%(startarea, endarea,maxeta,targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_area=%d-%d_eta=%d_targetface=%d.eps"%(startarea, endarea,maxeta,targetid),transparent = True, bbox_inches="tight")
 
 
 
