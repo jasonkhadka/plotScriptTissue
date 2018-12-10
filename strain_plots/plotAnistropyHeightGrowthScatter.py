@@ -543,9 +543,9 @@ clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
 
 fig2.subplots_adjust(right=0.9)
 
-cbar_ax2 = fig2.add_axes([0.91, 0.15, 0.025, 0.7])
+cbar_ax2 = fig2.add_axes([0.85, 0.2, 0.04, 0.65])
 
-fig2.tight_layout(rect=[0.,0.,.9,.9])
+fig2.tight_layout()
 
 
 clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
