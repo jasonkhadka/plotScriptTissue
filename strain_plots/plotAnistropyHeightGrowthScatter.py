@@ -509,7 +509,7 @@ for folder in listdir:
 		continue
 	if etacurrent == 0 or etacurrent == maxeta:
 		print etacurrent, "cloudCondition ! "
-		cloudCondition = True
+		cloudCondition = False
 	else:
 		cloudCondition = False
 	########################################################
