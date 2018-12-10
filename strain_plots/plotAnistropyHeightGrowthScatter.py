@@ -315,8 +315,7 @@ def getPrimordiaHeight(cell, targetid):
 ####################################################################################################################
 def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta, 
 	stressscatter, growthscatter,stressscatter1, growthscatter1, anisotropyplot,
-	cloud=False,
-	color,maxeta = 20,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
+	color='r',maxeta = 20,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20,cloud=False):
 	import numpy as np
 	import matplotlib.pyplot as plt
 	import os
