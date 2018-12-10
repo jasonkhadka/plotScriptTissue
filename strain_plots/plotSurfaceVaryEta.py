@@ -234,8 +234,8 @@ for folder in listdir:
 	counter+= 1
 
 ax.view_init(azim = azim, elev = elev)
-fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.png"%(targeteta[0],targetet[1]),transparent = True, bbox_inches="tight")
-fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.eps"%(targeteta[0],targetet[1]),transparent = True, bbox_inches="tight")
+fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.png"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
+fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.eps"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
 
 
 
