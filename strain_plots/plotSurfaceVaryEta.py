@@ -109,10 +109,9 @@ parser = argparse.ArgumentParser()#parser
 parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
 parser.add_argument('-e',"--end", help="End of simulation step",default = 2000, type = int)
 parser.add_argument('-d',"--stepsize", help="step size",default =10, type = int)
-parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
 parser.add_argument('-l', "--layer", help = "The number of layers in the quadedge cell",type=int)
-parser.add_argument("-a","--alpha",help = "value to set for Alpha (weigth of first term of Energy), default = 0",
-											  default = .8, type = float)
+parser.add_argument("-c","--targetarea",help = "targetarea for surface",
+											  default = 800, type = float)
 parser.add_argument("-n","--nonNormalize", help = "if option is used, the figures are not normalised", action= "store_false")
 parser.add_argument("-b","--beta",help = "value to set for Beta (weigth of second term of Energy), default = 0",
 											  default = 0., type = float)
@@ -133,9 +132,8 @@ args = parser.parse_args()
 #location = args.location
 endStep = args.end
 startStep = args.start
+targetArea = args.targetarea
 stepsize = args.stepsize
-cylinder = args.cylinder
-alpha = args.alpha
 beta = args.beta
 zeta  = args.zeta
 pressure = args.pressure
