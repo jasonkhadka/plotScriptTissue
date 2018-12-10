@@ -523,7 +523,7 @@ for folder in listdir:
 	os.chdir(folder)
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
-	plotData[eta] = plotHeightGrowthScatter(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
+	plotData[etacurrent] = plotHeightGrowthScatter(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
 				stressscatter = ax1,growthscatter = ax2,stressscatter1 =ax3,growthscatter1 = ax4,
 				anisotropyplot = anisotropyplot,
 				startStep = startStep,  maxeta = maxeta,
