@@ -315,7 +315,8 @@ def getPrimordiaHeight(cell, targetid):
 ####################################################################################################################
 def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta, 
 	stressscatter, growthscatter,stressscatter1, growthscatter1, anisotropyplot,
-	color='r',maxeta = 20,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20,cloud=False):
+	color='r',maxeta = 20,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20,cloud=False,startarea = None,
+	endarea = 850):
 	import numpy as np
 	import matplotlib.pyplot as plt
 	import os
@@ -327,13 +328,6 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 	initialTissueSurfaceArea = sf.getSurfaceArea(cell)
 	#######################################################################
 	# Starting the Calculation
-	#######################################################################
-	#####################################
-	#Getting initial area of primodial
-	#####################################
-	if not os.path.isfile("qdObject_step=001.obj"):
-		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1)
 	#######################################################################
 	laststep = 1
 	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
@@ -350,10 +344,12 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 
 	meangrowthEigenvalue1Array = []
 	meangrowthEigenvalue2Array = []
-	for steparea in range(680, 800, int(areastep)):
+	if not startarea:#no startarea given
+		startarea = int(initialTissueSurfaceArea)
+	for steparea in range(startarea, endarea, int(areastep)):
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 5)
 		########################################################################
-		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep/2., endStep, step, stepsize = 5)
+		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep., endStep, step, stepsize = 5)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
@@ -487,6 +483,8 @@ fastkappaOption = args.fastkappa
 large  = args.Large
 stepsize = 10
 maxarea = args.maxarea
+startarea = None
+endarea = 850
 # For surpressing err
 class NullDevice():
 	def write(self, s):
@@ -603,7 +601,7 @@ for folder in listdir:
 				anisotropyplot = anisotropyplot,
 				startStep = startStep,  maxeta = maxeta,
 				color = etacolor,stepsize = stepsize,
-				largerCondition = large,maxarea = maxarea, areastep = areastep, cloud=cloudCondition)
+				largerCondition = large,maxarea = maxarea, areastep = areastep, cloud=cloudCondition,startarea = startarea, endarea = endarea)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
