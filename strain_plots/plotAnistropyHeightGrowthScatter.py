@@ -27,412 +27,412 @@ import numpy as n, pylab as p, time
 import scipy.interpolate as interpolate
 
 def _angle_to_point(point, centre):
-    '''calculate angle in 2-D between points and x axis'''
-    delta = point - centre
-    res = n.arctan(delta[1] / delta[0])
-    if delta[0] < 0:
-        res += n.pi
-    return res
+	'''calculate angle in 2-D between points and x axis'''
+	delta = point - centre
+	res = n.arctan(delta[1] / delta[0])
+	if delta[0] < 0:
+		res += n.pi
+	return res
 
 def _draw_triangle(p1, p2, p3, **kwargs):
-    tmp = n.vstack((p1,p2,p3))
-    x,y = [x[0] for x in zip(tmp.transpose())]
-    p.fill(x,y, **kwargs)
+	tmp = n.vstack((p1,p2,p3))
+	x,y = [x[0] for x in zip(tmp.transpose())]
+	p.fill(x,y, **kwargs)
 
 def area_of_triangle(p1, p2, p3):
-    '''calculate area of any triangle given co-ordinates of the corners'''
-    return n.linalg.norm(n.cross((p2 - p1), (p3 - p1)))/2.
+	'''calculate area of any triangle given co-ordinates of the corners'''
+	return n.linalg.norm(n.cross((p2 - p1), (p3 - p1)))/2.
 
 
 def convex_hull(points, graphic=False, smidgen=0.0075,scale = 1.05):
-    '''
-    Calculate subset of points that make a convex hull around points
-    Recursively eliminates points that lie inside two neighbouring points until only convex hull is remaining.
+	'''
+	Calculate subset of points that make a convex hull around points
+	Recursively eliminates points that lie inside two neighbouring points until only convex hull is remaining.
 
-    :Parameters:
-    points : ndarray (2 x m)
-    array of points for which to find hull
-    graphic : bool
-    use pylab to show progress?
-    smidgen : float
-    offset for graphic number labels - useful values depend on your data range
+	:Parameters:
+	points : ndarray (2 x m)
+	array of points for which to find hull
+	graphic : bool
+	use pylab to show progress?
+	smidgen : float
+	offset for graphic number labels - useful values depend on your data range
 
-    :Returns:
-    hull_points : ndarray (2 x n)
-    convex hull surrounding points
-    '''
+	:Returns:
+	hull_points : ndarray (2 x n)
+	convex hull surrounding points
+	'''
 
-    if graphic:
-        p.clf()
-        p.plot(points[0], points[1], 'ro')
-    n_pts = points.shape[1]
-    assert(n_pts > 5)
-    centre = points.mean(1)
-    if graphic: p.plot((centre[0],),(centre[1],),'bo')
-    angles = n.apply_along_axis(_angle_to_point, 0, points, centre)
-    pts_ord = points[:,angles.argsort()]
-    if graphic:
-        for i in xrange(n_pts):
-            p.text(pts_ord[0,i] + smidgen, pts_ord[1,i] + smidgen, \
-                   '%d' % i)
-    pts = [x[0] for x in zip(pts_ord.transpose())]
-    prev_pts = len(pts) + 1
-    k = 0
-    while prev_pts > n_pts:
-        prev_pts = n_pts
-        n_pts = len(pts)
-        if graphic: p.gca().patches = []
-        i = -2
-        while i < (n_pts - 2):
-            Aij = area_of_triangle(centre, pts[i],     pts[(i + 1) % n_pts])
-            Ajk = area_of_triangle(centre, pts[(i + 1) % n_pts], \
-                                   pts[(i + 2) % n_pts])
-            Aik = area_of_triangle(centre, pts[i],     pts[(i + 2) % n_pts])
-            if graphic:
-                _draw_triangle(centre, pts[i], pts[(i + 1) % n_pts], \
-                               facecolor='blue', alpha = 0.2)
-                _draw_triangle(centre, pts[(i + 1) % n_pts], \
-                               pts[(i + 2) % n_pts], \
-                               facecolor='green', alpha = 0.2)
-                _draw_triangle(centre, pts[i], pts[(i + 2) % n_pts], \
-                               facecolor='red', alpha = 0.2)
-            if Aij + Ajk < Aik:
-                if graphic: p.plot((pts[i + 1][0],),(pts[i + 1][1],),'go')
-                del pts[i+1]
-            i += 1
-            n_pts = len(pts)
-        k += 1
-    return scale*n.asarray(pts)
+	if graphic:
+		p.clf()
+		p.plot(points[0], points[1], 'ro')
+	n_pts = points.shape[1]
+	assert(n_pts > 5)
+	centre = points.mean(1)
+	if graphic: p.plot((centre[0],),(centre[1],),'bo')
+	angles = n.apply_along_axis(_angle_to_point, 0, points, centre)
+	pts_ord = points[:,angles.argsort()]
+	if graphic:
+		for i in xrange(n_pts):
+			p.text(pts_ord[0,i] + smidgen, pts_ord[1,i] + smidgen, \
+				   '%d' % i)
+	pts = [x[0] for x in zip(pts_ord.transpose())]
+	prev_pts = len(pts) + 1
+	k = 0
+	while prev_pts > n_pts:
+		prev_pts = n_pts
+		n_pts = len(pts)
+		if graphic: p.gca().patches = []
+		i = -2
+		while i < (n_pts - 2):
+			Aij = area_of_triangle(centre, pts[i],     pts[(i + 1) % n_pts])
+			Ajk = area_of_triangle(centre, pts[(i + 1) % n_pts], \
+								   pts[(i + 2) % n_pts])
+			Aik = area_of_triangle(centre, pts[i],     pts[(i + 2) % n_pts])
+			if graphic:
+				_draw_triangle(centre, pts[i], pts[(i + 1) % n_pts], \
+							   facecolor='blue', alpha = 0.2)
+				_draw_triangle(centre, pts[(i + 1) % n_pts], \
+							   pts[(i + 2) % n_pts], \
+							   facecolor='green', alpha = 0.2)
+				_draw_triangle(centre, pts[i], pts[(i + 2) % n_pts], \
+							   facecolor='red', alpha = 0.2)
+			if Aij + Ajk < Aik:
+				if graphic: p.plot((pts[i + 1][0],),(pts[i + 1][1],),'go')
+				del pts[i+1]
+			i += 1
+			n_pts = len(pts)
+		k += 1
+	return scale*n.asarray(pts)
 ###############################################################################################################
 # to interpolate the data
 ###############################################################################################################
 def interpolatedata(data):
-    x = data[:,0]
-    y = data[:,1]
-    t = np.arange(x.shape[0], dtype=float)
-    t /= t[-1]
-    nt = np.linspace(0, 1, 100)
-    t /= t[-1]
-    x2 = interpolate.spline(t, x, nt)
-    y2 = interpolate.spline(t, y, nt)
-    return x2,y2
+	x = data[:,0]
+	y = data[:,1]
+	t = np.arange(x.shape[0], dtype=float)
+	t /= t[-1]
+	nt = np.linspace(0, 1, 100)
+	t /= t[-1]
+	x2 = interpolate.spline(t, x, nt)
+	y2 = interpolate.spline(t, y, nt)
+	return x2,y2
 
 ###############################################################################################################
 # Get 2 dictionaries one with radialDirection vectors for each face and 
 # another with orthoradialDirection vectors for each face
 ###############################################################################################################
 def getRadialOrthoradialDict(cell,targetid, large = False):
-    primordiafacelist= sf.getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=large)
-    orthoradialDict = {}
-    radialDict = {}
-    targetface = sf.getFace(cell,targetid)
-    targetcentroid = np.array([targetface.getXCentralised(), targetface.getYCentralised(),targetface.getZCentralised()])
-    ############################################################
-    for listiter in range(len(primordiafacelist)):
-        facelist = primordiafacelist[listiter]
-        ########################################################
-        for count in range(len(facelist)):
-            face = facelist[count]
-            #nextface = facelist[(count+1)%len(facelist)]
-            normal = face.getNormal()
-            normalvec = np.array([qd.doublearray_getitem(normal,0),
-                            qd.doublearray_getitem(normal,1),
-                            qd.doublearray_getitem(normal,2)])
-            ########################################################
-            facecentroid = np.array([face.getXCentralised(), face.getYCentralised(),face.getZCentralised()])
-            #Calculating direction Vector to primordia centroid
-            direcvec = np.subtract(targetcentroid,facecentroid)
-            direcvec = direcvec/np.linalg.norm(direcvec)
-            #Radial Vec to on-plane unitvector
-            radialvec = direcvec - normalvec*(np.dot(direcvec,normalvec))
-            radialvec = radialvec/np.linalg.norm(radialvec)
-            ########################################################
-            crossvec = np.cross(radialvec,normalvec)
-            crossvec = crossvec/np.linalg.norm(crossvec)
-            orthoradialDict[face.getID()] = crossvec
-            radialDict[face.getID()]= radialvec
-    return radialDict,orthoradialDict
+	primordiafacelist= sf.getSeparatePrimordiaBoundaryFaceList(cell, targetid, large=large)
+	orthoradialDict = {}
+	radialDict = {}
+	targetface = sf.getFace(cell,targetid)
+	targetcentroid = np.array([targetface.getXCentralised(), targetface.getYCentralised(),targetface.getZCentralised()])
+	############################################################
+	for listiter in range(len(primordiafacelist)):
+		facelist = primordiafacelist[listiter]
+		########################################################
+		for count in range(len(facelist)):
+			face = facelist[count]
+			#nextface = facelist[(count+1)%len(facelist)]
+			normal = face.getNormal()
+			normalvec = np.array([qd.doublearray_getitem(normal,0),
+							qd.doublearray_getitem(normal,1),
+							qd.doublearray_getitem(normal,2)])
+			########################################################
+			facecentroid = np.array([face.getXCentralised(), face.getYCentralised(),face.getZCentralised()])
+			#Calculating direction Vector to primordia centroid
+			direcvec = np.subtract(targetcentroid,facecentroid)
+			direcvec = direcvec/np.linalg.norm(direcvec)
+			#Radial Vec to on-plane unitvector
+			radialvec = direcvec - normalvec*(np.dot(direcvec,normalvec))
+			radialvec = radialvec/np.linalg.norm(radialvec)
+			########################################################
+			crossvec = np.cross(radialvec,normalvec)
+			crossvec = crossvec/np.linalg.norm(crossvec)
+			orthoradialDict[face.getID()] = crossvec
+			radialDict[face.getID()]= radialvec
+	return radialDict,orthoradialDict
 ###############################################################################################################
 # for a face, projecting its stress eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
 def getRadialOrthoradialStress(face, radialDict=None,orthoradialDict=None, vectors = False):
-    #eigenvec1 = face.getStressEigenVector1()
-    #eigenvec2 = face.getStressEigenVector2()
-    eigenvalue1 = face.getStressEigenValue1()
-    eigenvalue2 = face.getStressEigenValue2()
-    """
-    vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
-                    qd.doublearray_getitem(eigenvec1,1),
-                    qd.doublearray_getitem(eigenvec1,2)])
-    vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
-                    qd.doublearray_getitem(eigenvec2,1),
-                    qd.doublearray_getitem(eigenvec2,2)])
-    vec1 =eigenvalue1*vec1unit
-    vec2 = eigenvalue2*vec2unit
-    radialvec = np.copy(radialDict[face.getID()])
-    orthoradialvec = np.copy(orthoradialDict[face.getID()])
-    #print radialvec,orthoradialvec
-    ############################################
-    ########################################################################################
-    radsign1 = 1.#(np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
-    radsign2 = 1.#(np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
-    orthosign1 = 1.#(np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
-    orthosign2 = 1.#(np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
-    #print radsign1, radsign2, orthosign1, orthosign2
-    ########################################################################################
-    radialComp = eigenvalue1*np.dot(radialvec,vec1unit)*radsign1+eigenvalue2*np.dot(radialvec,vec2unit)*radsign2
-    orthoradialComp = #eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
-    #radialComp = np.dot(radialvec,vec1)+np.dot(radialvec,vec2)
-    #orthoradialComp = np.dot(orthoradialvec,vec1)+np.dot(orthoradialvec,vec2)
-    ############################################
-    if vectors:
-        radialvec = radialComp*radialvec
-        orthoradialvec = orthoradialComp*orthoradialvec
-        return radialvec, orthoradialvec
-    """
-    ############################################
-    radialComp = face.getRadialStress()
-    orthoradialComp = face.getOrthoradialStress()
-    ############################################
-    return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
+	#eigenvec1 = face.getStressEigenVector1()
+	#eigenvec2 = face.getStressEigenVector2()
+	eigenvalue1 = face.getStressEigenValue1()
+	eigenvalue2 = face.getStressEigenValue2()
+	"""
+	vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
+					qd.doublearray_getitem(eigenvec1,1),
+					qd.doublearray_getitem(eigenvec1,2)])
+	vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
+					qd.doublearray_getitem(eigenvec2,1),
+					qd.doublearray_getitem(eigenvec2,2)])
+	vec1 =eigenvalue1*vec1unit
+	vec2 = eigenvalue2*vec2unit
+	radialvec = np.copy(radialDict[face.getID()])
+	orthoradialvec = np.copy(orthoradialDict[face.getID()])
+	#print radialvec,orthoradialvec
+	############################################
+	########################################################################################
+	radsign1 = 1.#(np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
+	radsign2 = 1.#(np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
+	orthosign1 = 1.#(np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
+	orthosign2 = 1.#(np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
+	#print radsign1, radsign2, orthosign1, orthosign2
+	########################################################################################
+	radialComp = eigenvalue1*np.dot(radialvec,vec1unit)*radsign1+eigenvalue2*np.dot(radialvec,vec2unit)*radsign2
+	orthoradialComp = #eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
+	#radialComp = np.dot(radialvec,vec1)+np.dot(radialvec,vec2)
+	#orthoradialComp = np.dot(orthoradialvec,vec1)+np.dot(orthoradialvec,vec2)
+	############################################
+	if vectors:
+		radialvec = radialComp*radialvec
+		orthoradialvec = orthoradialComp*orthoradialvec
+		return radialvec, orthoradialvec
+	"""
+	############################################
+	radialComp = face.getRadialStress()
+	orthoradialComp = face.getOrthoradialStress()
+	############################################
+	return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
 ###################################################################
 ####################################################################################################################
 # Calculating the max time step for target surface area
 ####################################################################################################################
 def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
-    ####################################################
-    for step in range(startStep, endStep+1,stepsize):
-        if not os.path.isfile("qdObject_step=%03d.obj"%step):
-            return endStep,0.
-        ################################################
-        cell = sf.loadCellFromFile(step)
-        ################################################
-        tissueSurfaceArea = sf.getSurfaceArea(cell)
-        if (tissueSurfaceArea > targetArea):
-            gc.collect()
-            for calstep in range(step-1,step-stepsize-1,-1):
-                    cell = sf.loadCellFromFile(calstep)
-                    tissueSurfaceArea = sf.getSurfaceArea(cell)
-                    if (tissueSurfaceArea <= targetArea):
-                        gc.collect()
-                        cell = sf.loadCellFromFile(calstep+1)
-                        tissueSurfaceArea = sf.getSurfaceArea(cell)
-                        return calstep+1,tissueSurfaceArea
-        ################################################
-        gc.collect()
-    return endStep,tissueSurfaceArea
+	####################################################
+	for step in range(startStep, endStep+1,stepsize):
+		if not os.path.isfile("qdObject_step=%03d.obj"%step):
+			return endStep,0.
+		################################################
+		cell = sf.loadCellFromFile(step)
+		################################################
+		tissueSurfaceArea = sf.getSurfaceArea(cell)
+		if (tissueSurfaceArea > targetArea):
+			gc.collect()
+			for calstep in range(step-1,step-stepsize-1,-1):
+					cell = sf.loadCellFromFile(calstep)
+					tissueSurfaceArea = sf.getSurfaceArea(cell)
+					if (tissueSurfaceArea <= targetArea):
+						gc.collect()
+						cell = sf.loadCellFromFile(calstep+1)
+						tissueSurfaceArea = sf.getSurfaceArea(cell)
+						return calstep+1,tissueSurfaceArea
+		################################################
+		gc.collect()
+	return endStep,tissueSurfaceArea
 ###############################################################################################################
 # for a face, projecting its Growth eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
 def getRadialOrthoradialGrowth(face, radialDict=None,orthoradialDict=None, vectors = False):
-    #eigenvec1 = face.getRotGrowthEigenVector1()
-    #eigenvec2 = face.getRotGrowthEigenVector2()
-    eigenvalue1 = face.getRotGrowthEigenValue1()
-    eigenvalue2 = face.getRotGrowthEigenValue2()
-    """
-    vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
-                    qd.doublearray_getitem(eigenvec1,1),
-                    qd.doublearray_getitem(eigenvec1,2)])
-    vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
-                    qd.doublearray_getitem(eigenvec2,1),
-                    qd.doublearray_getitem(eigenvec2,2)])
-    vec1 =eigenvalue1*vec1unit
-    vec2 = eigenvalue2*vec2unit
-    #print vec1unit
-    radialvec = np.copy(radialDict[face.getID()])
-    orthoradialvec = np.copy(orthoradialDict[face.getID()])
-    #print radialvec,orthoradialvec
-    ########################################################################################
-    # sign change if needed : 
-    #       if EigenVector and RadialVec are opposite facing
-    ########################################################################################
-    #print "rad.vec1 :",np.dot(radialvec, vec1unit), 'rad.vec2',np.dot(radialvec, vec2unit), np.dot(vec1unit,vec2unit)
-    ########################################################################################
-    radsign1 = 1.#(np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
-    radsign2 = 1.#(np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
-    orthosign1 = 1.#(np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
-    orthosign2 = 1.#(np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
-    #print radsign1, radsign2, orthosign1, orthosign2
-    ########################################################################################
-    radialComp = eigenvalue1*np.dot(radialvec,vec1unit)*radsign1+eigenvalue2*np.dot(radialvec,vec2unit)*radsign2
-    orthoradialComp = eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
-    #radialComp = np.dot(radialvec,vec1)*radsign1+np.dot(radialvec,vec2)*radsign2
-    #orthoradialComp = np.dot(orthoradialvec,vec1)*orthosign1+np.dot(orthoradialvec,vec2)*orthosign2
-    ############################################
-    
-    if vectors:
-        radialvec = radialComp*radialvec
-        orthoradialvec = orthoradialComp*orthoradialvec
-        return radialvec, orthoradialvec
-    """
-    ############################################
-    radialComp = face.getRadialGrowth()
-    orthoradialComp = face.getOrthoradialGrowth()
-    ############################################
-    ############################################
-    return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
+	#eigenvec1 = face.getRotGrowthEigenVector1()
+	#eigenvec2 = face.getRotGrowthEigenVector2()
+	eigenvalue1 = face.getRotGrowthEigenValue1()
+	eigenvalue2 = face.getRotGrowthEigenValue2()
+	"""
+	vec1unit = np.array([qd.doublearray_getitem(eigenvec1,0),
+					qd.doublearray_getitem(eigenvec1,1),
+					qd.doublearray_getitem(eigenvec1,2)])
+	vec2unit = np.array([qd.doublearray_getitem(eigenvec2,0),
+					qd.doublearray_getitem(eigenvec2,1),
+					qd.doublearray_getitem(eigenvec2,2)])
+	vec1 =eigenvalue1*vec1unit
+	vec2 = eigenvalue2*vec2unit
+	#print vec1unit
+	radialvec = np.copy(radialDict[face.getID()])
+	orthoradialvec = np.copy(orthoradialDict[face.getID()])
+	#print radialvec,orthoradialvec
+	########################################################################################
+	# sign change if needed : 
+	#       if EigenVector and RadialVec are opposite facing
+	########################################################################################
+	#print "rad.vec1 :",np.dot(radialvec, vec1unit), 'rad.vec2',np.dot(radialvec, vec2unit), np.dot(vec1unit,vec2unit)
+	########################################################################################
+	radsign1 = 1.#(np.dot(radialvec, vec1unit)<0.)*(-1)+(np.dot(radialvec, vec1unit)>0.)*(1)
+	radsign2 = 1.#(np.dot(radialvec, vec2unit)<0.)*(-1)+(np.dot(radialvec, vec2unit)>0.)*(1)
+	orthosign1 = 1.#(np.dot(orthoradialvec, vec1unit)<0.)*(-1)+(np.dot(orthoradialvec, vec1unit)>0.)*(1)
+	orthosign2 = 1.#(np.dot(orthoradialvec, vec2unit)<0.)*(-1)+(np.dot(orthoradialvec, vec2unit)>0.)*(1)
+	#print radsign1, radsign2, orthosign1, orthosign2
+	########################################################################################
+	radialComp = eigenvalue1*np.dot(radialvec,vec1unit)*radsign1+eigenvalue2*np.dot(radialvec,vec2unit)*radsign2
+	orthoradialComp = eigenvalue1*np.dot(orthoradialvec,vec1unit)*orthosign1+eigenvalue2*np.dot(orthoradialvec,vec2unit)*orthosign2
+	#radialComp = np.dot(radialvec,vec1)*radsign1+np.dot(radialvec,vec2)*radsign2
+	#orthoradialComp = np.dot(orthoradialvec,vec1)*orthosign1+np.dot(orthoradialvec,vec2)*orthosign2
+	############################################
+	
+	if vectors:
+		radialvec = radialComp*radialvec
+		orthoradialvec = orthoradialComp*orthoradialvec
+		return radialvec, orthoradialvec
+	"""
+	############################################
+	radialComp = face.getRadialGrowth()
+	orthoradialComp = face.getOrthoradialGrowth()
+	############################################
+	############################################
+	return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
 ###############################################################################################################
 # Calculate primordia height
 ###############################################################################################################
 def getPrimordiaHeight(cell, targetid):
-    ###################################################################
-    def addMeanVertex(vertex,meanx,meany,meanz):
-        meanx += vertex.getXcoordinate()
-        meany += vertex.getYcoordinate()
-        meanz += vertex.getZcoordinate()
-        return meanx,meany,meanz
-    ########################################################################
-    # Getting the primordial boundary
-    ########################################################################
-    facetarget = sf.getFace(cell, targetid)
-    ##########################################
-    # Vertex on primordial boundary
-    ##########################################
-    vertexList = sf.getPrimordiaBoundaryVertexList(cell, targetid)
-    vertexNum = len(vertexList)
-    ####################################################
-    # Calculation of primordial height starts here
-    # This is for smaller primordia
-    ####################################################
-    meanx = 0.
-    meany = 0.
-    meanz = 0.
-    for vert in vertexList:#while edge.Dest().getID() != targetedge.Dest().getID():
-        meanx,meany,meanz = addMeanVertex(vert,meanx,meany,meanz)
-    ######################################
-    targetx = facetarget.getXCentralised()
-    targety = facetarget.getYCentralised()
-    targetz = facetarget.getZCentralised()
-    meanx /= vertexNum
-    meany /= vertexNum
-    meanz /= vertexNum
-    height = np.sqrt((meanx-targetx)**2+(meany-targety)**2+(meanz-targetz)**2)
-    ######################################
-    return height
+	###################################################################
+	def addMeanVertex(vertex,meanx,meany,meanz):
+		meanx += vertex.getXcoordinate()
+		meany += vertex.getYcoordinate()
+		meanz += vertex.getZcoordinate()
+		return meanx,meany,meanz
+	########################################################################
+	# Getting the primordial boundary
+	########################################################################
+	facetarget = sf.getFace(cell, targetid)
+	##########################################
+	# Vertex on primordial boundary
+	##########################################
+	vertexList = sf.getPrimordiaBoundaryVertexList(cell, targetid)
+	vertexNum = len(vertexList)
+	####################################################
+	# Calculation of primordial height starts here
+	# This is for smaller primordia
+	####################################################
+	meanx = 0.
+	meany = 0.
+	meanz = 0.
+	for vert in vertexList:#while edge.Dest().getID() != targetedge.Dest().getID():
+		meanx,meany,meanz = addMeanVertex(vert,meanx,meany,meanz)
+	######################################
+	targetx = facetarget.getXCentralised()
+	targety = facetarget.getYCentralised()
+	targetz = facetarget.getZCentralised()
+	meanx /= vertexNum
+	meany /= vertexNum
+	meanz /= vertexNum
+	height = np.sqrt((meanx-targetx)**2+(meany-targety)**2+(meanz-targetz)**2)
+	######################################
+	return height
 
 ####################################################################################################################
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
 def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta, 
-    stressscatter, growthscatter,stressscatter1, growthscatter1, anisotropyplot,
-    cloud=False,
-    color,maxeta = 20,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import os
-    ########################################################################
-    # faceidarray for Primordia
-    if not os.path.isfile("qdObject_step=001.obj"):
-        return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(1)
-    initialTissueSurfaceArea = sf.getSurfaceArea(cell)
-    #######################################################################
-    # Starting the Calculation
-    #######################################################################
-    #####################################
-    #Getting initial area of primodial
-    #####################################
-    if not os.path.isfile("qdObject_step=001.obj"):
-        return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(1)
-    #######################################################################
-    laststep = 1
-    plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
-    #######################################################################
-    orthoradialStressArray = []
-    radialStressArray = []
-    radialGrowthArray = []
-    orthoradialGrowthArray = []
-    tissueSurfaceAreaArray = []
-    primordiaAreaArray = []
-    heightArray = []
-    meanstressEigenvalue1Array = []
-    meanstressEigenvalue2Array = []
+	stressscatter, growthscatter,stressscatter1, growthscatter1, anisotropyplot,
+	cloud=False,
+	color,maxeta = 20,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20):
+	import numpy as np
+	import matplotlib.pyplot as plt
+	import os
+	########################################################################
+	# faceidarray for Primordia
+	if not os.path.isfile("qdObject_step=001.obj"):
+		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
+	cell = sf.loadCellFromFile(1)
+	initialTissueSurfaceArea = sf.getSurfaceArea(cell)
+	#######################################################################
+	# Starting the Calculation
+	#######################################################################
+	#####################################
+	#Getting initial area of primodial
+	#####################################
+	if not os.path.isfile("qdObject_step=001.obj"):
+		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
+	cell = sf.loadCellFromFile(1)
+	#######################################################################
+	laststep = 1
+	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
+	#######################################################################
+	orthoradialStressArray = []
+	radialStressArray = []
+	radialGrowthArray = []
+	orthoradialGrowthArray = []
+	tissueSurfaceAreaArray = []
+	primordiaAreaArray = []
+	heightArray = []
+	meanstressEigenvalue1Array = []
+	meanstressEigenvalue2Array = []
 
-    meangrowthEigenvalue1Array = []
-    meangrowthEigenvalue2Array = []
-    for steparea in range(680, 800, int(areastep)):
-        step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 5)
-        ########################################################################
-        step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep/2., endStep, step, stepsize = 5)
-        ########################################################################
-        if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
-            break
-        cell = sf.loadCellFromFile(step)
-        cell2 = sf.loadCellFromFile(step2)
-        ################################################
-        cell.calculateStressStrain()
-        ################################################
-        primordialface = sf.getFace(cell, targetid)
-        ################################################
-        cell.setRadialOrthoradialVector(primordialface)
-        cell.setRadialOrthoradialStress()
-        ################################################
-        sf.calculateDilation(cell,cell2)
-        ########################################################################
-        #  Starting the Calculation of mean growth and mean stress on boundary
-        ########################################################################
-        # mean stress
-        ########################################################################
-        faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
-        primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
-        primordiaarea = 0.
-        for face in primordiafacelist:
-            primordiaarea += face.getAreaOfFace()
-        ######################################################
-        #radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
-        ######################################################
-        stressEigenvalue1Array = []
-        stressEigenvalue2Array = []
-        growthEigenvalue1Array = []
-        growthEigenvalue2Array = []
-        stressdiffarray = []
-        growthdiffarray = []
-        dTissueSurfaceArea = tissueSurfaceArea2-tissueSurfaceArea
-        height = getPrimordiaHeight(cell,targetid)
-        height2 = getPrimordiaHeight(cell2,targetid)
-        dhdA = (height2-height)/dTissueSurfaceArea
-        for face in faceList:
-            radstress, orthstress,stresseigenvalue1, stresseigenvalue2  = getRadialOrthoradialStress(face)
-            radGrowth, orthGrowth, growtheigenvalue1, growtheigenvalue2 = getRadialOrthoradialGrowth(face)
-            stressEigenvalue1Array.append(stresseigenvalue1)
-            stressEigenvalue2Array.append(stresseigenvalue2)
-            growthEigenvalue1Array.append(growtheigenvalue1)
-            growthEigenvalue2Array.append(growtheigenvalue2)
-            stressdiffarray.append(stresseigenvalue2-stresseigenvalue1)
-            growthdiffarray.append(growtheigenvalue2-growtheigenvalue1)
-        #######################################################
-        # plotting
-        #######################################################
-        meanstresseigen1 = np.mean(stressEigenvalue1Array)
-        meanstresseigen2 = np.mean(stressEigenvalue2Array)
-        meangrowtheigenvalue1 = np.mean(growthEigenvalue1Array)
-        meangrowtheigenvalue2 = np.mean(growthEigenvalue2Array)
+	meangrowthEigenvalue1Array = []
+	meangrowthEigenvalue2Array = []
+	for steparea in range(680, 800, int(areastep)):
+		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 5)
+		########################################################################
+		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep/2., endStep, step, stepsize = 5)
+		########################################################################
+		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
+			break
+		cell = sf.loadCellFromFile(step)
+		cell2 = sf.loadCellFromFile(step2)
+		################################################
+		cell.calculateStressStrain()
+		################################################
+		primordialface = sf.getFace(cell, targetid)
+		################################################
+		cell.setRadialOrthoradialVector(primordialface)
+		cell.setRadialOrthoradialStress()
+		################################################
+		sf.calculateDilation(cell,cell2)
+		########################################################################
+		#  Starting the Calculation of mean growth and mean stress on boundary
+		########################################################################
+		# mean stress
+		########################################################################
+		faceList = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= large)
+		primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
+		primordiaarea = 0.
+		for face in primordiafacelist:
+			primordiaarea += face.getAreaOfFace()
+		######################################################
+		#radialDict, orthoradialDict = getRadialOrthoradialDict(cell,targetid,large = large)
+		######################################################
+		stressEigenvalue1Array = []
+		stressEigenvalue2Array = []
+		growthEigenvalue1Array = []
+		growthEigenvalue2Array = []
+		stressdiffarray = []
+		growthdiffarray = []
+		dTissueSurfaceArea = tissueSurfaceArea2-tissueSurfaceArea
+		height = getPrimordiaHeight(cell,targetid)
+		height2 = getPrimordiaHeight(cell2,targetid)
+		dhdA = (height2-height)/dTissueSurfaceArea
+		for face in faceList:
+			radstress, orthstress,stresseigenvalue1, stresseigenvalue2  = getRadialOrthoradialStress(face)
+			radGrowth, orthGrowth, growtheigenvalue1, growtheigenvalue2 = getRadialOrthoradialGrowth(face)
+			stressEigenvalue1Array.append(stresseigenvalue1)
+			stressEigenvalue2Array.append(stresseigenvalue2)
+			growthEigenvalue1Array.append(growtheigenvalue1)
+			growthEigenvalue2Array.append(growtheigenvalue2)
+			stressdiffarray.append(stresseigenvalue2-stresseigenvalue1)
+			growthdiffarray.append(growtheigenvalue2-growtheigenvalue1)
+		#######################################################
+		# plotting
+		#######################################################
+		meanstresseigen1 = np.mean(stressEigenvalue1Array)
+		meanstresseigen2 = np.mean(stressEigenvalue2Array)
+		meangrowtheigenvalue1 = np.mean(growthEigenvalue1Array)
+		meangrowtheigenvalue2 = np.mean(growthEigenvalue2Array)
 
-        sigma2 = max(meanstresseigen1 ,meanstresseigen2)
-        sigma1 = min(meanstresseigen1 ,meanstresseigen2)
-        g2 = max(meangrowtheigenvalue1,meangrowtheigenvalue2)
-        g1 = min(meangrowtheigenvalue1,meangrowtheigenvalue2)
-        #######################################################
-        stressscatter.scatter(sigma2-sigma1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-        growthscatter.scatter(g2-g1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-        #######################################################
-        stressscatter1.scatter(np.mean(stressdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-        growthscatter1.scatter(np.mean(growthdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-        #######################################################
-        anisotropyplot.scatter(np.mean(stressdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-        ########################################################################
-        if cloudCondition:
-            points = np.vstack((dhdA,np.mean(stressdiffarray)))
-            hullpts = convex_hull(points)
-            hull_pts = np.vstack((hull_pts,hull_pts[0]))
-            interpolatex, interpolatey = interpolatedata(hull_pts)
-            anisotropyplot.plot(interpolatex, interpolatey, c = color,ls= '--',lw=2)
-        ########################################################################
-        laststep = step
-        ########################################################################
-        print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
-    return 
+		sigma2 = max(meanstresseigen1 ,meanstresseigen2)
+		sigma1 = min(meanstresseigen1 ,meanstresseigen2)
+		g2 = max(meangrowtheigenvalue1,meangrowtheigenvalue2)
+		g1 = min(meangrowtheigenvalue1,meangrowtheigenvalue2)
+		#######################################################
+		stressscatter.scatter(sigma2-sigma1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+		growthscatter.scatter(g2-g1, dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+		#######################################################
+		stressscatter1.scatter(np.mean(stressdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+		growthscatter1.scatter(np.mean(growthdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+		#######################################################
+		anisotropyplot.scatter(np.mean(stressdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
+		########################################################################
+		if cloudCondition:
+			points = np.vstack((dhdA,np.mean(stressdiffarray)))
+			hullpts = convex_hull(points)
+			hull_pts = np.vstack((hull_pts,hull_pts[0]))
+			interpolatex, interpolatey = interpolatedata(hull_pts)
+			anisotropyplot.plot(interpolatex, interpolatey, c = color,ls= '--',lw=2)
+		########################################################################
+		laststep = step
+		########################################################################
+		print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
+	return 
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -493,10 +493,10 @@ class NullDevice():
 	def write(self, s):
 		pass
 if targetface == None:
-    if numOfLayer == 8:
-        targetface = 135
-    elif numOfLayer == 10:
-        targetface = 214
+	if numOfLayer == 8:
+		targetface = 135
+	elif numOfLayer == 10:
+		targetface = 214
 
 #print " start "
 #original_stdout = sys.stderr # keep a reference to STDOUT
@@ -583,11 +583,11 @@ for folder in listdir:
 	########################################################
 	if (maxeta != 0) and (etacurrent > maxeta):
 		continue
-    if etacurrent == 0 or etacurrent == maxeta:
-        print etacurrent, "cloudCondition ! "
-        cloudCondition = True
-    else:
-        cloudCondition = False
+	if etacurrent == 0 or etacurrent == maxeta:
+		print etacurrent, "cloudCondition ! "
+		cloudCondition = True
+	else:
+		cloudCondition = False
 	########################################################
 	percentStep = int((counter)/float(totalfolders)*100)
 	sys.stdout.write('\r'+"step : "+ str(counter) +" "+"#"*percentStep+' '*(100-percentStep)+"%d%%"%percentStep)
@@ -601,10 +601,10 @@ for folder in listdir:
 	#print "\n",os.getcwd()
 	plotHeightGrowthScatter(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
 				stressscatter = ax1,growthscatter = ax2,stressscatter1 =ax3,growthscatter1 = ax4,
-                anisotropyplot = anisotropyplot,
-                startStep = startStep,  maxeta = maxeta,
+				anisotropyplot = anisotropyplot,
+				startStep = startStep,  maxeta = maxeta,
 				color = etacolor,stepsize = stepsize,
-                largerCondition = large,maxarea = maxarea, areastep = areastep, cloud=cloudCondition)
+				largerCondition = large,maxarea = maxarea, areastep = areastep, cloud=cloudCondition)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
@@ -628,10 +628,10 @@ fig2.tight_layout(rect=[0.,0.,.9,.9])
 clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-    clrbar.set_label(r"Fast Growth Rate")
+	clrbar.set_label(r"Fast Growth Rate")
 else:
-    clrbar.set_label(r"Mechanical Feedback, $\eta$")
-    clrbar2.set_label(r"Mechanical Feedback, $\eta$")
+	clrbar.set_label(r"Mechanical Feedback, $\eta$")
+	clrbar2.set_label(r"Mechanical Feedback, $\eta$")
 
 ################################################################################
 
@@ -641,8 +641,8 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
 else:
 	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
-    fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_eta=%d_targetface=%d.png"%(maxeta,targetid),transparent = True, bbox_inches="tight")
-    fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_eta=%d_targetface=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_eta=%d_targetface=%d.png"%(maxeta,targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_eta=%d_targetface=%d.eps"%(maxeta,targetid),transparent = True, bbox_inches="tight")
 
 
 
