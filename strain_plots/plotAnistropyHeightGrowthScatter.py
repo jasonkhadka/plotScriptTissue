@@ -17,9 +17,9 @@ import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 22
-plt.rcParams['ytick.labelsize'] = 22
-plt.rcParams['axes.labelsize'] = 22
+plt.rcParams['xtick.labelsize'] = 20
+plt.rcParams['ytick.labelsize'] = 20
+plt.rcParams['axes.labelsize'] = 20
 plt.rcParams['legend.fontsize'] = 16
 plt.rcParams['axes.titlesize'] = 22
 
@@ -349,7 +349,8 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 	if cloudCondition:
 		points = np.vstack((meanstressdiffarray,areadiffarray)).T
 		hull_pts = ConvexHull(points)
-		hull_pts = points[hull_pts.vertices].T
+		hull_pts = points[hull_pts.vertices]
+		hull_pts = np.vstack((hull_pts,hull_pts[0])).T
 		interpolatex, interpolatey = interpolatedata(hull_pts)
 		anisotropyplot.plot(interpolatex, interpolatey, c = color,ls= '--',lw=2)
 	########################################################################
@@ -543,9 +544,9 @@ clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
 
 fig2.subplots_adjust(right=0.9)
 
-cbar_ax2 = fig2.add_axes([0.85, 0.2, 0.04, 0.65])
+cbar_ax2 = fig2.add_axes([0.9, 0.2, 0.04, 0.65])
 
-fig2.tight_layout()
+fig2.tight_layout(rect=[0.,0.,.9,.9])
 
 
 clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
