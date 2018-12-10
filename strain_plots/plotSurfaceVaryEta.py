@@ -20,7 +20,7 @@ import gc
 plt.rcParams['xtick.labelsize'] = 20
 plt.rcParams['ytick.labelsize'] = 20
 plt.rcParams['axes.labelsize'] = 20
-plt.rcParams['legend.fontsize'] = 16
+plt.rcParams['legend.fontsize'] = 20
 plt.rcParams['axes.titlesize'] = 22
 
 ####################################################################################################################
@@ -129,8 +129,8 @@ parser.add_argument("-o","--angle",help = "value to set for convex angle thresho
 parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneath the epidermis, comming from lower level cells. acting as the volume maximizing agent", default = 0.1, type = float)
 
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = 10, type = float)
-parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
-parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
+parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = 70, type = float)
+parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 0, type = float)
 parser.add_argument("-f","--fastkappa", help = "if option is used, the figures are made with respect to chaning fast kappa", action= "store_true")
 parser.add_argument("-x","--surface", help = "if option is used, surface will be plotted", action= "store_true")
 
@@ -177,7 +177,7 @@ ax = Axes3D(fig)
 xlim = 0.5
 ax.set_xlim((-xlim*radius,xlim*radius))
 ax.set_ylim((-xlim*radius,xlim*radius))
-ax.set_zlim((-0.1*radius,0.9*radius))
+ax.set_zlim((-0.1*radius,0.7*radius))
 ax.axis('off')
 ax.xaxis.pane.set_edgecolor('black')
 ax.yaxis.pane.set_edgecolor('black')
@@ -210,7 +210,7 @@ counter = 0
 totalfolders = len(listdir)
 plotData = {}
 #print listdir
-colors = ['magenta','beige']
+colors = ['darkgreen','navy']
 targeteta = [0.,8.]
 from matplotlib.lines import Line2D
 legenditems = []
@@ -242,8 +242,12 @@ for folder in listdir:
 
 ax.legend(handles = legenditems)
 ax.view_init(azim = azim, elev = elev)
-fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.png"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
-fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.eps"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
+if surface:
+	fig.savefig(saveDirectory+r"/plot_surface_surf_eta=%d_%d.png"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_surface_surf_eta=%d_%d.eps"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
+else:
+	fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.png"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_surface_eta=%d_%d.eps"%(targeteta[0],targeteta[1]),transparent = True, bbox_inches="tight")
 
 
 
