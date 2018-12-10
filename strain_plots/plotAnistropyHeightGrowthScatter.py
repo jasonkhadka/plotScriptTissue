@@ -344,6 +344,8 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 
 	meangrowthEigenvalue1Array = []
 	meangrowthEigenvalue2Array = []
+	meanstressdiffarray = []
+	areadiffarray = []
 	if not startarea:#no startarea given
 		startarea = int(initialTissueSurfaceArea)
 	for steparea in range(startarea, endarea, int(areastep)):
@@ -416,17 +418,20 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 		growthscatter1.scatter(np.mean(growthdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
 		#######################################################
 		anisotropyplot.scatter(np.mean(stressdiffarray), dhdA, c = color,marker = 'o',alpha = 0.7,zorder= maxeta-eta)
-		########################################################################
-		if cloudCondition:
-			points = np.vstack((dhdA,np.mean(stressdiffarray)))
-			hullpts = convex_hull(points)
-			hull_pts = np.vstack((hull_pts,hull_pts[0]))
-			interpolatex, interpolatey = interpolatedata(hull_pts)
-			anisotropyplot.plot(interpolatex, interpolatey, c = color,ls= '--',lw=2)
+		meanstressdiffarray.append(np.mean(stressdiffarray))
+		areadiffarray.append(dhdA)
 		########################################################################
 		laststep = step
 		########################################################################
 		print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
+	########################################################################
+	if cloudCondition:
+		points = np.vstack((areadiffarray,meanstressdiffarray))
+		hullpts = convex_hull(points)
+		hull_pts = np.vstack((hull_pts,hull_pts[0]))
+		interpolatex, interpolatey = interpolatedata(hull_pts)
+		anisotropyplot.plot(interpolatex, interpolatey, c = color,ls= '--',lw=2)
+	########################################################################
 	return 
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
