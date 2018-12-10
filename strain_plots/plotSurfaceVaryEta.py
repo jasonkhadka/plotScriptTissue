@@ -234,7 +234,7 @@ for folder in listdir:
 	os.chdir(folder)
 	step,tissueSurfaceArea = getTimeStep(targetArea, endStep, startStep, stepsize = stepsize)
 	cell = sf.loadCellFromFile(step)
-	plotSurface(cell,ax,color,surface)
+	plotSurface(cell,ax,color,surface,zorder = 10-counter)
 	legenditems.append(Line2D([0], [0], color=color, label=r"$\eta=%d$"%etacurrent,lw='3'))
 	os.chdir("..")
 	gc.collect()
