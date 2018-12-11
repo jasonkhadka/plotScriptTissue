@@ -23,6 +23,14 @@ plt.rcParams['axes.labelsize'] = 22
 plt.rcParams['legend.fontsize'] = 16
 plt.rcParams['axes.titlesize'] = 22
 
+
+####################################################################################################################
+# Add subplot annotation
+####################################################################################################################
+def addAnnotation(subplot,n = 1):
+	subplot.text(-0.1,1.05,string.ascii_lowercase[n],transform = subplot.transAxes,size = 26, weight = 'bold')
+	return
+
 ###############################################################################################################
 # Get 2 dictionaries one with radialDirection vectors for each face and 
 # another with orthoradialDirection vectors for each face
@@ -467,29 +475,29 @@ fig4 = plt.figure(4,figsize=(5.5,5))#boundary area over Tissue area
 meangrowthROplot = fig2.add_subplot(222)
 meangrowthROplot.set_xlabel(r"Surface Area, $A_T$")
 meangrowthROplot.set_ylabel(r"Mean Growth")
-
+addAnnotation(meangrowthROplot, 1)
 meangrowth12plot = fig3.add_subplot(222)
 meangrowth12plot.set_xlabel(r"Surface Area, $A_T$")
 meangrowth12plot.set_ylabel(r"Mean Growth")
-
+addAnnotation(meangrowth12plot, 1)
 stressROplot = fig2.add_subplot(221)
 stressROplot.set_xlabel(r"Surface Area, $A_T$")
 stressROplot.set_ylabel(r"Principal stresses")
-
+addAnnotation(stressROplot, 0)
 stress12plot = fig3.add_subplot(221)
 stress12plot.set_xlabel(r"Surface Area, $A_T$")
 stress12plot.set_ylabel(r"Principal stresses")
-
+addAnnotation(stress12plot, 0)
 
 boundaryareaplot = fig2.add_subplot(223)
 boundaryareaplot.set_xlabel(r"Surface Area, $A_T$")
 boundaryareaplot.set_ylabel(r"Boundary Area, $A_B$")
-
+addAnnotation(boundaryareaplot, 2)
 
 boundaryareaplot1 = fig3.add_subplot(223)
 boundaryareaplot1.set_xlabel(r"Surface Area, $A_T$")
 boundaryareaplot1.set_ylabel(r"Boundary Area, $A_B$")
-
+addAnnotation(boundaryareaplot1, 2)
 ##########################
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
 ax1 = fig.add_subplot(431)
@@ -752,10 +760,14 @@ minarea = min(plotData.values()[0][0])
 if startarea:#start area != none
 	meangrowth12plot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	meangrowthROplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+	stressROplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+	stress12plot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	boundaryareaplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 else:
 	meangrowth12plot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	meangrowthROplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+	stress12plot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+	stressROplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	boundaryareaplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 ################################################################################
 
@@ -768,7 +780,7 @@ else:
 	fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.png"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
-	fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
+	fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.png"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	fig4.savefig(saveDirectory+r"/plot_eta%d_boundaryarea_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
 
 
