@@ -356,8 +356,8 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
 #parser.add_argument('-l','--location', help="The location of targetformmatrix and coordinate file",type = string)
-parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
-parser.add_argument('-e',"--end", help="End of simulation step", type = int)
+parser.add_argument('-s',"--startarea", help="Start of area",default =None, type = int)
+parser.add_argument('-e',"--endarea", help="area end",default = 850, type = int)
 parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only cacluated till this value", type = float, default = 0.0)
 parser.add_argument("-x","--maxarea", help = "if this is given, then plot is only made till this area value value", type = float, default = None)
 parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
@@ -386,8 +386,6 @@ parser.add_argument('-d',"--areastep", help="area step for calculating the growt
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
-endStep = args.end
-startStep = args.start
 cylinder = args.cylinder
 alpha = args.alpha
 beta = args.beta
@@ -407,8 +405,11 @@ fastkappaOption = args.fastkappa
 large  = args.Large
 stepsize = 10
 maxarea = args.maxarea
-startarea = None
-endarea = 850
+startarea = args.startarea
+endarea =args.endarea
+
+endStep = 2000
+startStep = 1
 # For surpressing err
 class NullDevice():
 	def write(self, s):
@@ -459,22 +460,35 @@ scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
 fig = plt.figure(figsize=(15,20))
 ##########################
-fig2 = plt.figure(2,figsize=(5.5,5))#mean growth plots RO
-fig3 = plt.figure(3,figsize=(5.5,5))#mean growth plots 12
+fig2 = plt.figure(2,figsize=(10,10))# plots RO
+fig3 = plt.figure(3,figsize=(10,10))# plots 12
 fig4 = plt.figure(4,figsize=(5.5,5))#boundary area over Tissue area
 ##########################
-meangrowthROplot = fig2.add_subplot(111)
+meangrowthROplot = fig2.add_subplot(222)
 meangrowthROplot.set_xlabel(r"Surface Area, $A_T$")
 meangrowthROplot.set_ylabel(r"Mean Growth")
 
-meangrowth12plot = fig3.add_subplot(111)
+meangrowth12plot = fig3.add_subplot(222)
 meangrowth12plot.set_xlabel(r"Surface Area, $A_T$")
 meangrowth12plot.set_ylabel(r"Mean Growth")
 
+stressROplot = fig2.add_subplot(221)
+stressROplot.set_xlabel(r"Surface Area, $A_T$")
+stressROplot.set_ylabel(r"Principal stresses")
 
-boundaryareaplot = fig4.add_subplot(111)
+stress12plot = fig3.add_subplot(221)
+stress12plot.set_xlabel(r"Surface Area, $A_T$")
+stress12plot.set_ylabel(r"Principal stresses")
+
+
+boundaryareaplot = fig2.add_subplot(223)
 boundaryareaplot.set_xlabel(r"Surface Area, $A_T$")
 boundaryareaplot.set_ylabel(r"Boundary Area, $A_B$")
+
+
+boundaryareaplot1 = fig3.add_subplot(223)
+boundaryareaplot1.set_xlabel(r"Surface Area, $A_T$")
+boundaryareaplot1.set_ylabel(r"Boundary Area, $A_B$")
 
 ##########################
 #fig.suptitle("Time Step = %d"%endStep,fontsize = 40)
@@ -600,9 +614,9 @@ for key,data in plotData.iteritems():
 	##################################
 	#mean growth
 	##################################
-	#rad Stress
+	#rad 
 	ax2.plot(data[0], data[3],"-." ,label=r"$g_{r}$",c=color,**plotargs)
-	#ortho Stress
+	#ortho 
 	ax4.plot(data[0], data[4], label=r"$g_{o}$",c=color,**plotargs)
 	##################################
 	# Primordia Area
@@ -647,7 +661,14 @@ for key,data in plotData.iteritems():
 	meangrowth12plot.plot(data[0],data[9],"-.",c=color,**plotargs)
 	meangrowth12plot.plot(data[0],data[10],c=color,**plotargs)
 	############################################################
+	stressROplot.plot(data[0],data[1],"-.",c=color,**plotargs)
+	stressROplot.plot(data[0],data[2],c=color,**plotargs)
+	############################################################
+	stress12plot.plot(data[0],data[7],"-.",c=color,**plotargs)
+	stress12plot.plot(data[0],data[8],c=color,**plotargs)
+	############################################################
 	boundaryareaplot.plot(data[0],data[11],c=color,**plotargs)
+	boundaryareaplot1.plot(data[0],data[11],c=color,**plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
@@ -669,9 +690,23 @@ sumGrowtheigenplot.legend(handles = [Line2D([0], [0], linestyle = ":", color='k'
 rawstressplot.legend(handles = legend_elements[4:])
 rawgrowthplot.legend(handles = legend_elements[4:])
 
-meangrowth12plot.legend(handles = legend_elements[4:])
-meangrowthROplot.legend(handles = legend_elements[2:4])
 
+# make legend handles for all new plots
+growth_legend_elements = [
+			Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle g_{r} \rangle_c $",**plotargs),
+			Line2D([0], [0],  color='k', label=r"$\langle g_{o} \rangle_c $",**plotargs),
+			Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle g_{1} \rangle_c $",**plotargs),
+			Line2D([0], [0],  color='k',  label=r"$\langle g_{2} \rangle_c $",**plotargs)]
+meangrowth12plot.legend(handles = growth_legend_elements[:2])
+meangrowthROplot.legend(handles = growth_legend_elements[2:])
+
+stress_legend_elements = [
+			Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle \sigma_{r} \rangle_c $",**plotargs),
+			Line2D([0], [0],  color='k', label=r"$\langle \sigma_{o} \rangle_c $",**plotargs),
+			Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle \sigma_{1} \rangle_c $",**plotargs),
+			Line2D([0], [0],  color='k',  label=r"$\langle \sigma_{2} \rangle_c $",**plotargs)]
+stressgrowth12plot.legend(handles = stress_legend_elements[:2])
+stressgrowthROplot.legend(handles = stress_legend_elements[2:])
 ###############################################################################
 #color bar fig
 ###############################################################################
@@ -688,14 +723,14 @@ fig4.subplots_adjust(right=0.9)
 
 
 
-cbar_ax2 = fig2.add_axes([0.85, 0.2, 0.04, 0.65])
-cbar_ax3 = fig3.add_axes([0.85, 0.2, 0.04, 0.65])
+cbar_ax2 = fig2.add_axes([0.6,0.08,0.03,0.38])
+cbar_ax3 = fig3.add_axes([0.6,0.08,0.03,0.38])
 cbar_ax4 = fig4.add_axes([0.85, 0.2, 0.04, 0.65])
 
 
 
-fig2.tight_layout(rect=[0.,0.,.9,.9])
-fig3.tight_layout(rect=[0.,0.,.9,.9])
+fig2.tight_layout()
+fig3.tight_layout()
 fig4.tight_layout(rect=[0.,0.,.9,.9])
 
 
@@ -730,8 +765,10 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
 else:
 	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
-	fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowth_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
-	fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowth_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.png"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
+	fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
+	fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	fig4.savefig(saveDirectory+r"/plot_eta%d_boundaryarea_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
 
 
