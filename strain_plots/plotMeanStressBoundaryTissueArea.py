@@ -705,8 +705,8 @@ stress_legend_elements = [
 			Line2D([0], [0],  color='k', label=r"$\langle \sigma_{o} \rangle_c $",**plotargs),
 			Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle \sigma_{1} \rangle_c $",**plotargs),
 			Line2D([0], [0],  color='k',  label=r"$\langle \sigma_{2} \rangle_c $",**plotargs)]
-stressgrowth12plot.legend(handles = stress_legend_elements[:2])
-stressgrowthROplot.legend(handles = stress_legend_elements[2:])
+stress12plot.legend(handles = stress_legend_elements[:2])
+stressROplot.legend(handles = stress_legend_elements[2:])
 ###############################################################################
 #color bar fig
 ###############################################################################
