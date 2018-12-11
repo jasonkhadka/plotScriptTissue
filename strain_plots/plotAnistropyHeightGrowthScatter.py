@@ -471,7 +471,7 @@ fig2 = plt.figure(2,figsize=(5.5,5))
 anisotropyplot = fig2.add_subplot(111)
 anisotropyplot.set_xlabel(r"Stress anisotropy, $\langle\sigma_2 - \sigma_1\rangle_c$")
 anisotropyplot.set_ylabel(r"Height growth rate, $\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
-
+anisotropyplot.set_ylim((0,0.035))
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
