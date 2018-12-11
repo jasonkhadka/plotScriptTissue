@@ -764,12 +764,14 @@ if startarea:#start area != none
 	stressROplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	stress12plot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	boundaryareaplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+	boundaryareaplot1.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 else:
 	meangrowth12plot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	meangrowthROplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	stress12plot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	stressROplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	boundaryareaplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+	boundaryareaplot1.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 ################################################################################
 
 
