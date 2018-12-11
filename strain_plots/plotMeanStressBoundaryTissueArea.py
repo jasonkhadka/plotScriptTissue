@@ -732,8 +732,8 @@ fig4.subplots_adjust(right=0.9)
 
 
 
-cbar_ax2 = fig2.add_axes([0.6,0.08,0.03,0.38])
-cbar_ax3 = fig3.add_axes([0.6,0.08,0.03,0.38])
+cbar_ax2 = fig2.add_axes([0.54,0.09,0.03,0.4])
+cbar_ax3 = fig3.add_axes([0.54,0.09,0.03,0.4])
 cbar_ax4 = fig4.add_axes([0.85, 0.2, 0.04, 0.65])
 
 
