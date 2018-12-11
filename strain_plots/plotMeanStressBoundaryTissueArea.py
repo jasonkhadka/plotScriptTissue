@@ -706,16 +706,16 @@ growth_legend_elements = [
 			Line2D([0], [0],  color='k', label=r"$\langle g_{o} \rangle_c $",**plotargs),
 			Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle g_{1} \rangle_c $",**plotargs),
 			Line2D([0], [0],  color='k',  label=r"$\langle g_{2} \rangle_c $",**plotargs)]
-meangrowth12plot.legend(handles = growth_legend_elements[:2])
-meangrowthROplot.legend(handles = growth_legend_elements[2:])
+meangrowth12plot.legend(handles = growth_legend_elements[2:])
+meangrowthROplot.legend(handles = growth_legend_elements[:2])
 
 stress_legend_elements = [
 			Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle \sigma_{r} \rangle_c $",**plotargs),
 			Line2D([0], [0],  color='k', label=r"$\langle \sigma_{o} \rangle_c $",**plotargs),
 			Line2D([0], [0], linestyle = "-.", color='k', label=r"$\langle \sigma_{1} \rangle_c $",**plotargs),
 			Line2D([0], [0],  color='k',  label=r"$\langle \sigma_{2} \rangle_c $",**plotargs)]
-stress12plot.legend(handles = stress_legend_elements[:2])
-stressROplot.legend(handles = stress_legend_elements[2:])
+stress12plot.legend(handles = stress_legend_elements[2:])
+stressROplot.legend(handles = stress_legend_elements[:2])
 ###############################################################################
 #color bar fig
 ###############################################################################
