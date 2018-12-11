@@ -16,6 +16,7 @@ sys.path.append('/home/jkhadka/transferdata/scripts/plotscript/')
 import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
+import string
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
 plt.rcParams['xtick.labelsize'] = 22
 plt.rcParams['ytick.labelsize'] = 22
