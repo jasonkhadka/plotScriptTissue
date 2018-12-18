@@ -16,8 +16,8 @@ parser.add_argument('-d',"--duration",help="duration for each frame to be displa
 args = parser.parse_args()
 
 duration = args.duration
-starttime = args.starttime
-endtime = args.endtime
+startstep = args.starttime
+endstep= args.endtime
 timestep = args.timestep
 
 ####################################################################################################################################################################################
