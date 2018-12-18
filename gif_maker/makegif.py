@@ -2,7 +2,26 @@ import os
 #import imageio as io
 import re
 from PIL import Image
+import argparse #argument parser, handles the arguments passed by command line
 #############################################################
+#setting up the arguments to be passed 
+parser = argparse.ArgumentParser()#parser
+#parser.add_argument('-l','--location', help="The location of targetformmatrix and coordinate file",type = string)
+parser.add_argument('-s',"--starttime", help="Start of simulation time",default = 1, type = int)
+parser.add_argument('-e',"--endtime", help="End of simulation area",default = None,  type = int)
+parser.add_argument('-u',"--timestep", help="time step for simulation", type = int,default = 1)
+parser.add_argument('-d',"--duration",help="duration for each frame to be displayed in gif", default  = 10)
+
+## Getting the arguments 
+args = parser.parse_args()
+
+duration = args.duration
+starttime = args.starttime
+endtime = args.endtime
+timestep = args.timestep
+
+####################################################################################################################################################################################
+
 #key to sort the file_names in order
 numbers = re.compile(r'(\d+)')
 def numericalSort(value):
@@ -40,8 +59,8 @@ def gen_frame(path):
     return im
 ######################################################################
 frames = []
-file_names = file_names[::5]
+file_names = file_names[startstep:endstep:timestep]#[::5]
 for filename in file_names:
-	frames.append(gen_frame(filename))
+    frames.append(gen_frame(filename))
 ######################################################################
-frames[0].save('tissue_growth.gif', save_all=True, append_images=frames[1::],loop = 5, duration = 10)
+frames[0].save('tissue_growth.gif', save_all=True, append_images=frames[1::],loop = 5, duration = duration)
