@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()#parser
 parser.add_argument('-s',"--starttime", help="Start of simulation time",default = 1, type = int)
 parser.add_argument('-e',"--endtime", help="End of simulation area",default = None,  type = int)
 parser.add_argument('-u',"--timestep", help="time step for simulation", type = int,default = 1)
-parser.add_argument('-d',"--duration",help="duration for each frame to be displayed in gif", default  = 10)
+parser.add_argument('-d',"--duration",help="duration for each frame to be displayed in gif", default  = 10, type = int)
 
 ## Getting the arguments 
 args = parser.parse_args()
