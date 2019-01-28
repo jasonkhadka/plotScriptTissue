@@ -329,6 +329,209 @@ def plotStrainSurface(cell, numOfLayer,step = None, alpha = 0.8, Length=1.0,save
         plt.savefig(saveDirectory+r"/strainSurface_Time=%03d.png"%(step))
         plt.close()
     return
+##########################################################################################
+#  Getting points of target form matrix
+##########################################################################################
+def getTargetFormEllipsePoints(cell,targetface = 10):
+    #getting the Target Form Matrix
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while True:
+        if face.getID() == targetface:
+            break
+        face = faces.next()
+    #print "Face Id : ", face.getID()
+    targetformmatrix = np.array([[qd.getTargetFormMatrix(face, 0,0),qd.getTargetFormMatrix(face, 0,1)],
+                                 [qd.getTargetFormMatrix(face, 1,0),qd.getTargetFormMatrix(face, 1,1)]
+                                 ])
+    unitx = face.getUnitx()
+    unity = face.getUnity()
+    unitz = face.getUnitz()
+    unit_mat = np.matrix([[qd.doublearray_getitem(unitx,0),qd.doublearray_getitem(unitx,1),qd.doublearray_getitem(unitx,2)],
+                         [qd.doublearray_getitem(unity,0),qd.doublearray_getitem(unity,1),qd.doublearray_getitem(unity,2)],
+                         [qd.doublearray_getitem(unitz,0),qd.doublearray_getitem(unitz,1),qd.doublearray_getitem(unitz,2)]])
+    #transposing unitmatrix
+    transpose_unitmat = np.matrix(np.transpose(unit_mat))
+    #Getting Centroid of face
+    xcent = face.getXCentralised()
+    ycent = face.getYCentralised()
+    zcent = face.getZCentralised()
+    ##### getting data from ellipse & getting transformed coordinate to 3d Cartesian
+    data = plot_ellipse(cov=targetformmatrix, data_out=True)
+    points = np.matrix(np.vstack((data,np.zeros(len(data[0])))))
+    transformedpoints = transpose_unitmat*points
+    transformedpoints[0]+= xcent
+    transformedpoints[1]+= ycent
+    transformedpoints[2]+= zcent
+    ################################
+    return transformedpoints
+################################################################################################
+def getCurrentFormEllipsePoints(cell,targetface = 10):
+    #getting the Target Form Matrix
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while True:
+        if face.getID() == targetface:
+            break
+        face = faces.next()
+    #print "Face Id : ", face.getID()
+    targetformmatrix = np.array([[qd.getCurrentFormMatrix(face, 0,0),qd.getCurrentFormMatrix(face, 0,1)],
+                                 [qd.getCurrentFormMatrix(face, 1,0),qd.getCurrentFormMatrix(face, 1,1)]
+                                 ])
+    unitx = face.getUnitx()
+    unity = face.getUnity()
+    unitz = face.getUnitz()
+    unit_mat = np.matrix([[qd.doublearray_getitem(unitx,0),qd.doublearray_getitem(unitx,1),qd.doublearray_getitem(unitx,2)],
+                         [qd.doublearray_getitem(unity,0),qd.doublearray_getitem(unity,1),qd.doublearray_getitem(unity,2)],
+                         [qd.doublearray_getitem(unitz,0),qd.doublearray_getitem(unitz,1),qd.doublearray_getitem(unitz,2)]])
+    #transposing unitmatrix
+    transpose_unitmat = np.matrix(np.transpose(unit_mat))
+    #Getting Centroid of face
+    xcent = face.getXCentralised()
+    ycent = face.getYCentralised()
+    zcent = face.getZCentralised()
+    ##### getting data from ellipse & getting transformed coordinate to 3d Cartesian
+    data = plot_ellipse(cov=targetformmatrix, data_out=True)
+    points = np.matrix(np.vstack((data,np.zeros(len(data[0])))))
+    transformedpoints = transpose_unitmat*points
+    transformedpoints[0]+= xcent
+    transformedpoints[1]+= ycent
+    transformedpoints[2]+= zcent
+    ################################
+    return transformedpoints
+################################################################################################
+def getStrainEllipsePoints(cell,targetface = 10):
+    #getting the Target Form Matrix
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while True:
+        if face.getID() == targetface:
+            break
+        face = faces.next()
+    #print "Face Id : ", face.getID()
+    targetformmatrix = getStrainMatrix(cell,targetface)
+    unitx = face.getUnitx()
+    unity = face.getUnity()
+    unitz = face.getUnitz()
+    unit_mat = np.matrix([[qd.doublearray_getitem(unitx,0),qd.doublearray_getitem(unitx,1),qd.doublearray_getitem(unitx,2)],
+                         [qd.doublearray_getitem(unity,0),qd.doublearray_getitem(unity,1),qd.doublearray_getitem(unity,2)],
+                         [qd.doublearray_getitem(unitz,0),qd.doublearray_getitem(unitz,1),qd.doublearray_getitem(unitz,2)]])
+    #transposing unitmatrix
+    transpose_unitmat = np.matrix(np.transpose(unit_mat))
+    #Getting Centroid of face
+    xcent = face.getXCentralised()
+    ycent = face.getYCentralised()
+    zcent = face.getZCentralised()
+    ##### getting data from ellipse & getting transformed coordinate to 3d Cartesian
+    data = plot_ellipse(cov=targetformmatrix, data_out=True)
+    points = np.matrix(np.vstack((data,np.zeros(len(data[0])))))
+    transformedpoints = transpose_unitmat*points
+    transformedpoints[0]+= xcent
+    transformedpoints[1]+= ycent
+    transformedpoints[2]+= zcent
+    ################################
+    return transformedpoints
+###################################################################
+def plotMatrixSurface(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0,azim = -60.,elev=60):
+    #calculating forces, stress-matrix and strain-matrix
+    cell.calculateVertexForce()
+    cell.calculateStressStrain()
+    import matplotlib.colors as colors
+    import matplotlib.cm as cmx
+    #import the libraries
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib as mpl
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+    import numpy as np
+    import matplotlib.pyplot as plt
+    #limits of the plot
+    radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
+    #plotting part
+    fig = plt.figure(frameon=False,figsize=(20,16))
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    #fig.set_aspect(aspect='equal', adjustable='box')
+    ax = Axes3D(fig)
+    ax.set_xlim((-.5*radius,.5*radius))
+    ax.set_ylim((-.5*radius,.5*radius))
+    ax.set_zlim((-0.,1.*radius))
+    ax.axis('off')
+    #ax.axis('equal')
+    ax.xaxis.pane.set_edgecolor('black')
+    ax.yaxis.pane.set_edgecolor('black')
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+    ########################################################################
+    #                 Plotting the Cell                    #
+    ########################################################################
+    faces = qd.CellFaceIterator(cell)
+    ###################
+    face = faces.next()
+    while (face != None):
+        if face.getID() == 1:
+            face  = faces.next()
+            continue
+        faceid = face.getID()#grabbing face id
+        xlist = []
+        ylist = []
+        zlist = []
+        #print "== Face ID : ", faceid, "=="
+        xmean = face.getXCentralised()
+        ymean = face.getYCentralised()
+        zmean = face.getZCentralised()
+        edges = qd.FaceEdgeIterator(face)
+        edge = edges.next()
+        while edge != None:
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertex = edge.Org()
+            #print vertex.getID()
+            xCoord1 = vertex.getXcoordinate()
+            yCoord1 = vertex.getYcoordinate()
+            zCoord1 = vertex.getZcoordinate()
+            xlist.append(xCoord1)
+            ylist.append(yCoord1)
+            zlist.append(zCoord1)
+            edge = edges.next()
+        xlist.append(xlist[0])
+        ylist.append(ylist[0])
+        zlist.append(zlist[0])
+        ax.plot(xlist,ylist,zlist,'k')
+        #ax.text(xmean,ymean,zmean, face.getID(),fontsize = 20)
+        face = faces.next()
+        #if face.getID() == 1: break
+    #plt.clf()
+    ##PLOTTING ELLIPSE
+    numofface = cell.countFaces()
+    for i in range(2,numofface+1):
+        # Target Form
+        TFellipsepoints = getTargetFormEllipsePoints(cell,i)
+        verts = [zip(np.array(TFellipsepoints[0])[0],
+                     np.array(TFellipsepoints[1])[0], 
+                     np.array(TFellipsepoints[2])[0])]
+        pc = Poly3DCollection(verts,alpha = 0.5,linewidths=1, facecolor = 'r',zorder = 10,label="TFM" if i == 0 else "")
+        pc.set_edgecolor('k')
+        ax.add_collection3d(pc)
+        # Current Form
+        CFellipsepoints = getCurrentFormEllipsePoints(cell,i)
+        verts = [zip(np.array(CFellipsepoints[0])[0],np.array(CFellipsepoints[1])[0], np.array(CFellipsepoints[2])[0])]
+        pc = Poly3DCollection(verts,alpha = 0.5,linewidths=1,zorder = 9, facecolor = 'b')
+        pc.set_edgecolor('k')
+        ax.add_collection3d(pc)
+        # Strain 
+        strainellipsepoints = getStrainEllipsePoints(cell,i)
+        verts = [zip(np.array(strainellipsepoints[0])[0],np.array(strainellipsepoints[1])[0], np.array(strainellipsepoints[2])[0])]
+        pc = Poly3DCollection(verts,alpha = 0.5,linewidths=1,zorder = 11, facecolor = 'k')
+        pc.set_edgecolor('k')
+        ax.add_collection3d(pc)
+    ax.view_init(azim = azim,elev=elev)
+    scatter1_proxy = mpl.lines.Line2D([0],[0], linestyle="none", c='r', marker = 's',ms=20)
+    scatter2_proxy = mpl.lines.Line2D([0],[0], linestyle="none", c='b', marker = 's',ms=20)
+    scatter3_proxy = mpl.lines.Line2D([0],[0], linestyle="none", c='k', marker = 's',ms=20)
+    ax.legend([scatter1_proxy, scatter2_proxy,scatter3_proxy], ['Target Shape', 'Current Shape',"Strain"], numpoints = 1,loc = 0)
+    #plt.suptitle("Step =%03d"%step,fontsize = 30)
+    #plt.savefig('initial_TFM_layer8.png', transparent=True)
+    return
 ################################################################################################
 # Function to plot ellipse
 # Fixing the orientation of CFM and TFM

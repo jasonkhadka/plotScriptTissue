@@ -2122,7 +2122,9 @@ def plotGrowthRateSurface(cell, numOfLayer, name=None, alpha = 0.5, Length=1.0,v
     ##########################################################
     if vmax == 0:
         vmax = cell.getKappa() + cell.getGrowthVar()  
-    vmin = 0
+        vmin = cell.getKappa() - cell.getGrowthVar()
+    else:
+        vmin = 0.
     ##########################################################
     #### Making the COLOR BAR #########################
     jet = cm = plt.get_cmap('viridis') 
