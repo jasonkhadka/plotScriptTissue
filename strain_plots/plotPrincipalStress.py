@@ -241,7 +241,7 @@ def plotPrincipalStress(numOfLayer, targetid,endStep,eta,
 parser = argparse.ArgumentParser()#parser
 #parser.add_argument('-l','--location', help="The location of targetformmatrix and coordinate file",type = string)
 parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
-parser.add_argument('-e',"--end", help="End of simulation step", type = int)
+parser.add_argument('-e',"--end", help="End of simulation step", default = 2000, type = int)
 parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only cacluated till this value", type = float, default = 0.0)
 parser.add_argument("-x","--maxarea", help = "if this is given, then plot is only made till this area value value", type = float, default = None)
 parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
@@ -424,6 +424,8 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 		#print sys.getsizeof(plotData)
 		os.chdir("..")
 		gc.collect()
+	########################################################
+	print "fk :", fkcurrent, growthRatio[fkcurrent]
 	########################################################
 	maxvalue= max(growthRatio.values())
 	minvalue =int(min(growthRatio.values()))

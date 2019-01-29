@@ -259,20 +259,37 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	radialStressArray = []
 	radialGrowthArray = []
 	orthoradialGrowthArray = []
-	tissueSurfaceAreaArray = []
-	primordiaAreaArray = []
-	boundaryAreaArray = []
-	heightArray = []
 	meanstressEigenvalue1Array = []
 	meanstressEigenvalue2Array = []
 	meangrowthEigenvalue1Array = []
 	meangrowthEigenvalue2Array = []
+	###################################################
+	# save standard deviations of the stress and growth
+	###################################################
+	radialStressSDArray = []
+	orthoradialStressSDArray = []
+	radialGrowthSDArray = []
+	orthoradialGrowthSDArray = []
+	meanstressEigenvalue1SDArray = []
+	meanstressEigenvalue2SDArray = []
+	meangrowthEigenvalue1SDArray = []
+	meangrowthEigenvalue2SDArray = []
+	###################################################
+	tissueSurfaceAreaArray = []
+	primordiaAreaArray = []
+	boundaryAreaArray = []
+	heightArray = []
+	###################################################
 	if not startarea:#no startarea given
 		startarea = int(initialTissueSurfaceArea)
-	for steparea in range(startarea, endarea, int(areastep)):
+	###################################################
+	listsurfacearea = np.linspace(startarea,endarea,10)
+	#print listsurfacearea
+	#for steparea in range(startarea, endarea, int(areastep)):
+	for steparea in listsurfacearea:
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
-		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep/2, endStep, step, stepsize = 10)
+		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep, endStep, step, stepsize = 10)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
@@ -340,6 +357,17 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 		meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
 		meangrowthEigenvalue1Array.append(np.mean(growthEigenvalue1Array))
 		meangrowthEigenvalue2Array.append(np.mean(growthEigenvalue2Array))
+		#######################################################
+		# calculating the standard deviation
+		#######################################################
+		meanstressEigenvalue1SDArray.append(np.std(stressEigenvalue1Array))
+		meanstressEigenvalue2SDArray.append(np.std(stressEigenvalue2Array))
+		meangrowthEigenvalue1SDArray.append(np.std(growthEigenvalue1Array))
+		meangrowthEigenvalue2SDArray.append(np.std(growthEigenvalue2Array))
+		radialStressSDArray.append(np.std(radialStress))
+		orthoradialStressSDArray.append(np.std(orthoradialStress))
+		radialGrowthSDArray.append(np.std(radialGrowth))
+		orthoradialGrowthSDArray.append(np.std(orthoradialGrowth))
 		#meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
 		#    yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
 		#meanstress.errorbar(tissueSurfaceArea, np.mean(orthoradialStress),
@@ -360,7 +388,12 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 			primordiaAreaArray,
 			heightArray,
 			meanstressEigenvalue1Array, meanstressEigenvalue2Array,
-			meangrowthEigenvalue1Array, meangrowthEigenvalue2Array, boundaryAreaArray]
+			meangrowthEigenvalue1Array, meangrowthEigenvalue2Array, boundaryAreaArray,
+			radialStressSDArray, orthoradialStressSDArray, 
+			radialGrowthSDArray, orthoradialGrowthSDArray,
+			meanstressEigenvalue1SDArray, meanstressEigenvalue2SDArray,
+			meangrowthEigenvalue1SDArray, meangrowthEigenvalue2SDArray
+			]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -390,7 +423,8 @@ parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneat
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = None, type = int)
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
-parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 20)
+parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 10)
+parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
 
 ## Getting the arguments 
 args = parser.parse_args()
@@ -416,6 +450,7 @@ stepsize = 10
 maxarea = args.maxarea
 startarea = args.startarea
 endarea =args.endarea
+jobid = args.jobid
 
 endStep = 2000
 startStep = 1
@@ -568,7 +603,40 @@ rawgrowthplot.set_title("Growth Eigenvalues")
 rawgrowthplot.set_ylabel(r"$eigenvalue$")
 rawgrowthplot.set_xlabel(r"$A_T$")
 
-
+########################################################
+# When Growthratio is needed to be calculated
+########################################################
+growthRatio = {}
+if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
+	print "calculating growth ratio"
+	for folder in listdir:
+		# Converting folder name to dictionary
+		fkcurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
+		print "calculating growth ratio :", fkcurrent
+		########################################################
+		if (maxeta != 0) and (fkcurrent > maxeta):
+			continue
+		########################################################
+		os.chdir(folder)
+		########################################################
+		growthRatio[fkcurrent] = sf.getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,
+			endStep = endStep,startStep = startStep)
+		#print sys.getsizeof(plotData)
+		os.chdir("..")
+		gc.collect()
+	########################################################
+	print "fk :", fkcurrent, growthRatio[fkcurrent]
+	########################################################
+	maxvalue= max(growthRatio.values())
+	minvalue =int(min(growthRatio.values()))
+	########################################################
+	##################################################
+	jet = cm = plt.get_cmap('plasma') 
+	cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
+	scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+	##################################################
+	for key, data in growthRatio.iteritems():
+		print "fk = ", key, "  gr = ",data 
 ########################################################
 counter = 0
 totalfolders = len(listdir)
@@ -579,6 +647,7 @@ for folder in listdir:
 	#print folder
 	if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
+		etacurrent= growthRatio[etacurrent]
 	else:
 		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
 	etacolor = scalarMap.to_rgba(etacurrent)
@@ -594,6 +663,14 @@ for folder in listdir:
 	############################################################
 	#print os.listdir('.')
 	os.chdir(folder)
+	###########################################################
+	# Growth Ratio calculation
+	############################################################
+	if not fastkappaOption:
+		print "\n ############################################################"
+		print " "*15,"Growth Ratio = ",  sf.getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,
+				endStep = endStep,startStep = startStep)
+		print "############################################################"
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
 	plotData[etacurrent] = plotMeanStressGrowth(numOfLayer = numOfLayer, targetid = targetid,endStep = endStep,eta = etacurrent,
@@ -749,7 +826,10 @@ clrbar4 = plt.colorbar(scalarMap,cax = cbar_ax4,ticks=np.linspace(minvalue, maxv
 
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	clrbar.set_label(r"Fast Growth Rate")
+	clrbar.set_label(r"Growth ratio, $r_g$")
+	clrbar2.set_label(r"Growth ratio, $r_g$")
+	clrbar3.set_label(r"Growth ratio, $r_g$")
+	clrbar4.set_label(r"Growth ratio, $r_g$")
 else:
 	clrbar.set_label(r"Mechanical Feedback, $\eta$")
 	clrbar2.set_label(r"Mechanical Feedback, $\eta$")
@@ -777,7 +857,12 @@ else:
 
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_growthratio_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+	#fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_growthratio_romeangrowthstress_areastep=%d_targetface=%d.png"%(areastep,targetid),transparent = True, bbox_inches="tight")
+	#fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
+	fig3.savefig(saveDirectory+r"/plot_growthratio_12meangrowthstress_areastep=%d_targetface=%d.png"%(areastep,targetid),transparent = True, bbox_inches="tight")
+	#fig4.savefig(saveDirectory+r"/plot_eta%d_boundaryarea_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
 else:
 	fig.savefig(saveDirectory+r"/plot_meanstress_meangrowth_time=%d_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
@@ -794,9 +879,15 @@ else:
 plt.close('all')
 ### Saving Data Dictionary ###
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	np.save('meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	if jobid:
+		np.save('job=%d_growthratio_meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(jobid,endStep,targetid),plotData)
+	else:
+		np.save('growthratio_meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
 else:
-	np.save('meanstress_meangrowth_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	if jobid:
+		np.save('job=%d_meanstress_meangrowth_eta_time=%d_targetface=%d.npy'%(jobid,endStep,targetid),plotData)
+	else:
+		np.save('meanstress_meangrowth_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
 
 
 ################################################################################

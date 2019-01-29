@@ -385,7 +385,7 @@ parser.add_argument("-t","--target", help = "Target face for faster growth", def
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 20)
-
+parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
@@ -410,6 +410,9 @@ stepsize = 10
 maxarea = args.maxarea
 startarea = args.startarea
 endarea = args.endarea
+jobid = args.jobid
+
+
 startStep = 1
 endStep = 2000
 # For surpressing err
@@ -471,7 +474,8 @@ fig2 = plt.figure(2,figsize=(5.5,5))
 anisotropyplot = fig2.add_subplot(111)
 anisotropyplot.set_xlabel(r"Stress anisotropy, $\langle\sigma_2 - \sigma_1\rangle_c$")
 anisotropyplot.set_ylabel(r"Height growth rate, $\langle\frac{\Delta h}{\Delta A_T}\rangle_c$")
-anisotropyplot.set_ylim((0,0.035))
+#anisotropyplot.set_xlim(left=0.)
+#anisotropyplot.set_ylim(bottom=0.)
 ##########################
 #fig.set_aspect(aspect='equal', adjustable='box')
 #ax.axis('equal')
@@ -536,6 +540,9 @@ for folder in listdir:
 ###############################################################################
 #color bar fig
 ###############################################################################
+anisotropyplot.set_xlim(left=0.)
+anisotropyplot.set_ylim(bottom=0.)
+
 fig.tight_layout()
 scalarMap._A = []
 fig.subplots_adjust(bottom=0.2)
@@ -569,7 +576,10 @@ else:
 	fig.savefig(saveDirectory+r"/plot_anistropy_heightgrowth_scatterplot_area=%d-%d_targetface=%d.png"%(startarea,endarea,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_area=%d-%d_eta=%d_targetface=%d.png"%(startarea, endarea,maxeta,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_anistropy_scatterplot_area=%d-%d_eta=%d_targetface=%d.eps"%(startarea, endarea,maxeta,targetid),transparent = True, bbox_inches="tight")
-	np.save('anistropy_heightgrowth_eta=%d_targetface=%d.npy'%(maxeta,targetid),plotData)
+	if jobid:
+		np.save('job=%d_anistropy_heightgrowth_eta=%d_targetface=%d_arestep=%d.npy'%(jobid,maxeta,targetid,areastep),plotData)
+	else:
+		np.save('anistropy_heightgrowth_eta=%d_targetface=%d_arestep=%d.npy'%(maxeta,targetid,areastep),plotData)
 
 
 
