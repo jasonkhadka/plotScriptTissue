@@ -87,7 +87,6 @@ parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
-cylinder = args.cylinder
 alpha = args.alpha
 beta = args.beta
 zeta  = args.zeta
@@ -164,7 +163,6 @@ for folder in listdir:
 	else:
 		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
 		column1 = 'eta'
-	etacolor = scalarMap.to_rgba(etacurrent)
 	########################################################
 	if (maxeta != 0) and (etacurrent > maxeta):
 		continue
@@ -178,8 +176,8 @@ for folder in listdir:
 	#print os.listdir('.')
 	os.chdir(folder)
 	############################################################
-	step,tissueSurfaceArea = getTimeStep(steparea, endStep, startStep, stepsize = stepsize)
-	timedata.append({column1:etacurrent,
+	step,tissueSurfaceArea = getTimeStep(surfacearea, endStep, startStep, stepsize = stepsize)
+	timedata = timedata.append({column1:etacurrent,
 					'timestep':step,
 					'area':tissueSurfaceArea},ignore_index=True)
 	############################################################
@@ -190,4 +188,5 @@ for folder in listdir:
 ###############################################################################
 #color bar fig
 ###############################################################################
+print '\n','#'*100
 print timedata
