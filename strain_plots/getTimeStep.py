@@ -62,7 +62,6 @@ parser.add_argument('-s',"--startarea", help="Start of simulation area",default 
 parser.add_argument('-e',"--endarea", help="End of simulation area",default =850,  type = int)
 parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only cacluated till this value", type = float, default = 0.0)
 parser.add_argument("-c","--surfacearea", help = "calculate time step for the surfacearea", type = float, default = None)
-parser.add_argument("-c","--cylinder", help = "if option is used, the initial condition is Cylinder, else by default it is Dome", action= "store_true")
 parser.add_argument('-l', "--layer", help = "The number of layers in the quadedge cell",type=int,default = 8)
 parser.add_argument("-a","--alpha",help = "value to set for Alpha (weigth of first term of Energy), default = 0",
 											  default = 1., type = float)
