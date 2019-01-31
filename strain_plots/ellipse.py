@@ -432,7 +432,9 @@ def getStrainEllipsePoints(cell,targetface = 10):
     ################################
     return transformedpoints
 ###################################################################
-def plotMatrixSurface(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0,azim = -60.,elev=60):
+def plotMatrixSurface(cell, numOfLayer, step = None, 
+    alpha = 0.5, Length=1.0,azim = -60.,elev=60,
+    format='eps',name = None, ids = True):
     #calculating forces, stress-matrix and strain-matrix
     cell.calculateVertexForce()
     cell.calculateStressStrain()
@@ -497,7 +499,8 @@ def plotMatrixSurface(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0,azi
         ylist.append(ylist[0])
         zlist.append(zlist[0])
         ax.plot(xlist,ylist,zlist,'k')
-        #ax.text(xmean,ymean,zmean, face.getID(),fontsize = 20)
+        if ids:
+            ax.text(xmean,ymean,zmean, face.getID(),fontsize = 20)
         face = faces.next()
         #if face.getID() == 1: break
     #plt.clf()
@@ -509,19 +512,19 @@ def plotMatrixSurface(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0,azi
         verts = [zip(np.array(TFellipsepoints[0])[0],
                      np.array(TFellipsepoints[1])[0], 
                      np.array(TFellipsepoints[2])[0])]
-        pc = Poly3DCollection(verts,alpha = 0.5,linewidths=1, facecolor = 'r',zorder = 10,label="TFM" if i == 0 else "")
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = 'r',zorder = 100,label="TFM" if i == 0 else "")
         pc.set_edgecolor('k')
         ax.add_collection3d(pc)
         # Current Form
         CFellipsepoints = getCurrentFormEllipsePoints(cell,i)
         verts = [zip(np.array(CFellipsepoints[0])[0],np.array(CFellipsepoints[1])[0], np.array(CFellipsepoints[2])[0])]
-        pc = Poly3DCollection(verts,alpha = 0.5,linewidths=1,zorder = 9, facecolor = 'b')
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1,zorder = 1, facecolor = 'b')
         pc.set_edgecolor('k')
         ax.add_collection3d(pc)
         # Strain 
         strainellipsepoints = getStrainEllipsePoints(cell,i)
         verts = [zip(np.array(strainellipsepoints[0])[0],np.array(strainellipsepoints[1])[0], np.array(strainellipsepoints[2])[0])]
-        pc = Poly3DCollection(verts,alpha = 0.5,linewidths=1,zorder = 11, facecolor = 'k')
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1,zorder = 120, facecolor = 'k')
         pc.set_edgecolor('k')
         ax.add_collection3d(pc)
     ax.view_init(azim = azim,elev=elev)
@@ -529,6 +532,13 @@ def plotMatrixSurface(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0,azi
     scatter2_proxy = mpl.lines.Line2D([0],[0], linestyle="none", c='b', marker = 's',ms=20)
     scatter3_proxy = mpl.lines.Line2D([0],[0], linestyle="none", c='k', marker = 's',ms=20)
     ax.legend([scatter1_proxy, scatter2_proxy,scatter3_proxy], ['Target Shape', 'Current Shape',"Strain"], numpoints = 1,loc = 0)
+    if name == None:#plot the figure
+        plt.show()
+    else:
+        if format == None:
+            plt.savefig(name, transparent = True)
+        else:
+            plt.savefig(name+"."+format, transparent = True, format=format,dpi=500)
     #plt.suptitle("Step =%03d"%step,fontsize = 30)
     #plt.savefig('initial_TFM_layer8.png', transparent=True)
     return

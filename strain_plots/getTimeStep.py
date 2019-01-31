@@ -142,8 +142,10 @@ if not os.path.exists(saveDirectory):
 listdir = [d for d in listdir if d[0] == 'a']
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	etalist = [float(dict(item.split("=") for item in folder.split("_"))['fk']) for folder in listdir]
+	column1 = 'fk'
 else:
 	etalist = [float(dict(item.split("=") for item in folder.split("_"))['n']) for folder in listdir]
+	column1 = 'eta'
 #################################################################################
 #     Making the table
 ########################################################
@@ -159,10 +161,8 @@ for folder in listdir:
 	#print folder
 	if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
-		column1 = 'fk'
 	else:
 		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
-		column1 = 'eta'
 	########################################################
 	if (maxeta != 0) and (etacurrent > maxeta):
 		continue
@@ -187,6 +187,8 @@ for folder in listdir:
 	counter+= 1
 ###############################################################################
 #color bar fig
+###############################################################################
+timedata = timedata.sort_values(by=column1)
 ###############################################################################
 print '\n','#'*100
 print timedata

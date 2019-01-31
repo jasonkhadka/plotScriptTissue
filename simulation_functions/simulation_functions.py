@@ -2188,7 +2188,8 @@ def plotGrowthRateSurface(cell, numOfLayer, name=None, alpha = 0.5, Length=1.0,v
 ##########################################################################################
 #       Function to Plot Stress on the Surface of the Tissue
 ##########################################################################################
-def plotStressSurface(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0):
+def plotStressSurface(cell, numOfLayer, step = None, alpha = 0.8, 
+    Length=1.0,azim = 0, elev = 7, ids= False):
     #calculating forces, stress-matrix and strain-matrix
     #cell.calculateVertexForce()
     cell.calculateStressStrain()
@@ -2271,10 +2272,12 @@ def plotStressSurface(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0):
     minEigenValueRatio = (min(eigenvalueratioarray))
     #print "Max Eigen Value Ration :", maxEigenValueRatio
     #print "Min Eigen Value Ratio :", minEigenValueRatio
+    maxeigenvalue = max(np.abs(eigenvalue))
+    eigenvalue = np.array(eigenvalue)/maxeigenvalue
     for i in range(len(X)):
         veclength = eigenvalue[i]*np.sqrt((U[i])**2+(V[i])**2+(W[i])**2)
-        #ax.quiver(X[i], Y[i], Z[i], U[i], V[i], W[i],color='k',length = veclength,pivot='tail',zorder=4, linewidths = 2)
-        ax.quiver(X[i], Y[i], Z[i], U[i], V[i], W[i],color='k',pivot='tail',zorder=4, linewidths = 2)#quiver without length for older matplotlib
+        ax.quiver(X[i], Y[i], Z[i], U[i], V[i], W[i],color='k',length = veclength,pivot='tail',zorder=4, linewidths = 2)
+        #ax.quiver(X[i], Y[i], Z[i], U[i], V[i], W[i],color='k',pivot='tail',zorder=4, linewidths = 2)#quiver without length for older matplotlib
     ########    ########    ########    ########    ########
     #                 Plotting the Cell                    #
     ########    ########    ########    ########    ########
@@ -2335,14 +2338,19 @@ def plotStressSurface(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0):
         color = scalarMap.to_rgba(ratio)
         #print face.getZCentralised(), alpha_fac
         #ax.add_collection3d(arrow(xcen-0.5,ycen-0.5,zcen-0.5,xcen+0.5,ycen+0.5,zcen+0.5))
-        ax.add_collection3d(Poly3DCollection(verts,alpha = alpha,facecolors = color,linewidths=1,zorder=0))
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = color)
+        pc.set_edgecolor('k')
+        ax.add_collection3d(pc)
         ax.scatter(xcenarray[-1], ycenarray[-1],zcenarray[-1], 'o',c='r')
-        #ax.text(xcenarray[-1], ycenarray[-1],zcenarray[-1], face.getID())
+        if ids:
+            ax.text(xcenarray[-1], ycenarray[-1],zcenarray[-1], face.getID())
         face = faces.next()
         #if face.getID() == 1: break
     #plt.clf()
     scalarMap._A = []
-    clrbar = plt.colorbar(scalarMap)
+    ax.view_init(azim = azim,elev=elev)
+    cbar_ax2 = fig.add_axes([0.9, 0.2, 0.04, 0.65])
+    clrbar = plt.colorbar(scalarMap,cax=cbar_ax2)
     clrbar.set_label("Magnitude of Stress Anisotropy")
     if step != None:
         plt.title("Time = %d"%step)
@@ -2535,7 +2543,9 @@ def plotPrimaryStrainSurface(cell, numOfLayer,targetface = 0,step = None, alpha 
                 color = 'w'
         #print face.getZCentralised(), alpha_fac
         #ax.add_collection3d(arrow(xcen-0.5,ycen-0.5,zcen-0.5,xcen+0.5,ycen+0.5,zcen+0.5))
-        ax.add_collection3d(Poly3DCollection(verts,alpha = alpha,facecolors = color,linewidths=1,zorder=0))
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = color)
+        pc.set_edgecolor('k')
+        ax.add_collection3d(pc)
         if faceid == targetface:
             ax.text(xcenarray[-1], ycenarray[-1],zcenarray[-1], face.getID())
         ax.scatter(xcenarray[-1], ycenarray[-1],zcenarray[-1],c='r')
@@ -4960,3 +4970,42 @@ def calculateDilation(cell1,cell2):
         face1 = faces.next()
     #######################################
     return
+####################################################################################################################
+# Calculating the max time step for target surface area
+####################################################################################################################
+def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
+    ####################################################
+    for step in range(startStep, endStep+1,stepsize):
+        if not os.path.isfile("qdObject_step=%03d.obj"%step):
+            return endStep,0.
+        ################################################
+        cell = sf.loadCellFromFile(step)
+        ################################################
+        tissueSurfaceArea = sf.getSurfaceArea(cell)
+        if (tissueSurfaceArea > targetArea):
+            gc.collect()
+            for calstep in range(step-1,step-stepsize-1,-1):
+                    cell = sf.loadCellFromFile(calstep)
+                    tissueSurfaceArea = sf.getSurfaceArea(cell)
+                    if (tissueSurfaceArea <= targetArea):
+                        gc.collect()
+                        cell = sf.loadCellFromFile(calstep+1)
+                        tissueSurfaceArea = sf.getSurfaceArea(cell)
+                        return calstep+1,tissueSurfaceArea
+        ################################################
+        gc.collect()
+    return endStep,tissueSurfaceArea
+####################################################################################################################
+# Calculating the surface area for a given timestep
+####################################################################################################################
+def getSurfaceArea(step):
+    ####################################################
+    if not os.path.isfile("qdObject_step=%03d.obj"%step):
+        return endStep,0.
+    ################################################
+    cell = sf.loadCellFromFile(step)
+    ################################################
+    tissueSurfaceArea = sf.getSurfaceArea(cell)
+    ################################################
+    gc.collect()
+    return tissueSurfaceArea
