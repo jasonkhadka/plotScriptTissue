@@ -4993,6 +4993,7 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
                         tissueSurfaceArea = getSurfaceArea(cell)
                         return calstep+1,tissueSurfaceArea
         ################################################
+        import gc
         gc.collect()
     return endStep,tissueSurfaceArea
 ####################################################################################################################
