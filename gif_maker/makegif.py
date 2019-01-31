@@ -69,7 +69,7 @@ with io.get_writer('python_growth.gif', mode='I', duration=0.1) as writer:
 """
 
 ######################################################################
-def gen_frame(path,surfacearea=None, counter=None):
+def gen_frame_surfacearea(path,surfacearea=None, counter=None):
     im = Image.open(path)
     alpha = im.getchannel('A')
 
@@ -77,11 +77,32 @@ def gen_frame(path,surfacearea=None, counter=None):
     im = im.convert('RGB').convert('P', palette=Image.ADAPTIVE, colors=255)
 
     width, height = im.size
-    # adding area detail if needed
+    print im.size
+    # Set all pixel values below 128 to 255 , and the rest to 0
+    mask = Image.eval(alpha, lambda a: 255 if a <=20 else 0)
+
+    # Paste the color of index 255 and use alpha as a mask
+    im.paste(255, mask)
+
+    # The transparency index is 255
+    im.info['transparency'] = 255
     if surfacearea:
+        print surfacearea, "Yes!", counter
         draw = ImageDraw.Draw(im)
         font = ImageFont.truetype(font = '/usr/share/fonts/truetype/DejaVuSans.ttf',size = 50,encoding="unic")
-        draw.text((width/2,0.25*height),r"Area %.1f"%surfacearea,fill='#859c9a' )
+        draw.text((0.35*width,0.8*height),r"Area =  %.1f"%surfacearea,fill=120,font = font )
+        #draw.text((100,50),r"Area %.1f"%surfacearea,font = font )
+        del draw
+    # saving image
+    name = 'SurfaceImage%03d.png'%surfacearea
+    im.save(name)
+    return im,name
+######################################################################
+def gen_frame(path):
+    im = Image.open(path)
+    alpha = im.getchannel('A')
+    # Convert the image into P mode but only use 255 colors in the palette out of 256
+    im = im.convert('RGB').convert('P', palette=Image.ADAPTIVE, colors=255)
 
     # Set all pixel values below 128 to 255 , and the rest to 0
     mask = Image.eval(alpha, lambda a: 255 if a <=20 else 0)
@@ -91,19 +112,22 @@ def gen_frame(path,surfacearea=None, counter=None):
 
     # The transparency index is 255
     im.info['transparency'] = 255
-    
     return im
 ######################################################################
 frames = []
 if surfacearea:
     file_names = file_names
+    counter = 0
+    for filename in file_names:
+        im,name = gen_frame_surfacearea(filename,surfacearea=area_list[counter], counter=counter)
+        frames.append(gen_frame(name))
+        counter += 1
 else:
     file_names = file_names[startstep:endstep:timestep]#[::5]
-counter  = 0
-for filename in file_names:
-    frames.append(gen_frame(filename,surfacearea=area_list[counter], counter=counter))
-    print counter
-    counter += 1
+    for filename in file_names:
+        frames.append(gen_frame(filename))
+        counter += 1
+
 ######################################################################
 name = os.path.basename(os.getcwd())
 if surfacearea:
