@@ -98,7 +98,8 @@ frames = []
 file_names = file_names[startstep:endstep:timestep]#[::5]
 counter  = 0
 for filename in file_names:
-    frames.append(gen_frame(filename,surfacearea=surfacearea, counter=counter))
+    frames.append(gen_frame(filename,surfacearea=area_list[counter], counter=counter))
+    print counter
     counter += 1
 ######################################################################
 name = os.path.basename(os.getcwd())
