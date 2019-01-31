@@ -4975,6 +4975,7 @@ def calculateDilation(cell1,cell2):
 ####################################################################################################################
 def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
     ####################################################
+    import gc
     for step in range(startStep, endStep+1,stepsize):
         if not os.path.isfile("qdObject_step=%03d.obj"%step):
             return endStep,0.
@@ -4993,7 +4994,6 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
                         tissueSurfaceArea = getSurfaceArea(cell)
                         return calstep+1,tissueSurfaceArea
         ################################################
-        import gc
         gc.collect()
     return endStep,tissueSurfaceArea
 ####################################################################################################################
