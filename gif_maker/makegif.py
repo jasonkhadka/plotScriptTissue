@@ -76,6 +76,13 @@ def gen_frame(path,surfacearea=None, counter=None):
     # Convert the image into P mode but only use 255 colors in the palette out of 256
     im = im.convert('RGB').convert('P', palette=Image.ADAPTIVE, colors=255)
 
+    width, height = im.size
+    # adding area detail if needed
+    if surfacearea:
+        draw = ImageDraw.Draw(im)
+        font = ImageFont.truetype(font = '/usr/share/fonts/truetype/DejaVuSans.ttf',size = 100)
+        draw.text((width/2,0.25*height),r"$A_T = %.1f$"%surfacearea,fill= (20,20,20,2))
+
     # Set all pixel values below 128 to 255 , and the rest to 0
     mask = Image.eval(alpha, lambda a: 255 if a <=20 else 0)
 
@@ -85,12 +92,6 @@ def gen_frame(path,surfacearea=None, counter=None):
     # The transparency index is 255
     im.info['transparency'] = 255
     
-    width, height = im.size
-    # adding area detail if needed
-    if surfacearea:
-        draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype(font = '/usr/share/fonts/truetype/DejaVuSans.ttf',size = 40)
-        draw.text((width/2,0.05*height),r"$A_T = %.1f$"%surfacearea,fill= (20,20,20,128))
     return im
 ######################################################################
 frames = []
