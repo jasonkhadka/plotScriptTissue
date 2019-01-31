@@ -5007,5 +5007,4 @@ def getSurfaceAreaTimeStep(step):
     ################################################
     tissueSurfaceArea = sf.getSurfaceArea(cell)
     ################################################
-    gc.collect()
     return tissueSurfaceArea
