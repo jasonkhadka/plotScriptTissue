@@ -95,7 +95,10 @@ def gen_frame(path,surfacearea=None, counter=None):
     return im
 ######################################################################
 frames = []
-file_names = file_names[startstep:endstep:timestep]#[::5]
+if surfacearea:
+    file_names = file_names
+else:
+    file_names = file_names[startstep:endstep:timestep]#[::5]
 counter  = 0
 for filename in file_names:
     frames.append(gen_frame(filename,surfacearea=area_list[counter], counter=counter))
