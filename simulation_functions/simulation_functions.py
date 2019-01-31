@@ -4979,18 +4979,18 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
         if not os.path.isfile("qdObject_step=%03d.obj"%step):
             return endStep,0.
         ################################################
-        cell = sf.loadCellFromFile(step)
+        cell = loadCellFromFile(step)
         ################################################
-        tissueSurfaceArea = sf.getSurfaceArea(cell)
+        tissueSurfaceArea = getSurfaceArea(cell)
         if (tissueSurfaceArea > targetArea):
             gc.collect()
             for calstep in range(step-1,step-stepsize-1,-1):
-                    cell = sf.loadCellFromFile(calstep)
-                    tissueSurfaceArea = sf.getSurfaceArea(cell)
+                    cell = loadCellFromFile(calstep)
+                    tissueSurfaceArea = getSurfaceArea(cell)
                     if (tissueSurfaceArea <= targetArea):
                         gc.collect()
-                        cell = sf.loadCellFromFile(calstep+1)
-                        tissueSurfaceArea = sf.getSurfaceArea(cell)
+                        cell = loadCellFromFile(calstep+1)
+                        tissueSurfaceArea = getSurfaceArea(cell)
                         return calstep+1,tissueSurfaceArea
         ################################################
         gc.collect()
@@ -4998,10 +4998,10 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
 ####################################################################################################################
 # Calculating the surface area for a given timestep
 ####################################################################################################################
-def getSurfaceArea(step):
+def getSurfaceAreaTimeStep(step):
     ####################################################
     if not os.path.isfile("qdObject_step=%03d.obj"%step):
-        return endStep,0.
+        return 0.
     ################################################
     cell = sf.loadCellFromFile(step)
     ################################################
