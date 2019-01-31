@@ -32,6 +32,7 @@ if surfacearea:
     endStep = 2000
     startStep = 1000
     endarea,tissueSurfaceArea = sf.getTimeStep(surfacearea, endStep, startStep, stepsize = 10)
+    endarea = int(endarea)
     areastep = timestep#use area step instead of time for plotting
 #####################################################################################################
 #key to sort the file_names in order
@@ -46,7 +47,7 @@ def numericalSort(value):
 if surfacearea:
     file_names = []
     area_list = []
-    startarea = sf.getSurfaceAreaTimeStep(1)
+    startarea = int(sf.getSurfaceAreaTimeStep(1))
     for steparea in range(startarea, endarea, int(areastep)):
             step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 5)
             ########################################################################
