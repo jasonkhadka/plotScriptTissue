@@ -5004,8 +5004,8 @@ def getSurfaceAreaTimeStep(step):
     if not os.path.isfile("qdObject_step=%03d.obj"%step):
         return 0.
     ################################################
-    cell = sf.loadCellFromFile(step)
+    cell = loadCellFromFile(step)
     ################################################
-    tissueSurfaceArea = sf.getSurfaceArea(cell)
+    tissueSurfaceArea = getSurfaceArea(cell)
     ################################################
     return tissueSurfaceArea
