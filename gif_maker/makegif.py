@@ -30,8 +30,8 @@ surfacearea = args.surfacearea
 #################################################
 if surfacearea:
     endStep = 2000
-    startStep = 1000
-    endarea,tissueSurfaceArea = sf.getTimeStep(surfacearea, endStep, startStep, stepsize = 10)
+    startStep = 1
+    endStep, endarea= sf.getTimeStep(surfacearea, endStep, startStep, stepsize = 10)
     endarea = int(endarea)
     areastep = timestep#use area step instead of time for plotting
 #####################################################################################################
@@ -57,6 +57,7 @@ if surfacearea:
             file_names.append('surface_time=%03.d.png'%(step))
             area_list.append(tissueSurfaceArea)
             laststep = step
+            print step, tissueSurfaceArea
 else:
     file_names = sorted((fn for fn in os.listdir('.') if fn.startswith('surface')), key = numericalSort)
 """#gif writer
@@ -84,11 +85,12 @@ def gen_frame(path,surfacearea=None, counter=None):
     # The transparency index is 255
     im.info['transparency'] = 255
     
+    width, height = im.size
     # adding area detail if needed
     if surfacearea:
         draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype("sans-serif.ttf", 16)
-        draw.text((50,10),r"$A_T = %.1f$"%surfacearea,font = font)
+        font = ImageFont.truetype(size = 40)
+        draw.text((width/2,0.05*height),r"$A_T = %.1f$"%surfacearea,fill= (20,20,20,128))
     return im
 ######################################################################
 frames = []
