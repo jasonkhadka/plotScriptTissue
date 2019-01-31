@@ -48,6 +48,7 @@ if surfacearea:
     file_names = []
     area_list = []
     startarea = int(sf.getSurfaceAreaTimeStep(1))
+    laststep =1
     for steparea in range(startarea, endarea, int(areastep)):
             step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 5)
             ########################################################################
@@ -55,6 +56,7 @@ if surfacearea:
                 break
             file_names.append('surface_time=%03.d.png'%(step))
             area_list.append(tissueSurfaceArea)
+            laststep = step
 else:
     file_names = sorted((fn for fn in os.listdir('.') if fn.startswith('surface')), key = numericalSort)
 """#gif writer
