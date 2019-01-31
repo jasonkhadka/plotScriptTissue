@@ -89,7 +89,7 @@ def gen_frame(path,surfacearea=None, counter=None):
     # adding area detail if needed
     if surfacearea:
         draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype(size = 40)
+        font = ImageFont.truetype(font = '/usr/share/fonts/truetype/DejaVuSans.ttf',size = 40)
         draw.text((width/2,0.05*height),r"$A_T = %.1f$"%surfacearea,fill= (20,20,20,128))
     return im
 ######################################################################
