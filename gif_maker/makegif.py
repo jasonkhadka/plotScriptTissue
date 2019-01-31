@@ -80,8 +80,8 @@ def gen_frame(path,surfacearea=None, counter=None):
     # adding area detail if needed
     if surfacearea:
         draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype(font = '/usr/share/fonts/truetype/DejaVuSans.ttf',size = 100)
-        draw.text((width/2,0.25*height),r"$A_T = %.1f$"%surfacearea,fill= (20,20,20,2))
+        font = ImageFont.truetype(font = '/usr/share/fonts/truetype/DejaVuSans.ttf',size = 50,encoding="unic")
+        draw.text((width/2,0.25*height),r"Area %.1f"%surfacearea,fill='#859c9a' )
 
     # Set all pixel values below 128 to 255 , and the rest to 0
     mask = Image.eval(alpha, lambda a: 255 if a <=20 else 0)
