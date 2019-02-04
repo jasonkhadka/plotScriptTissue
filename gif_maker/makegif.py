@@ -99,15 +99,17 @@ def gen_frame(path,surfacearea=None, counter=None):
     return im
 ######################################################################
 frames = []
+counter  = 0
 if surfacearea:
     file_names = file_names
+    for filename in file_names:
+        frames.append(gen_frame(filename,surfacearea=area_list[counter], counter=counter))
+        counter += 1
 else:
     file_names = file_names[startstep:endstep:timestep]#[::5]
-counter  = 0
-for filename in file_names:
-    frames.append(gen_frame(filename,surfacearea=area_list[counter], counter=counter))
-    print counter
-    counter += 1
+    for filename in file_names:
+        frames.append(gen_frame(filename,surfacearea=None, counter=counter))
+        counter += 1
 ######################################################################
 name = os.path.basename(os.getcwd())
 if surfacearea:

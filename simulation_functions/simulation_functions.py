@@ -134,20 +134,21 @@ def makeCylinder(cell,numOfLayer, Length = 1.,laterCylinder=None):
 ############################################################################
 ###        Function to load cell from file
 ############################################################################
-def loadCellFromFile(step,numOfLayer = 8):
+def loadCellFromFile(step,numOfLayer = 8,resetids = False):
     ####################################
     if not ((os.path.isfile("qdObject_step=%03d.obj"%step)) or (os.path.isfile("TargetFormMatrix_step=%d.npy"%step))):
         return 
     loadedcell = qd.objReadCell("qdObject_step=%03d.obj"%step)
-    # Flipping the Face ID after Loading to cell so that the face id before and after matches
-    faces = qd.CellFaceIterator(loadedcell)
-    facecount = loadedcell.countFaces()
-    face= faces.next()
-    while face != None:
-        faceid = face.getID()
-        face.setID(facecount-faceid+1)
-        #print face.getID()
-        face = faces.next()
+    if resetids:
+        # Flipping the Face ID after Loading to cell so that the face id before and after matches
+        faces = qd.CellFaceIterator(loadedcell)
+        facecount = loadedcell.countFaces()
+        face= faces.next()
+        while face != None:
+            faceid = face.getID()
+            face.setID(facecount-faceid+1)
+            #print face.getID()
+            face = faces.next()
     loadedcell.setInitialParameters()
     ######################################################
     #print "######################################################"
