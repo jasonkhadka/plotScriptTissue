@@ -93,9 +93,8 @@ def gen_frame(path,surfacearea=None, counter=None):
         draw.text((0.35*width,0.8*height),r"Area =  %.1f"%surfacearea,fill=120,font = font )
         #draw.text((100,50),r"Area %.1f"%surfacearea,font = font )
         del draw
-    # saving image
-    im.save('SurfaceImage%03d.png'%surfacearea)
-
+        # saving image
+        im.save('SurfaceImage%03d.png'%surfacearea)
     return im
 ######################################################################
 frames = []
