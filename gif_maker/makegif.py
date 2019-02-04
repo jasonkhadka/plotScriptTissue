@@ -77,7 +77,7 @@ def gen_frame(path,surfacearea=None, counter=None):
     im = im.convert('RGB').convert('P', palette=Image.ADAPTIVE, colors=255)
 
     width, height = im.size
-    print im.size
+    #print im.size
     # Set all pixel values below 128 to 255 , and the rest to 0
     mask = Image.eval(alpha, lambda a: 255 if a <=20 else 0)
 
