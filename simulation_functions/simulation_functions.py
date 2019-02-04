@@ -4105,7 +4105,7 @@ def plotMinimumGaussianCurvature(step, numOfLayer=8.,save = False):
     ###################
     minimumCurvature=[]
     for currentstep in range(step+1):
-        cell = loadCellFromFile(currentstep, numOfLayer)
+        cell = loadCellFromFile(currentstep, numOfLayer,resetids = True)
         curvatureArray = []
         faces = qd.CellFaceIterator(cell)
         face = faces.next()
@@ -4981,18 +4981,18 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
         if not os.path.isfile("qdObject_step=%03d.obj"%step):
             return endStep,0.
         ################################################
-        cell = loadCellFromFile(step)
+        cell = loadCellFromFile(step,resetids = True)
         ################################################
         tissueSurfaceArea = getSurfaceArea(cell)
         if (tissueSurfaceArea > targetArea):
             gc.collect()
             for calstep in range(step-1,step-stepsize-1,-1):
-                    cell = loadCellFromFile(calstep)
+                    cell = loadCellFromFile(calstep,resetids = True)
                     tissueSurfaceArea = getSurfaceArea(cell)
                     if (tissueSurfaceArea <= targetArea):
                         gc.collect()
                         cell = loadCellFromFile(calstep+1)
-                        tissueSurfaceArea = getSurfaceArea(cell)
+                        tissueSurfaceArea = getSurfaceArea(cell,resetids = True)
                         return calstep+1,tissueSurfaceArea
         ################################################
         gc.collect()
@@ -5005,7 +5005,7 @@ def getSurfaceAreaTimeStep(step):
     if not os.path.isfile("qdObject_step=%03d.obj"%step):
         return 0.
     ################################################
-    cell = loadCellFromFile(step)
+    cell = loadCellFromFile(step,resetids = True)
     ################################################
     tissueSurfaceArea = getSurfaceArea(cell)
     ################################################

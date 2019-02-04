@@ -37,17 +37,17 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return endStep,0.
 		################################################
-		cell = sf.loadCellFromFile(step)
+		cell = sf.loadCellFromFile(step,resetids = True)
 		################################################
 		tissueSurfaceArea = sf.getSurfaceArea(cell)
 		if (tissueSurfaceArea > targetArea):
 			gc.collect()
 			for calstep in range(step-1,step-stepsize-1,-1):
-					cell = sf.loadCellFromFile(calstep)
+					cell = sf.loadCellFromFile(calstep,resetids = True)
 					tissueSurfaceArea = sf.getSurfaceArea(cell)
 					if (tissueSurfaceArea <= targetArea):
 						gc.collect()
-						cell = sf.loadCellFromFile(calstep+1)
+						cell = sf.loadCellFromFile(calstep+1,resetids = True)
 						tissueSurfaceArea = sf.getSurfaceArea(cell)
 						return calstep+1,tissueSurfaceArea
 		################################################

@@ -164,7 +164,7 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
     # faceidarray for Primordia
     if not os.path.isfile("qdObject_step=000.obj"):
         return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(0)
+    cell = sf.loadCellFromFile(0,resetids = True)
     faceList = sf.getPrimordiaFaces(cell,targetid, large = largerCondition)
     faceidarray = [xface.getID() for xface in faceList]
     primordialFaceNum  = len(faceList)
@@ -195,7 +195,7 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
     #####################################
     if not os.path.isfile("qdObject_step=001.obj"):
         return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(1)
+    cell = sf.loadCellFromFile(1,resetids = True)
     #################################
     # face area data
     #################################
@@ -206,7 +206,7 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
     for step in range(startStep,endStep+1,stepsize):
         if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
             break
-        cell = sf.loadCellFromFile(step)
+        cell = sf.loadCellFromFile(step,resetids = True)
         #################################
         # face area data
         #################################
