@@ -67,6 +67,7 @@ parser.add_argument("-a","--alpha",help = "value to set for Alpha (weigth of fir
 											  default = 1., type = float)
 parser.add_argument("-n","--nonNormalize", help = "if option is used, the figures are not normalised", action= "store_false")
 parser.add_argument("-L","--Large", help = "if option is used, calculation is done for larger primordia", action= "store_true")
+parser.add_argument("-v","--save", help = "if option is used, the data files for the surfacearea is stored in a folder", action= "store_true")
 parser.add_argument("-f","--fastkappa", help = "if option is used, the figures are made with respect to chaning fast kappa", action= "store_true")
 parser.add_argument("-b","--beta",help = "value to set for Beta (weigth of second term of Energy), default = 0",
 											  default = 0., type = float)
@@ -80,10 +81,8 @@ parser.add_argument("-o","--angle",help = "value to set for convex angle thresho
 parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneath the epidermis, comming from lower level cells. acting as the volume maximizing agent", default = 0.1, type = float)
 
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = None, type = int)
-parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
-parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 20)
-parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
+
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
@@ -95,8 +94,6 @@ numOfLayer = args.layer
 gamma = args.gamma
 anglethreshold = args.angle
 targetface = args.target
-azim = args.azimuthal
-elev = args.elevation
 norm = args.nonNormalize
 targetid = args.target
 areastep = args.areastep
@@ -107,7 +104,6 @@ stepsize = 10
 surfacearea = args.surfacearea
 startarea = args.startarea
 endarea = args.endarea
-jobid = args.jobid
 
 
 startStep = 1
@@ -130,11 +126,12 @@ if targetface == None:
 ################################################################################
 import sys
 import os
+import shutil
 #################################
 cwd = os.getcwd()#getting the current working directory
 DIRNAMES=1
 listdir = sorted(os.walk('.').next()[DIRNAMES])#all the list of directory in cwd
-directoryName = "plots"
+directoryName = "primordiaArea=%d"%surfacearea
 saveDirectory = cwd+"/"+directoryName
 if not os.path.exists(saveDirectory):
 	os.makedirs(saveDirectory)
@@ -161,8 +158,10 @@ for folder in listdir:
 	#print folder
 	if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['fk'])
+		datatype = 'fk'
 	else:
 		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
+		datatype = 'n'
 	########################################################
 	if (maxeta != 0) and (etacurrent > maxeta):
 		continue
@@ -181,6 +180,16 @@ for folder in listdir:
 					'timestep':step,
 					'area':tissueSurfaceArea},ignore_index=True)
 	############################################################
+	if args.save:
+		qdName = "qdObject_step=%03d.obj"%step
+		surfaceName=  'surface_time=%03.d.png'%step
+		tfmName = "TargetFormMatrix_step=%d.npy"%step
+		saveEta = saveDirectory+'/'+datatype+'=%d'%etacurrent
+		if not os.path.exists(saveEta):
+			os.makedirs(saveEta)
+		shutil.copy2(qdName, saveEta)
+		shutil.copy2(tfmName, saveEta)
+		shutil.copy2(surfaceName, saveEta)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
