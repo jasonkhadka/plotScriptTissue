@@ -237,6 +237,15 @@ def changePrimodialEta(cell,faceid,changedAlpha):
             face = faces.next()
     return cell
 ############################################################################
+###        Function to change threshold on boundary cells                 ##
+############################################################################
+def setBoundaryDivisionFactor(cell, targetid, factor):
+    faces = getPrimordiaBoundaryFaceList(cell, targetid, large=False)
+    for face in faces:
+        face.setDivisionFactor(factor)
+        face.setDivisionThreshold()
+    return
+############################################################################
 ###        Function to Divide Cells of this Tissue                       ###
 ############################################################################
 def randomDivideCell(cell):
@@ -279,6 +288,134 @@ def oneRandomDivideCell(cell):
         while face != None:
             if face.getID() == facetodivide:#large enough to divide
                 face.divideRandom()
+                break
+            face = faces.next()
+        cell.setParameters()
+    return cell
+############################################################################
+###        Function to Divide Cells of this Tissue                       ###
+############################################################################
+def oneRadialDivideCell(cell):
+    #global cell
+    print "##################################################"
+    print "Perfomring Random Cell Division"
+    print "##################################################"
+    import random as rn
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    facedivisionarray = []
+    while face != None:
+        if face.getAreaOfFace() > face.getDivisionThreshold():#large enough to divide
+            facedivisionarray.append(face.getID())
+        face = faces.next()
+    #################################################
+    #now choose one face randomly to divide
+    #################################################
+    if len(facedivisionarray) == 0:#if no face crossing threshold
+        return cell
+    else:
+        facetodivide = rn.choice(facedivisionarray)
+        faces = qd.CellFaceIterator(cell)
+        face = faces.next()
+        while face != None:
+            if face.getID() == facetodivide:#large enough to divide
+                face.divideRadial()
+                break
+            face = faces.next()
+        cell.setParameters()
+    return cell
+############################################################################
+###        Function to Divide Cells of this Tissue                       ###
+############################################################################
+def oneOrthoradialDivideCell(cell):
+    #global cell
+    print "##################################################"
+    print "Perfomring Random Cell Division"
+    print "##################################################"
+    import random as rn
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    facedivisionarray = []
+    while face != None:
+        if face.getAreaOfFace() > face.getDivisionThreshold():#large enough to divide
+            facedivisionarray.append(face.getID())
+        face = faces.next()
+    #################################################
+    #now choose one face randomly to divide
+    #################################################
+    if len(facedivisionarray) == 0:#if no face crossing threshold
+        return cell
+    else:
+        facetodivide = rn.choice(facedivisionarray)
+        faces = qd.CellFaceIterator(cell)
+        face = faces.next()
+        while face != None:
+            if face.getID() == facetodivide:#large enough to divide
+                face.divideOrthoradial()
+                break
+            face = faces.next()
+        cell.setParameters()
+    return cell
+############################################################################
+###        Function to Divide Cells of this Tissue                       ###
+############################################################################
+def oneMaximalStressDivideCell(cell):
+    #global cell
+    print "##################################################"
+    print "Perfomring Random Cell Division"
+    print "##################################################"
+    import random as rn
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    facedivisionarray = []
+    while face != None:
+        if face.getAreaOfFace() > face.getDivisionThreshold():#large enough to divide
+            facedivisionarray.append(face.getID())
+        face = faces.next()
+    #################################################
+    #now choose one face randomly to divide
+    #################################################
+    if len(facedivisionarray) == 0:#if no face crossing threshold
+        return cell
+    else:
+        facetodivide = rn.choice(facedivisionarray)
+        faces = qd.CellFaceIterator(cell)
+        face = faces.next()
+        while face != None:
+            if face.getID() == facetodivide:#large enough to divide
+                face.divideMaximalStress()
+                break
+            face = faces.next()
+        cell.setParameters()
+    return cell
+############################################################################
+###        Function to Divide Cells of this Tissue                       ###
+############################################################################
+def oneShortAxisDivideCell(cell):
+    #global cell
+    print "##################################################"
+    print "Perfomring Random Cell Division"
+    print "##################################################"
+    import random as rn
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    facedivisionarray = []
+    while face != None:
+        if face.getAreaOfFace() > face.getDivisionThreshold():#large enough to divide
+            facedivisionarray.append(face.getID())
+        face = faces.next()
+    #################################################
+    #now choose one face randomly to divide
+    #################################################
+    if len(facedivisionarray) == 0:#if no face crossing threshold
+        return cell
+    else:
+        facetodivide = rn.choice(facedivisionarray)
+        faces = qd.CellFaceIterator(cell)
+        face = faces.next()
+        while face != None:
+            if face.getID() == facetodivide:#large enough to divide
+                face.divideShortAxis()
                 break
             face = faces.next()
         cell.setParameters()
