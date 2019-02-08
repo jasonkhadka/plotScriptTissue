@@ -134,11 +134,16 @@ def makeCylinder(cell,numOfLayer, Length = 1.,laterCylinder=None):
 ############################################################################
 ###        Function to load cell from file
 ############################################################################
-def loadCellFromFile(step,numOfLayer = 8,resetids = False):
+def loadCellFromFile(step,numOfLayer = 8,resetids = False, location = None):
     ####################################
-    if not ((os.path.isfile("qdObject_step=%03d.obj"%step)) or (os.path.isfile("TargetFormMatrix_step=%d.npy"%step))):
-        return 
-    loadedcell = qd.objReadCell("qdObject_step=%03d.obj"%step)
+    if location:
+        if not ((os.path.isfile(location+"qdObject_step=%03d.obj"%step)) or (os.path.isfile(location+"TargetFormMatrix_step=%d.npy"%step))):
+            return 
+        loadedcell = qd.objReadCell(location+"qdObject_step=%03d.obj"%step)
+    else:
+        if not ((os.path.isfile("qdObject_step=%03d.obj"%step)) or (os.path.isfile("TargetFormMatrix_step=%d.npy"%step))):
+            return 
+        loadedcell = qd.objReadCell("qdObject_step=%03d.obj"%step)
     if resetids:
         # Flipping the Face ID after Loading to cell so that the face id before and after matches
         faces = qd.CellFaceIterator(loadedcell)
