@@ -162,7 +162,7 @@ def loadCellFromFile(step,numOfLayer = 8,resetids = False, location = None):
     #settig target Form Matrix : 
     #TMF step corresponds to coordinate step
     ####
-    setTargetFormMatrix(loadedcell,step)
+    setTargetFormMatrix(loadedcell,step, location = location)
     return loadedcell
 ############################################################################
 ###        Function to change the stiffness around the perifery of 
