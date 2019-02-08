@@ -1495,9 +1495,12 @@ def saveTargetFormMatrix(cell,growthcounter):
 ###############################################################################################################
 ###         Loading the TargetFormMatrix from file and setting it to the faces for given growthstep
 ###############################################################################################################
-def setTargetFormMatrix(cell, growthcounter):
+def setTargetFormMatrix(cell, growthcounter, location = None):
     ### Loading the TargetFormMatrix
-    loadedDictionary = np.load("TargetFormMatrix_step=%d.npy"%growthcounter).item()
+    if location:
+        loadedDictionary = np.load(locaiton+"TargetFormMatrix_step=%d.npy"%growthcounter).item()
+    else:
+        loadedDictionary = np.load("TargetFormMatrix_step=%d.npy"%growthcounter).item()
     faces = qd.CellFaceIterator(cell)
     face = faces.next()
     while face != None:
