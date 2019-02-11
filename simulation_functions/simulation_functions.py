@@ -266,7 +266,7 @@ def randomDivideCell(cell):
 def oneRandomDivideCell(cell):
     #global cell
     print "##################################################"
-    print "Perfomring Random Cell Division"
+    print "Performing Random Cell Division"
     print "##################################################"
     import random as rn
     faces = qd.CellFaceIterator(cell)
@@ -298,7 +298,7 @@ def oneRandomDivideCell(cell):
 def oneRadialDivideCell(cell):
     #global cell
     print "##################################################"
-    print "Perfomring Random Cell Division"
+    print "Performing Radial Cell Division"
     print "##################################################"
     import random as rn
     faces = qd.CellFaceIterator(cell)
@@ -330,7 +330,7 @@ def oneRadialDivideCell(cell):
 def oneOrthoradialDivideCell(cell):
     #global cell
     print "##################################################"
-    print "Perfomring Random Cell Division"
+    print "Performing Orthoradial Cell Division"
     print "##################################################"
     import random as rn
     faces = qd.CellFaceIterator(cell)
@@ -362,7 +362,7 @@ def oneOrthoradialDivideCell(cell):
 def oneMaximalStressDivideCell(cell):
     #global cell
     print "##################################################"
-    print "Perfomring Random Cell Division"
+    print "Performing Maximal Stress Cell Division"
     print "##################################################"
     import random as rn
     faces = qd.CellFaceIterator(cell)
@@ -394,7 +394,7 @@ def oneMaximalStressDivideCell(cell):
 def oneShortAxisDivideCell(cell):
     #global cell
     print "##################################################"
-    print "Perfomring Random Cell Division"
+    print "Performing Short Axis Cell Division"
     print "##################################################"
     import random as rn
     faces = qd.CellFaceIterator(cell)
