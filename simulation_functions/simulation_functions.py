@@ -295,12 +295,17 @@ def oneRandomDivideCell(cell):
 ############################################################################
 ###        Function to Divide Cells of this Tissue                       ###
 ############################################################################
-def oneRadialDivideCell(cell):
+def oneRadialDivideCell(cell, targetface):
     #global cell
     print "##################################################"
     print "Performing Radial Cell Division"
     print "##################################################"
     import random as rn
+    ##########################################################
+    # calculating radial/orthoradial vec before division
+    ##########################################################
+    cell.setRadialOrthoradialVector(targetface)
+    ##########################################################
     faces = qd.CellFaceIterator(cell)
     face = faces.next()
     facedivisionarray = []
@@ -333,6 +338,11 @@ def oneOrthoradialDivideCell(cell):
     print "Performing Orthoradial Cell Division"
     print "##################################################"
     import random as rn
+    ##########################################################
+    # calculating radial/orthoradial vec before division
+    ##########################################################
+    cell.setRadialOrthoradialVector(targetface)
+    ##########################################################
     faces = qd.CellFaceIterator(cell)
     face = faces.next()
     facedivisionarray = []
@@ -365,6 +375,11 @@ def oneMaximalStressDivideCell(cell):
     print "Performing Maximal Stress Cell Division"
     print "##################################################"
     import random as rn
+    ################################################
+    # calculating stress/strain before division
+    ################################################
+    cell.calculateStressStrain()
+    ################################################
     faces = qd.CellFaceIterator(cell)
     face = faces.next()
     facedivisionarray = []
