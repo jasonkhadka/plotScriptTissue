@@ -332,7 +332,7 @@ def oneRadialDivideCell(cell, targetface):
 ############################################################################
 ###        Function to Divide Cells of this Tissue                       ###
 ############################################################################
-def oneOrthoradialDivideCell(cell):
+def oneOrthoradialDivideCell(cell, targetface):
     #global cell
     print "##################################################"
     print "Performing Orthoradial Cell Division"
