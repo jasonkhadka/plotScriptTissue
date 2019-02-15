@@ -5170,3 +5170,35 @@ def getSurfaceAreaTimeStep(step):
     tissueSurfaceArea = getSurfaceArea(cell)
     ################################################
     return tissueSurfaceArea
+####################################################################################################################
+# get Zone Number of a face, by default 3 zones
+####################################################################################################################
+def getZoneNum(cell, face,numOfLayer,zoneOffSet = 6,zones = 3.):
+    #the radius of circle to be projected on
+    Length=1.
+    radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length
+    # total cells
+    totalCellNum = cell.countFaces()-1#counting out the outer face
+    zoneCellNum = totalCellNum/zones
+    return int((face.getID()-zoneOffSet)/zoneCellNum)+1
+####################################################################################################################
+# set Zone Number of the faces
+####################################################################################################################
+def setZoneNum(cell, numOfLayer, zoneOffSet  = 6,zones = 3.):
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while face != None:
+        face.setZone(getZoneNum(cell, face, numOfLayer,zoneOffSet=zoneOffSet, zones=zones))
+        face = faces.next()
+    return
+####################################################################################################################
+# set growth rates for one zone
+####################################################################################################################
+def setZonalKappa(cell,zone, kappa):
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while face != None:
+        if face.getZone() == zone:
+            face.setKappa(kappa)
+        face = faces.next()
+    return
