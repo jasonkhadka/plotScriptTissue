@@ -54,8 +54,14 @@ def plot_eigenvalues(cov, ax,plot_kwargs=None):
         ax.plot([0,eig_vec[0][0]],[0,eig_vec[0][1]])
         ax.plot([0,eig_vec[1][0]],[0,eig_vec[1][1]])
     else:
-        ax.plot([0,eig_vec[0][0]],[0,eig_vec[0][1]],**plot_kwargs)
-        ax.plot([0,eig_vec[1][0]],[0,eig_vec[1][1]],**plot_kwargs)
+        ax.arrow(0, 0,eig_vec[0][0], eig_vec[0][1],
+         length_includes_head=True, head_width=0.05,
+          head_length=0.1, fc=plot_kwargs['color'], ec=plot_kwargs['color'])
+        ax.arrow(0, 0,eig_vec[1][0], eig_vec[1][1], 
+            length_includes_head=True, head_width=0.05,
+            fc=plot_kwargs['color'], ec=plot_kwargs['color'])
+        #ax.plot([0,eig_vec[0][0]],[0,eig_vec[0][1]],**plot_kwargs)
+        #ax.plot([0,eig_vec[1][0]],[0,eig_vec[1][1]],**plot_kwargs)
     return ax
 def plot_ellipse(semimaj=1,semimin=1,phi=0,x_cent=0,y_cent=0,theta_num=1e3,ax=None,plot_kwargs=None,\
                     fill=False,fill_kwargs=None,data_out=False,cov=None,mass_level=0.68,norm = False):

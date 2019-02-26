@@ -2344,7 +2344,7 @@ def plotGrowthRateSurface(cell, numOfLayer, name=None, alpha = 0.5, Length=1.0,v
         plt.show()
     else:
         plt.savefig(name, transparent = True)
-    plt.clf()
+    plt.close()
     return
 ##########################################################################################
 #       Function to Plot Stress on the Surface of the Tissue
@@ -2892,7 +2892,7 @@ def plotNormalForce(cell, numOfLayer, step = None, alpha = 0.8, Length=1.0):
         plt.savefig(forceDirectory+r"/"+'Normal_Force_Plot_%d.png'%step, transparent=True)
     else:
         plt.show()
-    #plt.close("all")
+    plt.close("all")
     #return eigenvalueratioarray, eigenvalue1array, eigenvalue2array
     return
 
@@ -5201,4 +5201,127 @@ def setZonalKappa(cell,zone, kappa):
         if face.getZone() == zone:
             face.setKappa(kappa)
         face = faces.next()
+    return
+####################################################################################################################
+# set division threshold for one zone
+####################################################################################################################
+def setZonalDivisionThreshold(cell,zone, divisionthreshold):
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while face != None:
+        if face.getZone() == zone:
+            face.setDivisionThreshold(divisionthreshold)
+        face = faces.next()
+    return
+##########################################################################################
+#       Function to Plot division Threshold of the cells
+##########################################################################################
+def plotDivisionThresholdSurface(cell, numOfLayer, name=None, alpha = 0.5, Length=1.0,vmax=0,azim = 0, elev = 90):
+    #import the libraries
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib as mpl
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+    from mpl_toolkits.axes_grid1 import make_axes_locatable, axes_size
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as colors
+    import matplotlib.cm as cmx
+    #limits of the plot
+    radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
+    #plotting part
+    fig = plt.figure(frameon=False,figsize=(10,10))
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    ax = Axes3D(fig)
+    ax.set_xlim((-.7*radius,.7*radius))
+    ax.set_ylim((-.7*radius,.7*radius))
+    ax.set_zlim((0*radius,1.4*radius))
+    ax.axis('off')
+    ax.xaxis.pane.set_edgecolor('black')
+    ax.yaxis.pane.set_edgecolor('black')
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+    ##########################################################
+    #Get the Max/Min Of Division Threshold
+    ##########################################################
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    divisionthreshold = []
+    while (face != None):
+        faceid = face.getID()#grabbing face id
+        if faceid ==1 :
+            face = faces.next()
+            continue
+        divisionthreshold.append(face.getDivisionThreshold())
+        face = faces.next()
+    ##########################################################
+    vmax = max(divisionthreshold)
+    vmin = min(divisionthreshold)
+    if vmax == vmin:
+        vmin = 0.
+    ##########################################################
+    #### Making the COLOR BAR #########################
+    ##########################################################
+    jet = cm = plt.get_cmap('spring') 
+    cNorm  = colors.Normalize(vmin=vmin, vmax=vmax)
+    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+    ##########################################################
+    ##########################################################
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while (face != None):
+        faceid = face.getID()#grabbing face id
+        if faceid == 1:
+            face  = faces.next()
+            continue
+        xlist = []
+        ylist = []
+        zlist = []
+        xproj = []
+        yproj = []
+        zproj = []
+        #print "== Face ID : ", faceid, "=="
+        xmean = face.getXCentralised()
+        ymean = face.getYCentralised()
+        zmean = face.getZCentralised()
+        edges = qd.FaceEdgeIterator(face)
+        edge = edges.next()
+        while edge != None:
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertex = edge.Org()
+            #print vertex.getID()
+            xCoord1 = vertex.getXcoordinate()
+            yCoord1 = vertex.getYcoordinate()
+            zCoord1 = vertex.getZcoordinate()
+            xlist.append(xCoord1)
+            ylist.append(yCoord1)
+            zlist.append(zCoord1)
+            edge = edges.next()
+        xlist.append(xlist[0])
+        ylist.append(ylist[0])
+        zlist.append(zlist[0])
+        verts = [zip(xlist, ylist,zlist)]
+        #adding to 3d plot
+        dthreshold = face.getDivisionThreshold()
+        color = scalarMap.to_rgba(dthreshold)
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = color)
+        pc.set_edgecolor('k')
+        ax.add_collection3d(pc)
+        face = faces.next()
+                #if face.getID() == 1: break
+    #ax.axis("off")
+    ax.view_init(elev=elev, azim=azim)
+    ########################################################################
+    scalarMap._A = []
+    cbar_ax = fig.add_axes([0.9, 0.25, 0.03, 0.5])
+    clrbar = plt.colorbar(scalarMap,cax = cbar_ax,
+                          ticks = np.linspace(vmin,vmax,3),format = '%.1f')#,orientation='horizontal',cax = cbar_ax)
+    ########################################################################
+    clrbar.set_label(r"Division Threshold")
+    if name == None:#plot the figure
+        plt.show()
+    else:
+        plt.savefig(name, transparent = True)
+    plt.close()
     return
