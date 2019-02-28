@@ -368,8 +368,10 @@ if targetface == None:
 ################################################################################
 import sys
 import os
-#################################
+################################################################################
 cwd = os.getcwd()#getting the current working directory
+zone = cwd.split('/')[-2]
+################################################################################
 DIRNAMES=1
 listdir = sorted(os.walk('.').next()[DIRNAMES])#all the list of directory in cwd
 directoryName = "plots"
@@ -457,7 +459,7 @@ for folder in listdir:
 ###############################################################################
 #plotting
 ###############################################################################
-plotargs = {"linewidth":3}
+plotargs = {"linewidth":5}
 for key,data in plotData.iteritems():
 	color = scalarMap.to_rgba(key)
 	################################## [tissueSurfaceAreaArray, heightArray, timeArray]
@@ -548,7 +550,7 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 	#fig3.savefig(saveDirectory+r"/plot_growthratio_12meangrowthstress_areastep=%d_targetface=%d.png"%(areastep,targetid),transparent = True, bbox_inches="tight")
 	#fig4.savefig(saveDirectory+r"/plot_eta%d_boundaryarea_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
 else:
-	fig.savefig(saveDirectory+r"/plot_tissueSurface_height_time=%d_area=%d.png"%(endStep,endarea),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_tissueSurface_%s_height_time=%d_area=%d.png"%(zone, endStep,endarea),transparent = True, bbox_inches="tight")
 	#fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	#fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.png"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	#fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
@@ -562,6 +564,18 @@ else:
 #fig3.savefig(saveDirectory+r"/plot_eta_vs_sphericity_%d.png"%endStep,transparent = True)
 plt.close('all')
 ### Saving Data Dictionary ###
+
+### Saving Data Dictionary ###
+if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
+	if jobid:
+		np.save('job=%d_growthratio_meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(jobid,endStep,targetid),plotData)
+	else:
+		np.save('growthratio_meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+else:
+	if jobid:
+		np.save('job=%d_time=%d_endarea=%d.npy'%(endStep,endarea),plotData)
+	else:
+		np.save('plotHeightArea_%s_time=%d_endarea=%d.npy'%(zone,endStep,endarea),plotData)
 ################################################################################
 print '\n',15*" "+"################################################################################"
 print 45*" "+"DONE "
