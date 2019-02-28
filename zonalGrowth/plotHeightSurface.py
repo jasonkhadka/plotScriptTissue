@@ -18,11 +18,11 @@ import argparse #argument parser, handles the arguments passed by command line
 import gc
 import string
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 22
-plt.rcParams['ytick.labelsize'] = 22
-plt.rcParams['axes.labelsize'] = 22
-plt.rcParams['legend.fontsize'] = 16
-plt.rcParams['axes.titlesize'] = 22
+plt.rcParams['xtick.labelsize'] = 30
+plt.rcParams['ytick.labelsize'] = 30
+plt.rcParams['axes.labelsize'] = 30
+plt.rcParams['legend.fontsize'] = 30
+plt.rcParams['axes.titlesize'] = 35
 
 
 ####################################################################################################################
@@ -440,7 +440,7 @@ for folder in listdir:
 	###########################################################
 	# Growth Ratio calculation
 	############################################################
-	if not fastkappaOption:
+	if False:#not fastkappaOption:
 		print "\n ############################################################"
 		print " "*15,"Growth Ratio = ",  sf.getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,
 				endStep = endStep,startStep = startStep)
@@ -448,7 +448,7 @@ for folder in listdir:
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
 	plotData[etacurrent] = plotHeightSurface(numOfLayer, endStep=endStep,eta=etacurrent,startStep = startStep,  stepsize = stepsize,
-		maxarea = maxarea, areastep = areastep,tartarea = startarea,
+		maxarea = maxarea, areastep = areastep,startarea = startarea,
 				endarea = endarea)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
@@ -520,6 +520,7 @@ clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
 clrbar.set_label(r"Mechanical Feedback, $\eta$")
 ################################################################################
 minarea = min(plotData.values()[0][0])
+"""
 if False:#startarea:#start area != none
 	meangrowth12plot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	meangrowthROplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
@@ -534,6 +535,7 @@ else:
 	stressROplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	boundaryareaplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	boundaryareaplot1.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+"""
 ################################################################################
 
 
@@ -546,7 +548,7 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 	#fig3.savefig(saveDirectory+r"/plot_growthratio_12meangrowthstress_areastep=%d_targetface=%d.png"%(areastep,targetid),transparent = True, bbox_inches="tight")
 	#fig4.savefig(saveDirectory+r"/plot_eta%d_boundaryarea_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
 else:
-	fig.savefig(saveDirectory+r"/plot_tissueSurface_height.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_tissueSurface_height_time=%d_area=%d.png"%(endStep,endarea),transparent = True, bbox_inches="tight")
 	#fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	#fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.png"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	#fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
