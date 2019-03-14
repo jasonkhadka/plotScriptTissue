@@ -5330,3 +5330,55 @@ def plotDivisionThresholdSurface(cell, numOfLayer, name=None, alpha = 0.5, Lengt
         plt.savefig(name, transparent = True)
     plt.close()
     return
+####################################################################################################################
+# calculating growth ratio
+####################################################################################################################
+def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
+    if not os.path.isfile("qdObject_step=001.obj"):
+            return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
+    cell = sf.loadCellFromFile(1)
+    ####################################################################################################################
+    # fit function
+    ####################################################################################################################
+    def fitLinFunc(t,m,c):
+        return m*t + c
+    ########################################################################
+    meanprimordiaArray = []
+    meanrestArray = []
+    timeArray = []
+    ########################################################################
+    fitlen = 50
+    finalstep = startStep + stepsize*fitlen
+    for step in range(startStep, finalstep, stepsize):
+        ########################################################################
+        if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
+            break
+        cell = sf.loadCellFromFile(step)
+        ################################################
+        primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
+        primordiaarea = 0.
+        for face in primordiafacelist:
+            primordiaarea += face.getAreaOfFace()
+        ################################################
+        tissueSurfaceArea = sf.getSurfaceArea(cell)
+        ################################################
+        primordialface = sf.getFace(cell, targetid)
+        restoftissuearea =  tissueSurfaceArea - primordiaarea
+        ################################################
+        numOfPrimordialcell = len(primordiafacelist)
+        numOfrestofcell = cell.countFaces() -1 -numOfPrimordialcell
+        ################################################
+        meanprimordiafacearea = primordiaarea/numOfPrimordialcell
+        meanrestoftissuefacearea = restoftissuearea/(numOfrestofcell)
+        ################################################
+        meanprimordiaArray.append(meanprimordiafacearea)
+        meanrestArray.append(meanrestoftissuefacearea)
+        timeArray.append(step-1)
+        ################################################
+    logfastarea = np.log(meanprimordiaArray)
+    logslowarea = np.log(meanrestArray)
+    ################################################
+    fastareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logfastarea[:fitlen],bounds=([-np.inf,logfastarea[0]-0.000001],[+np.inf,logfastarea[0]]))
+    slowareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logslowarea[:fitlen],bounds=([-np.inf,logslowarea[0]-0.000001],[+np.inf,logslowarea[0]]))
+    ################################################
+    return fastareafit[0]/slowareafit[0]
