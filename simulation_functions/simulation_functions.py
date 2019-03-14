@@ -5336,7 +5336,7 @@ def plotDivisionThresholdSurface(cell, numOfLayer, name=None, alpha = 0.5, Lengt
 def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
     if not os.path.isfile("qdObject_step=001.obj"):
             return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(1)
+    cell = loadCellFromFile(1,resetids = True)
     ####################################################################################################################
     # fit function
     ####################################################################################################################
@@ -5353,16 +5353,16 @@ def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
         ########################################################################
         if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
             break
-        cell = sf.loadCellFromFile(step)
+        cell = loadCellFromFile(step,resetids=True)
         ################################################
-        primordiafacelist  = sf.getPrimordiaFaces(cell, targetid, large = False)
+        primordiafacelist  = getPrimordiaFaces(cell, targetid, large = False)
         primordiaarea = 0.
         for face in primordiafacelist:
             primordiaarea += face.getAreaOfFace()
         ################################################
-        tissueSurfaceArea = sf.getSurfaceArea(cell)
+        tissueSurfaceArea = getSurfaceArea(cell)
         ################################################
-        primordialface = sf.getFace(cell, targetid)
+        primordialface = getFace(cell, targetid)
         restoftissuearea =  tissueSurfaceArea - primordiaarea
         ################################################
         numOfPrimordialcell = len(primordiafacelist)
