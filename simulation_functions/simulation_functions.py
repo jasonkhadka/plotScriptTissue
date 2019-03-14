@@ -5342,6 +5342,7 @@ def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
     ####################################################################################################################
     def fitLinFunc(t,m,c):
         return m*t + c
+    import scipy.optimize as sop
     ########################################################################
     meanprimordiaArray = []
     meanrestArray = []
