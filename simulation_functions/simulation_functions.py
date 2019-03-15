@@ -22,6 +22,23 @@ import Quadedge_lattice_development as latdev
 import centered_lattice_generator as latgen
 import matplotlib.pyplot as plt
 import os
+########################################################################################
+# Formatter for ticks
+########################################################################################
+import matplotlib.ticker
+class OOMFormatter(matplotlib.ticker.ScalarFormatter):
+    def __init__(self, order=0, fformat="%1.2f", offset=True, mathText=True):
+        self.oom = order
+        self.fformat = fformat
+        matplotlib.ticker.ScalarFormatter.__init__(self,useOffset=offset,useMathText=mathText)
+    def _set_orderOfMagnitude(self, nothing):
+        self.orderOfMagnitude = self.oom
+    def _set_format(self, vmin, vmax):
+        self.format = self.fformat
+        if self._useMathText:
+            self.format = '$%s$' % matplotlib.ticker._mathdefault(self.format)
+
+
 ######################################################################
 #          Function to make initial Dome                            ##
 ######################################################################
@@ -4578,6 +4595,37 @@ def plotSpontaneousMeanCurvatureTriangulation(cell, numOfLayer,save=True,thresho
     plt.close()
     return
 ########################################################################################
+# Function to calculate weighted gaussian curvature
+########################################################################################
+def getFaceWeightedGaussianCurvature(face):
+    edges = qd.FaceEdgeIterator(face)
+    edge = edges.next()
+    curvature = [face.getGaussianCurvature()]
+    areaMixed = [face.getAreaMixed()]
+    while edge != None:
+        vertexDest = edge.Dest()
+        curvature.append(vertexDest.getGaussianCurvature())
+        areaMixed.append(vertexDest.getAreaMixed())
+        #####################
+        edge = edges.next()
+    return np.sum(np.multiply(curvature,areaMixed))/np.sum(areaMixed)#returning weighted curvature
+########################################################################################
+# Function to calculate weighted mean curvature
+########################################################################################
+def getFaceWeightedMeanCurvature(face):
+    edges = qd.FaceEdgeIterator(face)
+    edge = edges.next()
+    curvature = [face.getMeanCurvature()]
+    areaMixed = [face.getAreaMixed()]
+    while edge != None:
+        vertexDest = edge.Dest()
+        curvature.append(vertexDest.getMeanCurvature())
+        areaMixed.append(vertexDest.getAreaMixed())
+        #####################
+        edge = edges.next()
+    return np.sum(np.multiply(curvature,areaMixed))/np.sum(areaMixed)#returning weighted curvature
+
+########################################################################################
 # Function to plot spontaneous mean curvature for a quadedge cell
 ########################################################################################
 def plotMeanCurvatureTriangulation(cell, numOfLayer,save = True, threshold=-0.0, step = None, alpha = 0.8, Length=1.0,azim = -60.,elev=60):
@@ -4665,6 +4713,518 @@ def plotMeanCurvatureTriangulation(cell, numOfLayer,save = True, threshold=-0.0,
         plt.savefig('mean_curvature_layer=%d_elev=%d_azim=%d_step=%03d.png'%(numOfLayer,elev,azim,step), transparent = True)
     ###################################
     plt.close()
+    return
+########################################################################################
+# Function to plot gaussian curvature surface for a quadedge cell
+########################################################################################
+###################################################################
+def plotGaussianCurvatureSurface(cell, numOfLayer,threshold=-0.0,
+                ids= False,step = None, save= False, 
+                alpha = 0.8, Length=1.0,azim = -60.,elev=60,
+                zaxisoffset=0.3,
+                colormap = 'viridis'):
+    import matplotlib.colors as colors
+    import matplotlib.cm as cmx
+    #import the libraries
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib as mpl
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+    import numpy as np
+    import matplotlib.pyplot as plt
+        #limits of the plot
+    radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
+    #plotting part
+    #plotting part
+    fig = plt.figure(frameon=False,figsize=(20,16))
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    #fig.set_aspect(aspect='equal', adjustable='box')
+    ax = Axes3D(fig)
+    limfac =1.-zaxisoffset
+    ax.set_xlim((-limfac*radius,limfac*radius))
+    ax.set_ylim((-limfac*radius,limfac*radius))
+    ax.set_zlim((-0.,0.7*2*limfac*radius))
+    ax.axis('off')
+    #ax.axis('equal')
+    ax.xaxis.pane.set_edgecolor('black')
+    ax.yaxis.pane.set_edgecolor('black')
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+    ########################################################################
+    #                 Plotting the Cell                    #
+    ########################################################################
+    meanpointx = []
+    meanpointy = []
+    meanpointz = []
+    unneccesary = False
+    if unneccesary:
+        print "NOT"
+        edge = getEdge(cell,211,210)
+        edgenext = edge
+        ####grabbing the origin of edge####
+        #centralised coordiante
+        vertexOrg = edge.Org()
+        vertexDest = edge.Dest()
+        #print vertex.getID()
+        xCoord1 = vertexOrg.getXcoordinate()
+        yCoord1 = vertexOrg.getYcoordinate()
+        zCoord1 = vertexOrg.getZcoordinate()
+        xCoord2 = vertexDest.getXcoordinate()
+        yCoord2 = vertexDest.getYcoordinate()
+        zCoord2 = vertexDest.getZcoordinate()
+        meanpointx.append(xCoord2)
+        meanpointy.append(yCoord2)
+        meanpointz.append(zCoord2)
+        ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'m', lw = 4)
+        while True:
+            edgenext = edgenext.Rprev()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            ########################################################
+            edgenext = edgenext.Lnext()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            ########################################################
+            edgenext = edgenext.Lnext()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            ###############################################################
+            edgenext = edgenext.Rprev()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            ########################################################
+            edgenext = edgenext.Lnext()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            #############################################################
+            if edgenext.Org().getID() == edge.Org().getID():
+                break
+    #ax.scatter(np.mean(meanpointx),np.mean(meanpointy),np.mean(meanpointz),s = 60, c= 'm')
+    #targetface = getFace(cell, 135)
+    #targetx = targetface.getXCentralised()
+    #targety = targetface.getYCentralised()
+    #targetz = targetface.getZCentralised()
+    #ax.scatter(targetx,targety,targetz,s = 60, c= 'g')
+    #ax.plot([targetx,np.mean(meanpointx)],[targety,np.mean(meanpointy)],[targetz,np.mean(meanpointz)],lw = 4,c= 'r')
+    
+    ###################
+    curvaturedict = {}
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while (face != None):
+        if face.getID() == 1 or checkExternalFace(face):
+            face  = faces.next()
+            continue
+        faceid = face.getID()#grabbing face id
+        curvaturedict[faceid] = getFaceWeightedGaussianCurvature(face)#getFaceWeightedMeanCurvature(face)
+        ################################
+        face = faces.next()
+    ###################
+    curvatureArray = np.array(curvaturedict.values())
+    maxcurvature = np.max(curvatureArray)
+    mincurvature = np.min(curvatureArray)
+    ###################################
+    ######### Color Map
+    ###################################
+    jet = cm = plt.get_cmap(colormap) 
+    cNorm  = colors.Normalize(vmin=mincurvature, vmax=maxcurvature)
+    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+    ###################################
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while (face != None):
+        faceid = face.getID()#grabbing face id
+        if face.getID() == 1:
+            face = faces.next()
+            continue
+        xlist = []
+        ylist = []
+        zlist = []
+        xproj = []
+        yproj = []
+        zproj = []
+        #print "== Face ID : ", faceid, "=="
+        xmean = face.getXCentralised()
+        ymean = face.getYCentralised()
+        zmean = face.getZCentralised()
+        edges = qd.FaceEdgeIterator(face)
+        edge = edges.next()
+        while edge != None:
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertex = edge.Org()
+            #print vertex.getID()
+            xCoord1 = vertex.getXcoordinate()
+            yCoord1 = vertex.getYcoordinate()
+            zCoord1 = vertex.getZcoordinate()
+            xlist.append(xCoord1)
+            ylist.append(yCoord1)
+            zlist.append(zCoord1)
+            edge = edges.next()
+        xlist.append(xlist[0])
+        ylist.append(ylist[0])
+        zlist.append(zlist[0])
+        verts = [zip(xlist, ylist,zlist)]
+        #adding to 3d plot
+        if checkExternalFace(face):
+                #gausscurve = curvaturedict[faceid]
+                facecolor = 'slategray'
+        else:
+                gausscurve = curvaturedict[faceid]
+                if gausscurve<threshold:
+                    facecolor = 'r'
+                else:
+                    facecolor =  scalarMap.to_rgba(gausscurve)
+        #facecolor = 'b'
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = facecolor)
+        ax.plot(xlist,ylist,zlist,'k', lw = 1)
+        pc.set_edgecolor('k')
+        ax.add_collection3d(pc)
+        # adding ids for face
+        if ids: 
+            ax.text(xmean,ymean,zmean,faceid)
+        face = faces.next()
+    ax.view_init(azim = azim,elev=elev)
+    ###################################
+    # color bar
+    ###################################
+    import matplotlib.ticker
+    print mincurvature, maxcurvature
+    scalarMap._A = []
+    cbar_ax = fig.add_axes([0.9, 0.15, 0.03, 0.55])
+    clrbar = plt.colorbar(scalarMap,cax = cbar_ax,
+                          ticks = np.linspace(mincurvature,maxcurvature,3),
+                          format=OOMFormatter(-2, mathText=True))#,orientation='horizontal',cax = cbar_ax)
+    clrbar.set_label(r"Gaussian curvature, $K$")
+    #plt.show()
+    #plt.suptitle("Step =%03d"%step,fontsize = 30)
+    if save:
+        plt.savefig('gaussianCurvatureSurface-weighted.eps',format = 'eps',bbox_inches='tight', transparent=True)
+    #print table.draw()
+    return
+###################################################################
+# to plot surface with mean curvature
+###################################################################
+def plotMeanCurvatureSurface(cell, numOfLayer,threshold=-0.0,
+                ids= False,step = None, save= False, 
+                alpha = 0.8, Length=1.0,azim = -60.,elev=60,
+                zaxisoffset=0.3,
+                colormap = 'viridis'):
+    import matplotlib.colors as colors
+    import matplotlib.cm as cmx
+    #import the libraries
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib as mpl
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+    import numpy as np
+    import matplotlib.pyplot as plt
+    #limits of the plot
+    radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
+    #plotting part
+    #plotting part
+    fig = plt.figure(frameon=False,figsize=(20,16))
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    #fig.set_aspect(aspect='equal', adjustable='box')
+    ax = Axes3D(fig)
+    limfac =1.-zaxisoffset
+    ax.set_xlim((-limfac*radius,limfac*radius))
+    ax.set_ylim((-limfac*radius,limfac*radius))
+    ax.set_zlim((-0.,0.7*2*limfac*radius))
+    ax.axis('off')
+    #ax.axis('equal')
+    ax.xaxis.pane.set_edgecolor('black')
+    ax.yaxis.pane.set_edgecolor('black')
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+    ########################################################################
+    #                 Plotting the Cell                    #
+    ########################################################################
+    meanpointx = []
+    meanpointy = []
+    meanpointz = []
+    unneccesary = False
+    if unneccesary:
+        print "NOT"
+        edge = getEdge(cell,211,210)
+        edgenext = edge
+        ####grabbing the origin of edge####
+        #centralised coordiante
+        vertexOrg = edge.Org()
+        vertexDest = edge.Dest()
+        #print vertex.getID()
+        xCoord1 = vertexOrg.getXcoordinate()
+        yCoord1 = vertexOrg.getYcoordinate()
+        zCoord1 = vertexOrg.getZcoordinate()
+        xCoord2 = vertexDest.getXcoordinate()
+        yCoord2 = vertexDest.getYcoordinate()
+        zCoord2 = vertexDest.getZcoordinate()
+        meanpointx.append(xCoord2)
+        meanpointy.append(yCoord2)
+        meanpointz.append(zCoord2)
+        ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'m', lw = 4)
+        while True:
+            edgenext = edgenext.Rprev()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            ########################################################
+            edgenext = edgenext.Lnext()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            ########################################################
+            edgenext = edgenext.Lnext()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            ###############################################################
+            edgenext = edgenext.Rprev()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            ########################################################
+            edgenext = edgenext.Lnext()
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertexOrg = edgenext.Org()
+            vertexDest = edgenext.Dest()
+            #print vertex.getID()
+            xCoord1 = vertexOrg.getXcoordinate()
+            yCoord1 = vertexOrg.getYcoordinate()
+            zCoord1 = vertexOrg.getZcoordinate()
+            xCoord2 = vertexDest.getXcoordinate()
+            yCoord2 = vertexDest.getYcoordinate()
+            zCoord2 = vertexDest.getZcoordinate()
+            meanpointx.append(xCoord2)
+            meanpointy.append(yCoord2)
+            meanpointz.append(zCoord2)
+            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
+            #############################################################
+            if edgenext.Org().getID() == edge.Org().getID():
+                break
+    #ax.scatter(np.mean(meanpointx),np.mean(meanpointy),np.mean(meanpointz),s = 60, c= 'm')
+    #targetface = getFace(cell, 135)
+    #targetx = targetface.getXCentralised()
+    #targety = targetface.getYCentralised()
+    #targetz = targetface.getZCentralised()
+    #ax.scatter(targetx,targety,targetz,s = 60, c= 'g')
+    #ax.plot([targetx,np.mean(meanpointx)],[targety,np.mean(meanpointy)],[targetz,np.mean(meanpointz)],lw = 4,c= 'r')
+    
+    ###################
+    curvaturedict = {}
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while (face != None):
+        if face.getID() == 1 or checkExternalFace(face):
+            face  = faces.next()
+            continue
+        faceid = face.getID()#grabbing face id
+        curvaturedict[faceid] = getFaceWeightedMeanCurvature(face)#getFaceWeightedMeanCurvature(face)
+        ################################
+        face = faces.next()
+    ###################
+    curvatureArray = np.array(curvaturedict.values())
+    maxcurvature = np.max(curvatureArray)
+    mincurvature = np.min(curvatureArray)
+    ###################################
+    ######### Color Map
+    ###################################
+    jet = cm = plt.get_cmap(colormap) 
+    cNorm  = colors.Normalize(vmin=mincurvature, vmax=maxcurvature)
+    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+    ###################################
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while (face != None):
+        faceid = face.getID()#grabbing face id
+        if face.getID() == 1:
+            face = faces.next()
+            continue
+        xlist = []
+        ylist = []
+        zlist = []
+        xproj = []
+        yproj = []
+        zproj = []
+        #print "== Face ID : ", faceid, "=="
+        xmean = face.getXCentralised()
+        ymean = face.getYCentralised()
+        zmean = face.getZCentralised()
+        edges = qd.FaceEdgeIterator(face)
+        edge = edges.next()
+        while edge != None:
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertex = edge.Org()
+            #print vertex.getID()
+            xCoord1 = vertex.getXcoordinate()
+            yCoord1 = vertex.getYcoordinate()
+            zCoord1 = vertex.getZcoordinate()
+            xlist.append(xCoord1)
+            ylist.append(yCoord1)
+            zlist.append(zCoord1)
+            edge = edges.next()
+        xlist.append(xlist[0])
+        ylist.append(ylist[0])
+        zlist.append(zlist[0])
+        verts = [zip(xlist, ylist,zlist)]
+        #adding to 3d plot
+        if checkExternalFace(face):
+                #gausscurve = curvaturedict[faceid]
+                facecolor = 'slategray'
+        else:
+                gausscurve = curvaturedict[faceid]
+                if gausscurve<threshold:
+                    facecolor = 'r'
+                else:
+                    facecolor =  scalarMap.to_rgba(gausscurve)
+        #facecolor = 'b'
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = facecolor)
+        ax.plot(xlist,ylist,zlist,'k', lw = 1)
+        pc.set_edgecolor('k')
+        ax.add_collection3d(pc)
+        # adding ids for face
+        if ids: 
+            ax.text(xmean,ymean,zmean,faceid)
+        face = faces.next()
+    ax.view_init(azim = azim,elev=elev)
+    ###################################
+    # color bar
+    ###################################
+    import matplotlib.ticker
+    scalarMap._A = []
+    cbar_ax = fig.add_axes([0.9, 0.15, 0.03, 0.55])
+    clrbar = plt.colorbar(scalarMap,cax = cbar_ax,
+                          ticks = np.linspace(mincurvature,maxcurvature,3),
+                          format=OOMFormatter(-2, mathText=True))#,orientation='horizontal',cax = cbar_ax)
+    clrbar.set_label(r"Mean Curvature, $H$")
+    print mincurvature, maxcurvature
+    #clrbar.ax.tick_params(labelsize=30)
+    #clrbar.ax.set_yticklabels(['{:.3f}'.format(x) for x in np.linspace(mincurvature,maxcurvature,4)], fontsize=30)
+    #formatter = matplotlib.ticker.ScalarFormatter(useMathText=False)
+    #clrbar.ax.yaxis.set_major_formatter(formatter)
+    #clrbar.ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+
+
+    #plt.show()
+    #plt.suptitle("Step =%03d"%step,fontsize = 30)
+    if save:
+        plt.savefig('meanCurvatureSurface-weighted.eps',format = 'eps',bbox_inches='tight', transparent=True)
+    #print table.draw()
     return
 ####################################################################################################
 # Get array of all vertices on boundary of primordia

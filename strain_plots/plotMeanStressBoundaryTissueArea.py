@@ -263,6 +263,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	meanstressEigenvalue2Array = []
 	meangrowthEigenvalue1Array = []
 	meangrowthEigenvalue2Array = []
+	meangaussianCurvatureArray = []
 	###################################################
 	# save standard deviations of the stress and growth
 	###################################################
@@ -325,6 +326,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 		stressEigenvalue2Array = []
 		growthEigenvalue1Array = []
 		growthEigenvalue2Array = []
+		gaussianCurvatureArray = []
 		dTissueSurfaceArea = tissueSurfaceArea2-tissueSurfaceArea
 		boundaryarea = 0.
 		for face in faceList:
@@ -341,6 +343,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 			stressEigenvalue2Array.append(stresseigenvalue2)
 			growthEigenvalue1Array.append(growtheigenvalue1)
 			growthEigenvalue2Array.append(growtheigenvalue2)
+			gaussianCurvatureArray.append(sf.getFaceWeightedGaussianCurvature(face))
 		######################################################
 		radialStressArray.append(np.mean(radialStress))
 		orthoradialStressArray.append(np.mean(orthoradialStress))
@@ -357,6 +360,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 		meanstressEigenvalue2Array.append(np.mean(stressEigenvalue2Array))
 		meangrowthEigenvalue1Array.append(np.mean(growthEigenvalue1Array))
 		meangrowthEigenvalue2Array.append(np.mean(growthEigenvalue2Array))
+		meangaussianCurvatureArray.append(np.mean(gaussianCurvatureArray))
 		#######################################################
 		# calculating the standard deviation
 		#######################################################
@@ -392,7 +396,8 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 			radialStressSDArray, orthoradialStressSDArray, 
 			radialGrowthSDArray, orthoradialGrowthSDArray,
 			meanstressEigenvalue1SDArray, meanstressEigenvalue2SDArray,
-			meangrowthEigenvalue1SDArray, meangrowthEigenvalue2SDArray
+			meangrowthEigenvalue1SDArray, meangrowthEigenvalue2SDArray,
+			meangaussianCurvatureArray
 			]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
