@@ -88,7 +88,8 @@ def plotAspectRatio(targetid,othertargetid, targetsurfacearea,
 		primordialfaceids = [f.getID() for f in primordialfaces]
 		primordialBoundaryfaces = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= True)
 		primordialBoundaryfaceids = [f.getID() for f in primordialBoundaryfaces]
-		othertissuefacelist = getMeristemFaces(cell,primordialfaceids+primordialBoundaryfaceids)
+		othertissuefacelist = sf.getPrimordialFaces(cell,othertargetid, large=False)+\
+								sf.getPrimordiaBoundaryFaceList(cell,orthertargetid,large= True)#getMeristemFaces(cell,primordialfaceids+primordialBoundaryfaceids)
 		################################################
 		########################################################################
 		# calculate the roundness
@@ -134,7 +135,7 @@ parser.add_argument("-p","--pressure",help = "value to set for Pressure (wegith 
 parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneath the epidermis, comming from lower level cells. acting as the volume maximizing agent", default = 0.1, type = float)
 
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = None, type = int)
-parser.add_argument("-o","--othersidetissue",help = "target cell for other side of the tissue (non-primordia)", type = int,default = 224)
+parser.add_argument("-o","--othersidetissue",help = "target cell for other side of the tissue (non-primordia)", type = int,default = 226)
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,
