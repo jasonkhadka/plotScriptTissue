@@ -156,7 +156,7 @@ def getFaceAreaData(cell,faceidarray):
 ###################################################################
 def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta, 
     mincurvatureplot, heightplot,ax3,ax4,ax5,ax6,ax7,
-    color,startStep=0,stepsize= 1,largerCondition = False,maxarea = None):
+    color,startStep=0,stepsize= 1,largerCondition = False,maxarea = None,resetids = True):
     import numpy as np
     import matplotlib.pyplot as plt
     import os
@@ -164,7 +164,7 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
     # faceidarray for Primordia
     if not os.path.isfile("qdObject_step=000.obj"):
         return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(0,resetids = True)
+    cell = sf.loadCellFromFile(0,resetids = resetids)
     faceList = sf.getPrimordiaFaces(cell,targetid, large = largerCondition)
     faceidarray = [xface.getID() for xface in faceList]
     primordialFaceNum  = len(faceList)
@@ -195,7 +195,7 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
     #####################################
     if not os.path.isfile("qdObject_step=001.obj"):
         return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = sf.loadCellFromFile(1,resetids = True)
+    cell = sf.loadCellFromFile(1,resetids = resetids)
     #################################
     # face area data
     #################################
@@ -206,7 +206,7 @@ def plotMinGaussianCurvaturePrimodiaHeight(numOfLayer, targetid,endStep,eta,
     for step in range(startStep,endStep+1,stepsize):
         if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
             break
-        cell = sf.loadCellFromFile(step,resetids = True)
+        cell = sf.loadCellFromFile(step,resetids = resetids)
         #################################
         # face area data
         #################################
@@ -337,6 +337,8 @@ parser.add_argument("-t","--target", help = "Target face for faster growth", def
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument("-d","--stepsize", help = "stepsize on plot", default = 1, type = int)
+parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
+parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_false")
 
 ## Getting the arguments 
 args = parser.parse_args()
@@ -361,6 +363,9 @@ maxeta = args.maxeta
 fastkappaOption = args.fastkappa
 large  = args.Large
 maxarea = args.maxarea
+
+jobid = args.jobid
+resetids = args.resetids
 # For surpressing err
 class NullDevice():
 	def write(self, s):
