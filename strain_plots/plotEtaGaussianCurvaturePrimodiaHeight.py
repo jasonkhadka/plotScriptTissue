@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 sys.path.append('/home/jkhadka/transferdata/scripts/simulation_functions/')
 sys.path.append('/home/jkhadka/transferdata/scripts/plotscript/')
+import primordiaplotfunctions as ppf
 import simulation_functions as sf
 import argparse #argument parser, handles the arguments passed by command line
 import gc
