@@ -5848,5 +5848,5 @@ def getAspectRatio(face):
     targetformmatrix = np.array([[qd.getTargetFormMatrix(face, 0,0),qd.getTargetFormMatrix(face, 0,1)],
                                  [qd.getTargetFormMatrix(face, 1,0),qd.getTargetFormMatrix(face, 1,1)]
                                  ])
-    eig_vec,eig_val,u = np.linalg.svd(targetformatrix)
+    eig_vec,eig_val,u = np.linalg.svd(targetformmatrix)
     return eig_val[0]/eig_val[1]
