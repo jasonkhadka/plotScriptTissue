@@ -4718,8 +4718,8 @@ def plotMeanCurvatureTriangulation(cell, numOfLayer,save = True, threshold=-0.0,
 # Function to plot gaussian curvature surface for a quadedge cell
 ########################################################################################
 ###################################################################
-def plotGaussianCurvatureSurface(cell, numOfLayer,threshold=-0.0,
-                ids= False,step = None, save= False, 
+def plotGaussianCurvatureSurface(cell, numOfLayer,threshold=-10000.0,
+                ids= False,step = None, save= False, name= None,fileformat = 'pdf',
                 alpha = 0.8, Length=1.0,azim = -60.,elev=60,
                 zaxisoffset=0.3,
                 colormap = 'viridis'):
@@ -4756,114 +4756,6 @@ def plotGaussianCurvatureSurface(cell, numOfLayer,threshold=-0.0,
     meanpointx = []
     meanpointy = []
     meanpointz = []
-    unneccesary = False
-    if unneccesary:
-        print "NOT"
-        edge = getEdge(cell,211,210)
-        edgenext = edge
-        ####grabbing the origin of edge####
-        #centralised coordiante
-        vertexOrg = edge.Org()
-        vertexDest = edge.Dest()
-        #print vertex.getID()
-        xCoord1 = vertexOrg.getXcoordinate()
-        yCoord1 = vertexOrg.getYcoordinate()
-        zCoord1 = vertexOrg.getZcoordinate()
-        xCoord2 = vertexDest.getXcoordinate()
-        yCoord2 = vertexDest.getYcoordinate()
-        zCoord2 = vertexDest.getZcoordinate()
-        meanpointx.append(xCoord2)
-        meanpointy.append(yCoord2)
-        meanpointz.append(zCoord2)
-        ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'m', lw = 4)
-        while True:
-            edgenext = edgenext.Rprev()
-            ####grabbing the origin of edge####
-            #centralised coordiante
-            vertexOrg = edgenext.Org()
-            vertexDest = edgenext.Dest()
-            #print vertex.getID()
-            xCoord1 = vertexOrg.getXcoordinate()
-            yCoord1 = vertexOrg.getYcoordinate()
-            zCoord1 = vertexOrg.getZcoordinate()
-            xCoord2 = vertexDest.getXcoordinate()
-            yCoord2 = vertexDest.getYcoordinate()
-            zCoord2 = vertexDest.getZcoordinate()
-            meanpointx.append(xCoord2)
-            meanpointy.append(yCoord2)
-            meanpointz.append(zCoord2)
-            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
-            ########################################################
-            edgenext = edgenext.Lnext()
-            ####grabbing the origin of edge####
-            #centralised coordiante
-            vertexOrg = edgenext.Org()
-            vertexDest = edgenext.Dest()
-            #print vertex.getID()
-            xCoord1 = vertexOrg.getXcoordinate()
-            yCoord1 = vertexOrg.getYcoordinate()
-            zCoord1 = vertexOrg.getZcoordinate()
-            xCoord2 = vertexDest.getXcoordinate()
-            yCoord2 = vertexDest.getYcoordinate()
-            zCoord2 = vertexDest.getZcoordinate()
-            meanpointx.append(xCoord2)
-            meanpointy.append(yCoord2)
-            meanpointz.append(zCoord2)
-            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
-            ########################################################
-            edgenext = edgenext.Lnext()
-            ####grabbing the origin of edge####
-            #centralised coordiante
-            vertexOrg = edgenext.Org()
-            vertexDest = edgenext.Dest()
-            #print vertex.getID()
-            xCoord1 = vertexOrg.getXcoordinate()
-            yCoord1 = vertexOrg.getYcoordinate()
-            zCoord1 = vertexOrg.getZcoordinate()
-            xCoord2 = vertexDest.getXcoordinate()
-            yCoord2 = vertexDest.getYcoordinate()
-            zCoord2 = vertexDest.getZcoordinate()
-            meanpointx.append(xCoord2)
-            meanpointy.append(yCoord2)
-            meanpointz.append(zCoord2)
-            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
-            ###############################################################
-            edgenext = edgenext.Rprev()
-            ####grabbing the origin of edge####
-            #centralised coordiante
-            vertexOrg = edgenext.Org()
-            vertexDest = edgenext.Dest()
-            #print vertex.getID()
-            xCoord1 = vertexOrg.getXcoordinate()
-            yCoord1 = vertexOrg.getYcoordinate()
-            zCoord1 = vertexOrg.getZcoordinate()
-            xCoord2 = vertexDest.getXcoordinate()
-            yCoord2 = vertexDest.getYcoordinate()
-            zCoord2 = vertexDest.getZcoordinate()
-            meanpointx.append(xCoord2)
-            meanpointy.append(yCoord2)
-            meanpointz.append(zCoord2)
-            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
-            ########################################################
-            edgenext = edgenext.Lnext()
-            ####grabbing the origin of edge####
-            #centralised coordiante
-            vertexOrg = edgenext.Org()
-            vertexDest = edgenext.Dest()
-            #print vertex.getID()
-            xCoord1 = vertexOrg.getXcoordinate()
-            yCoord1 = vertexOrg.getYcoordinate()
-            zCoord1 = vertexOrg.getZcoordinate()
-            xCoord2 = vertexDest.getXcoordinate()
-            yCoord2 = vertexDest.getYcoordinate()
-            zCoord2 = vertexDest.getZcoordinate()
-            meanpointx.append(xCoord2)
-            meanpointy.append(yCoord2)
-            meanpointz.append(zCoord2)
-            ax.plot([xCoord1,xCoord2],[yCoord1,yCoord2], [zCoord1,zCoord2],'r', lw = 4)
-            #############################################################
-            if edgenext.Org().getID() == edge.Org().getID():
-                break
     #ax.scatter(np.mean(meanpointx),np.mean(meanpointy),np.mean(meanpointz),s = 60, c= 'm')
     #targetface = getFace(cell, 135)
     #targetx = targetface.getXCentralised()
@@ -4887,7 +4779,7 @@ def plotGaussianCurvatureSurface(cell, numOfLayer,threshold=-0.0,
     ###################
     curvatureArray = np.array(curvaturedict.values())
     maxcurvature = np.max(curvatureArray)
-    mincurvature = np.min(curvatureArray)
+    mincurvature = -1*maxcurvature#np.min(curvatureArray)
     ###################################
     ######### Color Map
     ###################################
@@ -4964,14 +4856,17 @@ def plotGaussianCurvatureSurface(cell, numOfLayer,threshold=-0.0,
     #plt.show()
     #plt.suptitle("Step =%03d"%step,fontsize = 30)
     if save:
-        plt.savefig('gaussianCurvatureSurface-weighted.eps',format = 'eps',bbox_inches='tight', transparent=True)
+        if name:
+            plt.savefig(name+'.'+fileformat,format = fileformat,bbox_inches='tight', transparent=True)
+        else:
+            plt.savefig('gaussianCurvatureSurface-weighted'+'.'+fileformat,format = fileformat,bbox_inches='tight', transparent=True)
     #print table.draw()
     return
 ###################################################################
 # to plot surface with mean curvature
 ###################################################################
-def plotMeanCurvatureSurface(cell, numOfLayer,threshold=-0.0,
-                ids= False,step = None, save= False, 
+def plotMeanCurvatureSurface(cell, numOfLayer,threshold=-1000.0,
+                ids= False,step = None, save= False, name=None,fileformat='pdf',
                 alpha = 0.8, Length=1.0,azim = -60.,elev=60,
                 zaxisoffset=0.3,
                 colormap = 'viridis'):
@@ -5223,7 +5118,10 @@ def plotMeanCurvatureSurface(cell, numOfLayer,threshold=-0.0,
     #plt.show()
     #plt.suptitle("Step =%03d"%step,fontsize = 30)
     if save:
-        plt.savefig('meanCurvatureSurface-weighted.eps',format = 'eps',bbox_inches='tight', transparent=True)
+        if name:
+            plt.savefig(name+'.'+fileformat,format =fileformat,bbox_inches='tight', transparent=True)
+        else:
+            plt.savefig('meanCurvatureSurface-weighted'+'.'+fileformat,format = fileformat,bbox_inches='tight', transparent=True)
     #print table.draw()
     return
 ####################################################################################################
@@ -5943,3 +5841,12 @@ def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
     slowareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logslowarea[:fitlen],bounds=([-np.inf,logslowarea[0]-0.000001],[+np.inf,logslowarea[0]]))
     ################################################
     return fastareafit[0]/slowareafit[0]
+####################################################################################################################
+# aspectratio
+####################################################################################################################
+def getAspectRatio(face):
+    targetformmatrix = np.array([[qd.getTargetFormMatrix(face, 0,0),qd.getTargetFormMatrix(face, 0,1)],
+                                 [qd.getTargetFormMatrix(face, 1,0),qd.getTargetFormMatrix(face, 1,1)]
+                                 ])
+    eig_vec,eig_val,u = np.linalg.svd(targetformatrix)
+    return eig_val[0]/eig_val[1]
