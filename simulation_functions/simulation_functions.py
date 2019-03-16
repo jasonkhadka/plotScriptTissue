@@ -4274,7 +4274,7 @@ def plotTargetFace(cell, numOfLayer,targetid, name = None, alpha = 0.8, Length=1
 ########################################################################################
 # Function to plot Minimum gaussian curvature for each time step till given step
 ########################################################################################
-def plotMinimumGaussianCurvature(step, numOfLayer=8.,save = False):
+def plotMinimumGaussianCurvature(step, numOfLayer=8.,save = False,resetids):
     ###################
     fig = plt.figure(1)
     ax1 = fig.add_subplot(111)
@@ -4282,7 +4282,7 @@ def plotMinimumGaussianCurvature(step, numOfLayer=8.,save = False):
     ###################
     minimumCurvature=[]
     for currentstep in range(step+1):
-        cell = loadCellFromFile(currentstep, numOfLayer,resetids = True)
+        cell = loadCellFromFile(currentstep, numOfLayer,resetids = resetids)
         curvatureArray = []
         faces = qd.CellFaceIterator(cell)
         face = faces.next()
@@ -5592,24 +5592,24 @@ def calculateDilation(cell1,cell2):
 ####################################################################################################################
 # Calculating the max time step for target surface area
 ####################################################################################################################
-def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
+def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10,resetids = True):
     ####################################################
     import gc
     for step in range(startStep, endStep+1,stepsize):
         if not os.path.isfile("qdObject_step=%03d.obj"%step):
             return endStep,0.
         ################################################
-        cell = loadCellFromFile(step,resetids = True)
+        cell = loadCellFromFile(step,resetids = resetids)
         ################################################
         tissueSurfaceArea = getSurfaceArea(cell)
         if (tissueSurfaceArea > targetArea):
             gc.collect()
             for calstep in range(step-1,step-stepsize-1,-1):
-                    cell = loadCellFromFile(calstep,resetids = True)
+                    cell = loadCellFromFile(calstep,resetids = resetids)
                     tissueSurfaceArea = getSurfaceArea(cell)
                     if (tissueSurfaceArea <= targetArea):
                         gc.collect()
-                        cell = loadCellFromFile(calstep+1,resetids=True)
+                        cell = loadCellFromFile(calstep+1,resetids = resetids)
                         tissueSurfaceArea = getSurfaceArea(cell)
                         return calstep+1,tissueSurfaceArea
         ################################################
@@ -5618,12 +5618,12 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
 ####################################################################################################################
 # Calculating the surface area for a given timestep
 ####################################################################################################################
-def getSurfaceAreaTimeStep(step):
+def getSurfaceAreaTimeStep(step,resetids = True):
     ####################################################
     if not os.path.isfile("qdObject_step=%03d.obj"%step):
         return 0.
     ################################################
-    cell = loadCellFromFile(step,resetids = True)
+    cell = loadCellFromFile(step,resetids = resetids)
     ################################################
     tissueSurfaceArea = getSurfaceArea(cell)
     ################################################
@@ -5791,10 +5791,10 @@ def plotDivisionThresholdSurface(cell, numOfLayer, name=None, alpha = 0.5, Lengt
 ####################################################################################################################
 # calculating growth ratio
 ####################################################################################################################
-def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
+def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5, resetids = True):
     if not os.path.isfile("qdObject_step=001.obj"):
             return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    cell = loadCellFromFile(1,resetids = True)
+    cell = loadCellFromFile(1,resetids = resetids)
     ####################################################################################################################
     # fit function
     ####################################################################################################################
@@ -5812,7 +5812,7 @@ def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5):
         ########################################################################
         if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
             break
-        cell = loadCellFromFile(step,resetids=True)
+        cell = loadCellFromFile(step,resetids=resetids)
         ################################################
         primordiafacelist  = getPrimordiaFaces(cell, targetid, large = False)
         primordiaarea = 0.
