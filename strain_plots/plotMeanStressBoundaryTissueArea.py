@@ -111,31 +111,6 @@ def getRadialOrthoradialStress(face, radialDict=None,orthoradialDict=None, vecto
 	############################################
 	return radialComp, orthoradialComp, eigenvalue1, eigenvalue2#radialvec,orthoradialvec
 ###################################################################
-####################################################################################################################
-# Calculating the max time step for target surface area
-####################################################################################################################
-def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
-	####################################################
-	for step in range(startStep, endStep+1,stepsize):
-		if not os.path.isfile("qdObject_step=%03d.obj"%step):
-			return endStep,0.
-		################################################
-		cell = sf.loadCellFromFile(step)
-		################################################
-		tissueSurfaceArea = sf.getSurfaceArea(cell)
-		if (tissueSurfaceArea > targetArea):
-			gc.collect()
-			for calstep in range(step-1,step-stepsize-1,-1):
-					cell = sf.loadCellFromFile(calstep)
-					tissueSurfaceArea = sf.getSurfaceArea(cell)
-					if (tissueSurfaceArea <= targetArea):
-						gc.collect()
-						cell = sf.loadCellFromFile(calstep+1)
-						tissueSurfaceArea = sf.getSurfaceArea(cell)
-						return calstep+1,tissueSurfaceArea
-		################################################
-		gc.collect()
-	return endStep,tissueSurfaceArea
 ###############################################################################################################
 # for a face, projecting its Growth eigendecomposed vectors onto radial-orthoradial direction
 ###############################################################################################################
@@ -240,7 +215,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	# faceidarray for Primordia
 	if not os.path.isfile("qdObject_step=001.obj"):
 		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1)
+	cell = sf.loadCellFromFile(1,resetids=True)
 	initialTissueSurfaceArea = sf.getSurfaceArea(cell)
 	#######################################################################
 	# Starting the Calculation
@@ -250,7 +225,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	#####################################
 	if not os.path.isfile("qdObject_step=001.obj"):
 		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1)
+	cell = sf.loadCellFromFile(1,resetids=True)
 	#######################################################################
 	laststep = 1
 	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
@@ -288,14 +263,14 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	#print listsurfacearea
 	#for steparea in range(startarea, endarea, int(areastep)):
 	for steparea in listsurfacearea:
-		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
+		step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
-		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep, endStep, step, stepsize = 10)
+		step2,tissueSurfaceArea2 = sf.getTimeStep(steparea+areastep, endStep, step, stepsize = 10)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
-		cell = sf.loadCellFromFile(step)
-		cell2 = sf.loadCellFromFile(step2)
+		cell = sf.loadCellFromFile(step,resetids=True)
+		cell2 = sf.loadCellFromFile(step2,resetids=True)
 		################################################
 		cell.calculateStressStrain()
 		################################################
@@ -387,6 +362,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 		laststep = step
 		########################################################################
 		print tissueSurfaceArea, tissueSurfaceArea2,dTissueSurfaceArea, step , step2
+		########################################################################
 	return [tissueSurfaceAreaArray, radialStressArray, orthoradialStressArray,
 			radialGrowthArray, orthoradialGrowthArray,
 			primordiaAreaArray,
