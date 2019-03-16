@@ -34,17 +34,17 @@ def calculateMeanAspectRatio(facelist):
 		totalAspectRatio.append(sf.getAspectRatio(face))
 		#########################
 	return np.nanmean(totalAspectRatio)
-def getMeristemFaces(cell, primordiafaces)
+def getMeristemFaces(cell, primordialfaceids):
 	meristemfaces = []
-	faces = qd.CellFaceIterator(cell1)
+	faces = qd.CellFaceIterator(cell)
 	face = faces.next()
 	while face != None:
-	    if (face.getID() in primordiafaceids) or sf.checkExternalFace(face) or (face.getID() == 1):
-	        face = faces.next()
-	        continue
-	    meristemfaces.append(face)
-    	face = faces.next()
-    return meristemfaces
+		if (face.getID() in primordialfaceids) or sf.checkExternalFace(face) or (face.getID() == 1):
+			face = faces.next()
+			continue
+		meristemfaces.append(face)
+		face = faces.next()
+	return meristemfaces
 ####################################################################################################################
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
@@ -85,10 +85,10 @@ def plotAspectRatio(targetid,othertargetid, targetsurfacearea,
 		cell = sf.loadCellFromFile(step,resetids=True)
 		################################################
 		primordialfaces = sf.getPrimordiaFaces(cell,targetid, large = False)
-		primordiafaceids = [f.getID() for f in primordiafaces]
+		primordialfaceids = [f.getID() for f in primordialfaces]
 		primordialBoundaryfaces = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= True)
 		primordialBoundaryfaceids = [f.getID() for f in primordialBoundaryfaces]
-		othertissuefacelist = getMeristemFaces(cell,primordiafaceids+primordialBoundaryfaceids)
+		othertissuefacelist = getMeristemFaces(cell,primordialfaceids+primordialBoundaryfaceids)
 		################################################
 		########################################################################
 		# calculate the roundness
@@ -284,7 +284,6 @@ legend_elements = [Line2D([0], [0], marker = '*', color='k', label=r"primordium"
 				   Line2D([0], [0], marker = 's',linestyle = ":", color='k', label=r"meristem",**plotargs),
 				   ]
 ax1.legend(handles = legend_elements)
-ax1.set_ylim(0.8,1.0)
 ###############################################################################
 #color bar fig
 ###############################################################################
