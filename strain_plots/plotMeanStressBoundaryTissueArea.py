@@ -207,7 +207,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	meanstress, meandilation,
 	color,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20,
 	startarea = None,
-	endarea = 850):
+	endarea = 850,resetids = True):
 	import numpy as np
 	import matplotlib.pyplot as plt
 	import os
@@ -215,7 +215,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	# faceidarray for Primordia
 	if not os.path.isfile("qdObject_step=001.obj"):
 		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1,resetids=True)
+	cell = sf.loadCellFromFile(1,resetids=resetids)
 	initialTissueSurfaceArea = sf.getSurfaceArea(cell)
 	#######################################################################
 	# Starting the Calculation
@@ -263,8 +263,8 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
-		cell = sf.loadCellFromFile(step,resetids=True)
-		cell2 = sf.loadCellFromFile(step2,resetids=True)
+		cell = sf.loadCellFromFile(step,resetids=resetids)
+		cell2 = sf.loadCellFromFile(step2,resetids=resetids)
 		################################################
 		cell.calculateStressStrain()
 		################################################
@@ -400,7 +400,7 @@ parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", de
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 10)
 parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
-
+parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_false")
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
@@ -426,6 +426,7 @@ maxarea = args.maxarea
 startarea = args.startarea
 endarea =args.endarea
 jobid = args.jobid
+resetids = args.resetids
 
 endStep = 2000
 startStep = 1
@@ -654,7 +655,7 @@ for folder in listdir:
 				color = etacolor,stepsize = stepsize,
 				largerCondition = large,maxarea = maxarea, areastep = areastep,
 				startarea = startarea,
-				endarea = endarea)
+				endarea = endarea,resetids=resetids)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
