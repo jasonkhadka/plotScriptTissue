@@ -156,6 +156,11 @@ maxarea = args.maxarea
 startarea = args.startarea
 endarea =args.endarea
 jobid = args.jobid
+
+endStep = 2000
+startStep = 1
+
+
 # For surpressing err
 class NullDevice():
 	def write(self, s):
