@@ -28,12 +28,23 @@ plt.rcParams['axes.titlesize'] = 18
 # calculating the roundness of the faces
 ####################################################################################################################
 def calculateMeanAspectRatio(facelist):
-	totalAspectRatio = 0.
+	totalAspectRatio = []
 	for face in facelist:
 		#########################
-		totalAspectRatio += sf.getAspectRatio(face)
+		totalAspectRatio.append(sf.getAspectRatio(face))
 		#########################
-	return totalAspectRatio/len(facelist)
+	return np.nanmean(totalAspectRatio)
+def getMeristemFaces(cell, primordiafaces)
+	meristemfaces = []
+	faces = qd.CellFaceIterator(cell1)
+	face = faces.next()
+	while face != None:
+	    if (face.getID() in primordiafaceids) or sf.checkExternalFace(face) or (face.getID() == 1):
+	        face = faces.next()
+	        continue
+	    meristemfaces.append(face)
+    	face = faces.next()
+    return meristemfaces
 ####################################################################################################################
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
@@ -74,10 +85,10 @@ def plotAspectRatio(targetid,othertargetid, targetsurfacearea,
 		cell = sf.loadCellFromFile(step,resetids=True)
 		################################################
 		primordialfaces = sf.getPrimordiaFaces(cell,targetid, large = False)
+		primordiafaceids = [f.getID() for f in primordiafaces]
 		primordialBoundaryfaces = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= True)
-		othertissuefacelist1 = sf.getPrimordiaFaces(cell,othertargetid, large = False)
-		othertissuefacelist2 = sf.getPrimordiaBoundaryFaceList(cell,othertargetid, large = True)
-		othertissuefacelist = othertissuefacelist1 + othertissuefacelist2
+		primordialBoundaryfaceids = [f.getID() for f in primordialBoundaryfaces]
+		othertissuefacelist = getMeristemFaces(cell,primordiafaceids+primordialBoundaryfaceids)
 		################################################
 		########################################################################
 		# calculate the roundness
