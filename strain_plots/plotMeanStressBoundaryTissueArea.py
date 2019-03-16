@@ -257,9 +257,9 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	#print listsurfacearea
 	#for steparea in range(startarea, endarea, int(areastep)):
 	for steparea in listsurfacearea:
-		step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 10)
+		step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 10,resetids = resetids)
 		########################################################################
-		step2,tissueSurfaceArea2 = sf.getTimeStep(steparea+areastep, endStep, step, stepsize = 10)
+		step2,tissueSurfaceArea2 = sf.getTimeStep(steparea+areastep, endStep, step, stepsize = 10,resetids = resetids)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
