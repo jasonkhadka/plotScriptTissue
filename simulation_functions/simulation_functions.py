@@ -4274,7 +4274,7 @@ def plotTargetFace(cell, numOfLayer,targetid, name = None, alpha = 0.8, Length=1
 ########################################################################################
 # Function to plot Minimum gaussian curvature for each time step till given step
 ########################################################################################
-def plotMinimumGaussianCurvature(step, numOfLayer=8.,save = False,resetids):
+def plotMinimumGaussianCurvature(step, numOfLayer=8.,save = False,resetids = True):
     ###################
     fig = plt.figure(1)
     ax1 = fig.add_subplot(111)
