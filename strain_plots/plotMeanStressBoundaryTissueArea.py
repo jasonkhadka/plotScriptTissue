@@ -596,7 +596,7 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 		os.chdir(folder)
 		########################################################
 		growthRatio[fkcurrent] = sf.getGrowthRatio(numOfLayer = numOfLayer, targetid = targetid,
-			endStep = endStep,startStep = startStep)
+			endStep = endStep,startStep = startStep,resetids = resetids)
 		#print sys.getsizeof(plotData)
 		os.chdir("..")
 		gc.collect()
