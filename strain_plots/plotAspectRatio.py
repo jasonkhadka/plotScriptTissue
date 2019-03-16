@@ -67,7 +67,7 @@ def plotAspectRatio(targetid,othertargetid, targetsurfacearea,
 	listsurfacearea = np.linspace(startarea,endarea,10)
 	###################################################
 	for steparea in listsurfacearea:
-		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
+		step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
