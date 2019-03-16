@@ -220,12 +220,6 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	#######################################################################
 	# Starting the Calculation
 	#######################################################################
-	#####################################
-	#Getting initial area of primodial
-	#####################################
-	if not os.path.isfile("qdObject_step=001.obj"):
-		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1,resetids=True)
 	#######################################################################
 	laststep = 1
 	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}

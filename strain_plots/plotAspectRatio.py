@@ -38,7 +38,9 @@ def calculateMeanAspectRatio(facelist):
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
 def plotAspectRatio(targetid,othertargetid, targetsurfacearea,
-	startStep=1,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 10):
+	startStep=1,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 10,
+	startarea = None,
+	endarea = 850):
 	import numpy as np
 	import matplotlib.pyplot as plt
 	import os
@@ -51,12 +53,6 @@ def plotAspectRatio(targetid,othertargetid, targetsurfacearea,
 	#######################################################################
 	# Starting the Calculation
 	#######################################################################
-	#####################################
-	#Getting initial area of primodial
-	#####################################
-	if not os.path.isfile("qdObject_step=001.obj"):
-		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1,resetids= True)
 	#######################################################################
 	laststep = 1
 	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
@@ -65,8 +61,13 @@ def plotAspectRatio(targetid,othertargetid, targetsurfacearea,
 	primordialBoundaryroundnessArray = []
 	othertissueroundnessArray = []
 	tissueSurfaceAreaArray = []
-	for steparea in range(680, targetsurfacearea, int(areastep)):
-		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 20)
+	if not startarea:#no startarea given
+		startarea = int(initialTissueSurfaceArea)
+	#######################################################################
+	listsurfacearea = np.linspace(startarea,endarea,10)
+	###################################################
+	for steparea in listsurfacearea:
+		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
@@ -100,8 +101,8 @@ def plotAspectRatio(targetid,othertargetid, targetsurfacearea,
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
 #parser.add_argument('-l','--location', help="The location of targetformmatrix and coordinate file",type = string)
-parser.add_argument('-s',"--start", help="Start of simulation step",default =1, type = int)
-parser.add_argument('-e',"--end", help="End of simulation step", type = int)
+parser.add_argument('-s',"--startarea", help="Start of area",default =None, type = int)
+parser.add_argument('-e',"--endarea", help="area end",default = 850, type = int)
 parser.add_argument("-m","--maxeta", help = "if this is given, then eta is only cacluated till this value", type = float, default = 0.0)
 parser.add_argument("-x","--maxarea", help = "if this is given, then plot is only made till this area value value", type = float, default = None)
 parser.add_argument('-c',"--surfaceArea", help="The surface area for which the stress vs feedback plot would need to be plotStrainDifferenceSurface",
@@ -127,12 +128,10 @@ parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", de
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,
 						default = 10)
-
+parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
-endStep = args.end
-startStep = args.start
 alpha = args.alpha
 beta = args.beta
 zeta  = args.zeta
@@ -154,6 +153,9 @@ fastkappaOption = args.fastkappa
 large  = args.Large
 stepsize = 10
 maxarea = args.maxarea
+startarea = args.startarea
+endarea =args.endarea
+jobid = args.jobid
 # For surpressing err
 class NullDevice():
 	def write(self, s):
@@ -235,7 +237,8 @@ for folder in listdir:
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
 	plotData[etacurrent] = plotAspectRatio(targetid=targetid,othertargetid=othertargetid, targetsurfacearea=targetarea,
-	startStep=startStep,areastep = areastep)
+	startStep=startStep,areastep = areastep,startarea = startarea,
+				endarea = endarea)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
@@ -320,11 +323,17 @@ else:
 #fig2.savefig(saveDirectory+r"/plot_eta_vs_curvature_height_surfaceratio_%d.png"%endStep,transparent = True)
 #fig3.savefig(saveDirectory+r"/plot_eta_vs_sphericity_%d.png"%endStep,transparent = True)
 plt.close('all')
-### Saving Data Dictionary ###
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	np.save('aspectratio_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	if jobid:
+		np.save('job=%d_aspectratio_fk_time=%d_targetface=%d.npy'%(jobid,endStep,targetid),plotData)
+	else:
+		np.save('aspectratio_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
 else:
-	np.save('aspectratio_meangrowth_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	if jobid:
+		np.save('job=%d_aspectratio_eta_time=%d_targetface=%d.npy'%(jobid,endStep,targetid),plotData)
+	else:
+		np.save('aspectratio_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+
 
 
 ################################################################################
