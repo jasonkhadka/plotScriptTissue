@@ -31,23 +31,23 @@ from scipy.spatial import ConvexHull
 ####################################################################################################################
 # Calculating the max time step for target surface area
 ####################################################################################################################
-def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
+def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10,resetids = True):
 	####################################################
 	for step in range(startStep, endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return endStep,0.
 		################################################
-		cell = sf.loadCellFromFile(step,resetids = True)
+		cell = sf.loadCellFromFile(step,resetids = resetids )
 		################################################
 		tissueSurfaceArea = sf.getSurfaceArea(cell)
 		if (tissueSurfaceArea > targetArea):
 			gc.collect()
 			for calstep in range(step-1,step-stepsize-1,-1):
-					cell = sf.loadCellFromFile(calstep,resetids = True)
+					cell = sf.loadCellFromFile(calstep,resetids = resetids )
 					tissueSurfaceArea = sf.getSurfaceArea(cell)
 					if (tissueSurfaceArea <= targetArea):
 						gc.collect()
-						cell = sf.loadCellFromFile(calstep+1,resetids = True)
+						cell = sf.loadCellFromFile(calstep+1,resetids = resetids )
 						tissueSurfaceArea = sf.getSurfaceArea(cell)
 						return calstep+1,tissueSurfaceArea
 		################################################
@@ -82,6 +82,8 @@ parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneat
 
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = None, type = int)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 20)
+parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_false")
+
 
 ## Getting the arguments 
 args = parser.parse_args()
@@ -105,6 +107,7 @@ surfacearea = args.surfacearea
 startarea = args.startarea
 endarea = args.endarea
 
+resetids = args.resetids
 
 startStep = 1
 endStep = 2000
@@ -175,7 +178,7 @@ for folder in listdir:
 	#print os.listdir('.')
 	os.chdir(folder)
 	############################################################
-	step,tissueSurfaceArea = getTimeStep(surfacearea, endStep, startStep, stepsize = stepsize)
+	step,tissueSurfaceArea = getTimeStep(surfacearea, endStep, startStep, stepsize = stepsize,resetids = resetids)
 	timedata = timedata.append({column1:etacurrent,
 					'timestep':step,
 					'area':tissueSurfaceArea},ignore_index=True)
