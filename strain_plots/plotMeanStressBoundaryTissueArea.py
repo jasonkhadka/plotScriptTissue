@@ -833,7 +833,7 @@ else:
 
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	fig.savefig(saveDirectory+r"/plot_growthratio_meanstress_meangrowth_targetface=%d.png"%(endStep,targetid),transparent = True, bbox_inches="tight")
+	fig.savefig(saveDirectory+r"/plot_growthratio_meanstress_meangrowth_targetface=%d.png"%(targetid),transparent = True, bbox_inches="tight")
 	#fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	fig2.savefig(saveDirectory+r"/plot_growthratio_romeangrowthstress_areastep=%d_targetface=%d.png"%(areastep,targetid),transparent = True, bbox_inches="tight")
 	#fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")

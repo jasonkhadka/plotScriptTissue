@@ -18,11 +18,11 @@ import argparse #argument parser, handles the arguments passed by command line
 import gc
 import string
 #plt.rcParams['figure.figsize'] = (20.0, 10.0)
-plt.rcParams['xtick.labelsize'] = 30
-plt.rcParams['ytick.labelsize'] = 30
-plt.rcParams['axes.labelsize'] = 30
-plt.rcParams['legend.fontsize'] = 30
-plt.rcParams['axes.titlesize'] = 35
+plt.rcParams['xtick.labelsize'] = 20
+plt.rcParams['ytick.labelsize'] = 20
+plt.rcParams['axes.labelsize'] = 20
+plt.rcParams['legend.fontsize'] = 16
+plt.rcParams['axes.titlesize'] = 22
 
 
 ####################################################################################################################
@@ -244,7 +244,7 @@ def getTissueHeight(cell):
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
 def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = None, areastep = 20,
-	startarea = None, endarea = 850):
+	startarea = None, endarea = 850,resetids = False):
 	import numpy as np
 	import matplotlib.pyplot as plt
 	import os
@@ -270,6 +270,7 @@ def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = 
 	heightArray = []
 	tissueSurfaceAreaArray = []
 	timeArray = []
+	dhdAArray = []
 	###################################################
 	if not startarea:#no startarea given
 		startarea = int(initialTissueSurfaceArea)
@@ -277,19 +278,25 @@ def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = 
 	listsurfacearea = np.linspace(startarea,endarea,20)
 	for steparea in listsurfacearea:
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
+		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep, endStep, step, stepsize = 10)
 		########################################################################
-		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
+		if not (os.path.isfile("qdObject_step=%03d.obj"%step) or os.path.isfile("qdObject_step=%03d.obj"%step2) ):#check if file exists
 			break
-		cell = sf.loadCellFromFile(step)
+		cell = sf.loadCellFromFile(step,resetids = resetids)
+		cell2 = sf.loadCellFromFile(step2,resetids = resetids)
 		################################################
 		tissueSurfaceAreaArray.append(tissueSurfaceArea)
 		height = getTissueHeight(cell)
+		height2 = getTissueHeight(cell2)
 		heightArray.append(height)
 		timeArray.append(step)
 		########################################################################
+		dhdA = (height2-height)/(tissueSurfaceArea2-tissueSurfaceArea)
+		dhdAArray.append(dhdA)
+		########################################################################
 		print step, tissueSurfaceArea, height
 	########################################################################
-	return [tissueSurfaceAreaArray, heightArray, timeArray]
+	return [tissueSurfaceAreaArray, heightArray, timeArray,dhdAArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -321,6 +328,7 @@ parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", de
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 10)
 parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
+parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_false")
 
 ## Getting the arguments 
 args = parser.parse_args()
@@ -347,6 +355,7 @@ maxarea = args.maxarea
 startarea = args.startarea
 endarea =args.endarea
 jobid = args.jobid
+resetids = args.resetids
 
 endStep = 2000
 startStep = 1
@@ -412,7 +421,13 @@ timeArea.set_ylabel(r"$A_T$")
 
 areaHeight.set_xlabel(r"$A_T$")
 areaHeight.set_ylabel(r"$H_T$")
-
+########################################################
+# dHdA scatter plot
+########################################################
+fig2 = plt.figure(2,figsize=(5.5,5))
+heightscatterplot = fig2.add_subplot(111)
+heightscatterplot.set_xlabel(r"Surface Area, $A_T$")
+heightscatterplot.set_ylabel(r"Height growth rate, $\frac{\Delta h_T}{\Delta A_T}$")
 ########################################################
 counter = 0
 totalfolders = len(listdir)
@@ -450,7 +465,7 @@ for folder in listdir:
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
 	plotData[etacurrent] = plotHeightSurface(numOfLayer, endStep=endStep,eta=etacurrent,startStep = startStep,  stepsize = stepsize,
-		maxarea = maxarea, areastep = areastep,startarea = startarea,
+		maxarea = maxarea, areastep = areastep,startarea = startarea,resetids = resetids,
 				endarea = endarea)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
@@ -470,6 +485,10 @@ for key,data in plotData.iteritems():
 	#area height
 	##################################
 	areaHeight.plot(data[0], data[1], c=color,**plotargs)
+	##################################
+	#del height scatter
+	##################################
+	heightscatterplot.plot(data[0],data[3], c = color,marker = 'o',alpha = 0.7,zorder= maxeta-key)
 ############################################################
 # Legend of the plot
 ############################################################
@@ -551,6 +570,8 @@ if fastkappaOption:# if true calculate with respect to changing fastkappa, else 
 	#fig4.savefig(saveDirectory+r"/plot_eta%d_boundaryarea_time=%d_targetface=%d.eps"%(maxeta,endStep,targetid),transparent = True, bbox_inches="tight")
 else:
 	fig.savefig(saveDirectory+r"/plot_tissueSurface_%s_height_time=%d_area=%d.png"%(zone, endStep,endarea),transparent = True, bbox_inches="tight")
+	fig2.savefig(saveDirectory+r"/plot_scatterheightgrowthrate_%s_height_time=%d_area=%d.png"%(zone, endStep,endarea),transparent = True, bbox_inches="tight")
+
 	#fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	#fig2.savefig(saveDirectory+r"/plot_eta%d_romeangrowthstress_areastep=%d_targetface=%d.png"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
 	#fig3.savefig(saveDirectory+r"/plot_eta%d_12meangrowthstress_areastep=%d_targetface=%d.eps"%(maxeta,areastep,targetid),transparent = True, bbox_inches="tight")
