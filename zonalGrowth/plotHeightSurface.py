@@ -275,7 +275,7 @@ def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = 
 	if not startarea:#no startarea given
 		startarea = int(initialTissueSurfaceArea)
 	###################################################
-	listsurfacearea = np.linspace(startarea,endarea,20)
+	listsurfacearea = np.linspace(startarea,endarea,15)
 	for steparea in listsurfacearea:
 		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
 		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep, endStep, step, stepsize = 10)
@@ -488,7 +488,7 @@ for key,data in plotData.iteritems():
 	##################################
 	#del height scatter
 	##################################
-	heightscatterplot.plot(data[0],data[3], c = color,marker = 'o',alpha = 0.7,zorder= maxeta-key)
+	heightscatterplot.plot(data[0],data[3], c = color,marker = 'o',alpha = 0.9,zorder= maxeta-key)
 ############################################################
 # Legend of the plot
 ############################################################
@@ -558,6 +558,11 @@ else:
 	boundaryareaplot1.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 """
 ################################################################################
+fig2.tight_layout(rect=[0.,0.,.9,.9])
+
+cbar_ax2 = fig2.add_axes([0.9, 0.2, 0.04, 0.65])
+
+clrbar2 = plt.colorbar(scalarMap,cax = cbar_ax2,ticks=np.linspace(minvalue, maxvalue, 3).astype('int'))
 
 
 
