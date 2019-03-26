@@ -128,7 +128,7 @@ parser.add_argument("-v","--elevation", help = "elevation angle for display", de
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,
 						default = 10)
 parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
-
+parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_false")
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
@@ -157,6 +157,7 @@ stepsize = 10
 maxarea = args.maxarea
 
 jobid = args.jobid
+resetids = args.resetids
 
 # For surpressing err
 class NullDevice():
@@ -239,7 +240,7 @@ for folder in listdir:
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
 	plotData[etacurrent] = plotRoundness(targetid=targetid,othertargetid=othertargetid, targetsurfacearea=targetarea,
-	startStep=startStep,areastep = areastep)
+	startStep=startStep,areastep = areastep,resetids = resetids)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
