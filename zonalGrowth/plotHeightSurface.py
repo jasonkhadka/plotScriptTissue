@@ -271,6 +271,7 @@ def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = 
 	tissueSurfaceAreaArray = []
 	timeArray = []
 	dhdAArray = []
+	volumeArray = []
 	###################################################
 	if not startarea:#no startarea given
 		startarea = int(initialTissueSurfaceArea)
@@ -285,6 +286,7 @@ def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = 
 		cell = sf.loadCellFromFile(step,resetids = resetids)
 		cell2 = sf.loadCellFromFile(step2,resetids = resetids)
 		################################################
+		volumeArray.append(cell.getNonConvexVolume())#getting the volume of the tissue
 		tissueSurfaceAreaArray.append(tissueSurfaceArea)
 		height = getTissueHeight(cell)
 		height2 = getTissueHeight(cell2)
@@ -296,7 +298,7 @@ def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = 
 		########################################################################
 		print step, tissueSurfaceArea, height
 	########################################################################
-	return [tissueSurfaceAreaArray, heightArray, timeArray,dhdAArray]
+	return [tissueSurfaceAreaArray, heightArray, timeArray,dhdAArray,volumeArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -409,9 +411,10 @@ minvalue = min(etalist)
 cNorm  = colors.Normalize(vmin=minvalue, vmax=maxvalue)
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 #fig = plt.figure(frameon=False,figsize=(20,16))
-fig = plt.figure(figsize=(20,10))
-timeArea = fig.add_subplot(121)
-areaHeight = fig.add_subplot(122)
+fig = plt.figure(figsize=(20,20))
+timeArea = fig.add_subplot(221)
+areaHeight = fig.add_subplot(222)
+volumeHeight = fig.add_subplot(223)
 #################################################################################
 # Min Stress
 ##################################
@@ -421,13 +424,20 @@ timeArea.set_ylabel(r"$A_T$")
 
 areaHeight.set_xlabel(r"$A_T$")
 areaHeight.set_ylabel(r"$H_T$")
+
+volumeHeight.set_xlabel(r"$V_T$")
+volumeHeight.set_ylabel(r"$H_T$")
 ########################################################
 # dHdA scatter plot
 ########################################################
-fig2 = plt.figure(2,figsize=(5.5,5))
-heightscatterplot = fig2.add_subplot(111)
+fig2 = plt.figure(2,figsize=(10,5))
+heightscatterplot = fig2.add_subplot(121)
 heightscatterplot.set_xlabel(r"Surface Area, $A_T$")
 heightscatterplot.set_ylabel(r"Height growth rate, $\frac{\Delta h_T}{\Delta A_T}$")
+
+volumescatterplot = fig2.add_subplot(122)
+volumescatterplot.set_xlabel(r"Volume, $V_T$")
+volumescatterplot.set_ylabel(r"Height growth rate, $\frac{\Delta h_T}{\Delta A_T}$")
 ########################################################
 counter = 0
 totalfolders = len(listdir)
@@ -486,9 +496,16 @@ for key,data in plotData.iteritems():
 	##################################
 	areaHeight.plot(data[0], data[1], c=color,**plotargs)
 	##################################
+	#volume height
+	##################################
+	volumeHeight.plot(data[4], data[1], c=color,**plotargs)
+	##################################
 	#del height scatter
 	##################################
 	heightscatterplot.plot(data[0],data[3], c = color,marker = 'o',alpha = 0.9,zorder= maxeta-key)
+	########################################
+	#volume scatter
+	volumescatterplot.plot(data[4],data[3], c = color,marker = 'o',alpha = 0.9,zorder= maxeta-key)
 ############################################################
 # Legend of the plot
 ############################################################
