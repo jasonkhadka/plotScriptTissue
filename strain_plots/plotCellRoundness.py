@@ -65,7 +65,7 @@ def plotRoundness(targetid,othertargetid, targetsurfacearea,endStep = 2000,
 	primordialBoundaryroundnessArray = []
 	othertissueroundnessArray = []
 	tissueSurfaceAreaArray = []
-	for steparea in range(int(initialTissueSurfaceArea), targetsurfacearea, int(areastep)):
+	for steparea in np.linspace(initialTissueSurfaceArea, targetsurfacearea, 10):
 		step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 20,resetids = resetids)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
@@ -126,7 +126,7 @@ parser.add_argument("-o","--othersidetissue",help = "target cell for other side 
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,
-						default = 10)
+						default = 20)
 parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
 parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_false")
 ## Getting the arguments 
