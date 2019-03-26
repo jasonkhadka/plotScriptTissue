@@ -65,7 +65,7 @@ def plotRoundness(targetid,othertargetid, targetsurfacearea,endStep = 2000,
 	primordialBoundaryroundnessArray = []
 	othertissueroundnessArray = []
 	tissueSurfaceAreaArray = []
-	for steparea in range(initialTissueSurfaceArea, targetsurfacearea, int(areastep)):
+	for steparea in range(int(initialTissueSurfaceArea), targetsurfacearea, int(areastep)):
 		step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 20,resetids = resetids)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
