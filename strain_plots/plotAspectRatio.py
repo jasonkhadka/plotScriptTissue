@@ -88,8 +88,8 @@ def plotAspectRatio(targetid,othertargetid, targetsurfacearea,
 		primordialfaceids = [f.getID() for f in primordialfaces]
 		primordialBoundaryfaces = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= True)
 		primordialBoundaryfaceids = [f.getID() for f in primordialBoundaryfaces]
-		othertissuefacelist = sf.getPrimordialFaces(cell,othertargetid, large=False)+\
-								sf.getPrimordiaBoundaryFaceList(cell,orthertargetid,large= True)#getMeristemFaces(cell,primordialfaceids+primordialBoundaryfaceids)
+		othertissuefacelist = sf.getPrimordiaFaces(cell,othertargetid, large=False)+\
+								sf.getPrimordiaBoundaryFaceList(cell,othertargetid,large= True)#getMeristemFaces(cell,primordialfaceids+primordialBoundaryfaceids)
 		################################################
 		########################################################################
 		# calculate the roundness
