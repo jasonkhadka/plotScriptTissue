@@ -24,31 +24,6 @@ plt.rcParams['legend.fontsize'] = 18
 plt.rcParams['axes.titlesize'] = 18
 
 ####################################################################################################################
-# Calculating the max time step for target surface area
-####################################################################################################################
-def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
-	####################################################
-	for step in range(startStep, endStep+1,stepsize):
-		if not os.path.isfile("qdObject_step=%03d.obj"%step):
-			return endStep,0.
-		################################################
-		cell = sf.loadCellFromFile(step)
-		################################################
-		tissueSurfaceArea = sf.getSurfaceArea(cell)
-		if (tissueSurfaceArea > targetArea):
-			gc.collect()
-			for calstep in range(step-1,step-stepsize-1,-1):
-					cell = sf.loadCellFromFile(calstep)
-					tissueSurfaceArea = sf.getSurfaceArea(cell)
-					if (tissueSurfaceArea <= targetArea):
-						gc.collect()
-						cell = sf.loadCellFromFile(calstep+1)
-						tissueSurfaceArea = sf.getSurfaceArea(cell)
-						return calstep+1,tissueSurfaceArea
-		################################################
-		gc.collect()
-	return endStep,tissueSurfaceArea
-####################################################################################################################
 # calculating the roundness of the faces
 ####################################################################################################################
 def calculateMeanRoundness(facelist):
@@ -69,7 +44,7 @@ def calculateMeanRoundness(facelist):
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
 def plotRoundness(targetid,othertargetid, targetsurfacearea,
-	startStep=1,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 10):
+	startStep=1,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 10,resetids = False):
 	import numpy as np
 	import matplotlib.pyplot as plt
 	import os
@@ -77,17 +52,11 @@ def plotRoundness(targetid,othertargetid, targetsurfacearea,
 	# faceidarray for Primordia
 	if not os.path.isfile("qdObject_step=001.obj"):
 		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1)
+	cell = sf.loadCellFromFile(1,resetids = resetids)
 	initialTissueSurfaceArea = sf.getSurfaceArea(cell)
 	#######################################################################
 	# Starting the Calculation
 	#######################################################################
-	#####################################
-	#Getting initial area of primodial
-	#####################################
-	if not os.path.isfile("qdObject_step=001.obj"):
-		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1)
 	#######################################################################
 	laststep = 1
 	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
@@ -97,11 +66,11 @@ def plotRoundness(targetid,othertargetid, targetsurfacearea,
 	othertissueroundnessArray = []
 	tissueSurfaceAreaArray = []
 	for steparea in range(680, targetsurfacearea, int(areastep)):
-		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 20)
+		step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 20,resetids = resetids)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
-		cell = sf.loadCellFromFile(step)
+		cell = sf.loadCellFromFile(step,resetids = resetids)
 		################################################
 		primordialfaces = sf.getPrimordiaFaces(cell,targetid, large = False)
 		primordialBoundaryfaces = sf.getPrimordiaBoundaryFaceList(cell,targetid,large= True)
@@ -153,11 +122,12 @@ parser.add_argument("-p","--pressure",help = "value to set for Pressure (wegith 
 parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneath the epidermis, comming from lower level cells. acting as the volume maximizing agent", default = 0.1, type = float)
 
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = None, type = int)
-parser.add_argument("-o","--othersidetissue",help = "target cell for other side of the tissue (non-primordia)", type = int)
+parser.add_argument("-o","--othersidetissue",help = "target cell for other side of the tissue (non-primordia)", type = int,default = 226)
 parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", default = -60, type = float)
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,
 						default = 10)
+parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
 
 ## Getting the arguments 
 args = parser.parse_args()
@@ -185,6 +155,9 @@ fastkappaOption = args.fastkappa
 large  = args.Large
 stepsize = 10
 maxarea = args.maxarea
+
+jobid = args.jobid
+
 # For surpressing err
 class NullDevice():
 	def write(self, s):
@@ -353,9 +326,12 @@ else:
 plt.close('all')
 ### Saving Data Dictionary ###
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	np.save('meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	np.save('cellroundness_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
 else:
-	np.save('meanstress_meangrowth_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	if jobid:
+		np.save('job=%d_cellroundness_time=%d_targetface=%d.npy'%(jobid,endStep,targetid),plotData)
+	else:
+		np.save('cellroundness_eta_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
 
 
 ################################################################################
