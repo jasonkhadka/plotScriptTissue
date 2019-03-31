@@ -550,9 +550,9 @@ for key,data in plotData.iteritems():
 	########################################
 	# radius vol plot : fill_between(x, y-error, y+error)
 	########################################
-	radiusMeanErrorUpper = np.array(data[5]+data[6])
-	radiusMeanErrorLower = np.array(data[5]-data[6])
-	radiusvolplot.fill_between(data[4],data[5],radiusMeanErrorLower, radiusMeanErrorUpper, c= color,alpha = 0.6, **plotargs)
+	radiusMeanErrorUpper = np.array(data[5])+np.array(data[6])
+	radiusMeanErrorLower = np.array(data[5])-np.array(data[6])
+	radiusvolplot.fill_between(data[4],data[5],radiusMeanErrorLower, radiusMeanErrorUpper, color = color,alpha = 0.6, **plotargs)
 ############################################################
 # Legend of the plot
 ############################################################
@@ -665,15 +665,12 @@ plt.close('all')
 
 ### Saving Data Dictionary ###
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
-	if jobid:
-		np.save('job=%d_growthratio_meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(jobid,endStep,targetid),plotData)
-	else:
-		np.save('growthratio_meanstress_meangrowth_fk_time=%d_targetface=%d.npy'%(endStep,targetid),plotData)
+	print " nothing "
 else:
 	if jobid:
-		np.save('job=%d_time=%d_endarea=%d.npy'%(endStep,endarea),plotData)
+		np.save('job=%d_%s_heightradiusArea_time=%d_endarea=%d.npy.npy'%(jobid, zone,endStep,endarea),plotData)
 	else:
-		np.save('plotHeightArea_%s_time=%d_endarea=%d.npy'%(zone,endStep,endarea),plotData)
+		np.save('%s_heightradiusArea_time=%d_endarea=%d.npy'%(zone,endStep,endarea),plotData)
 ################################################################################
 print '\n',15*" "+"################################################################################"
 print 45*" "+"DONE "
