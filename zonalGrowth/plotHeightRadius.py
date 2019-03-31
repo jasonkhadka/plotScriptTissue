@@ -35,11 +35,11 @@ def addAnnotation(subplot,n = 1):
 # get mean radius of the vertices
 ####################################################################################################################
 def getMeanRadius(cell):
-	vetices = qd.CellVertexIterator(cell)
+	vertices = qd.CellVertexIterator(cell)
 	vertex = vertices.next()
 	countVertex = cell.countVertices()
 	radiusArray = np.zeros(countVertex)
-	counter = 0.
+	counter = 0
 	while vertex != None:
 		radiusArray[counter] = np.sqrt(vertex.getXcoordinate()**2+vertex.getYcoordinate()**2)
 		counter += 1
