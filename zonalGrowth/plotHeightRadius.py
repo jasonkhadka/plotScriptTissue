@@ -462,11 +462,11 @@ volumescatterplot.set_ylabel(r"Height growth rate, $\frac{\Delta h_T}{\Delta A_T
 # radius plot
 ########################################################
 fig3 = plt.figure(3,figsize=(10,5))
-radiusheightplot = fig2.add_subplot(121)
+radiusheightplot = fig3.add_subplot(121)
 radiusheightplot.set_xlabel(r"Mean Radius, $\langle R \rangle_v$")
 radiusheightplot.set_ylabel(r"Tissue height, $H_T$")
 
-radiusvolplot = fig2.add_subplot(122)
+radiusvolplot = fig3.add_subplot(122)
 radiusvolplot.set_xlabel(r"Volume, $V_T$")
 radiusvolplot.set_ylabel(r"Mean Radius, $\langle R \rangle_v$")
 
