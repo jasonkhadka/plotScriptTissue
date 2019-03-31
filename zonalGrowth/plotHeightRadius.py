@@ -304,7 +304,7 @@ def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = 
 		radiusArray = getMeanRadius(cell)
 		################################################
 		radiusMeanArray.append(np.mean(radiusArray))
-		radiusVarArray.append(np.var(radiusArray))
+		radiusVarArray.append(np.std(radiusArray))
 		volumeArray.append(cell.getNonConvexVolume())#getting the volume of the tissue
 		tissueSurfaceAreaArray.append(tissueSurfaceArea)
 		height = getTissueHeight(cell)
