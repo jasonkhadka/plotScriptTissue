@@ -349,7 +349,7 @@ parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", de
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 10)
 parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
-parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_false")
+parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_true")
 
 ## Getting the arguments 
 args = parser.parse_args()
@@ -546,7 +546,7 @@ for key,data in plotData.iteritems():
 	########################################
 	# radius height plot
 	########################################
-	radiusheightplot.plot(data[5],data[0], c= color, **plotargs)
+	radiusheightplot.plot(data[5],data[1], c= color, **plotargs)
 	########################################
 	# radius vol plot : fill_between(x, y-error, y+error)
 	########################################
