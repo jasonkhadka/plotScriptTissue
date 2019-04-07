@@ -33,9 +33,11 @@ from scipy.spatial import ConvexHull
 ####################################################################################################################
 def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10,resetids = True):
 	####################################################
+	tissueSurfaceArea = 0.
+	####################################################
 	for step in range(startStep, endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
-			return endStep,0.
+			return step, tissueSurfaceArea
 		################################################
 		cell = sf.loadCellFromFile(step,resetids = resetids )
 		################################################
