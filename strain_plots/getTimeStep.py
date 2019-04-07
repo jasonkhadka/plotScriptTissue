@@ -37,7 +37,7 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10,resetids = True)
 	####################################################
 	for step in range(startStep, endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
-			return step, tissueSurfaceArea
+			return step-stepsize, tissueSurfaceArea
 		################################################
 		cell = sf.loadCellFromFile(step,resetids = resetids )
 		################################################
