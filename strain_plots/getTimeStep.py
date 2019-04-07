@@ -84,7 +84,7 @@ parser.add_argument("-g","--gamma", help = "Gamme is the pressure from underneat
 
 parser.add_argument("-t","--target", help = "Target face for faster growth", default = None, type = int)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 20)
-parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_false")
+parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_true")
 
 
 ## Getting the arguments 

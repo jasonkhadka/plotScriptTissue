@@ -131,7 +131,7 @@ def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
 	####################################################
 	for step in range(startStep, endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
-			return endStep,0.
+			return step-stepsize, tissueSurfaceArea
 		################################################
 		cell = sf.loadCellFromFile(step)
 		################################################
@@ -269,13 +269,7 @@ def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = 
 	initialTissueSurfaceArea = sf.getSurfaceArea(cell)
 	#######################################################################
 	# Starting the Calculation
-	#######################################################################
-	#####################################
-	#Getting initial area of primodial
-	#####################################
-	if not os.path.isfile("qdObject_step=001.obj"):
-		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1)
+	######################################################################
 	#######################################################################
 	laststep = 1
 	plotargs = {"markersize": 10, "capsize": 10,"elinewidth":3,"markeredgewidth":2}
