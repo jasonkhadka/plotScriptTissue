@@ -526,7 +526,7 @@ areaHeight.set_xlabel(r"$A_T$")
 areaHeight.set_ylabel(r"$H_T$")
 
 absstressplot.set_xlabel(r"$d_c$")
-absstressplot.set_ylabel(r"$\langle\lvert \sigma_c \rvert\rangle_t$")
+absstressplot.set_ylabel(r"$\langle \| \sigma_c \| \rangle_t$")
 
 stressRadOrthplot.set_xlabel(r"$d_c$")
 stressRadOrthplot.set_ylabel(r"$\langle\sigma_c\rangle_t$")
