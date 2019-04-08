@@ -4316,15 +4316,15 @@ def plotMinimumGaussianCurvature(step, numOfLayer=8.,save = False,resetids = Tru
     return
 ########################################################################################
 # Function to return face of given id
+# if no face is found, None is returned
 ########################################################################################
 def getFace(cell,targetid):
     faces = qd.CellFaceIterator(cell)
     face = faces.next()
-    while True:
+    while face != None:
         if face.getID() == targetid:
             break
-        else:
-            face = faces.next()
+        face = faces.next()
     return face
 ########################################################################################
 # Function to return area of target cell and cells arround it
@@ -5647,7 +5647,7 @@ def getZoneNum(cell, face,numOfLayer,zoneOffSet = 8,zones = 3.):
 ####################################################################################################################
 # set Zone Number of the faces
 ####################################################################################################################
-def setZoneNum(cell, numOfLayer, zoneOffSet  = 8,zones = 3.):
+def setZoneNum(cell, numOfLayer, zoneOffSet  = 6,zones = 3.):
     faces = qd.CellFaceIterator(cell)
     face = faces.next()
     while face != None:
