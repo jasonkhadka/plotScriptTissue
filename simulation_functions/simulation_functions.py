@@ -2533,7 +2533,7 @@ def plotStressSurface(cell, numOfLayer, step = None, alpha = 0.8,
     scalarMap._A = []
     ax.view_init(azim = azim,elev=elev)
     cbar_ax2 = fig.add_axes([0.9, 0.25, 0.05, 0.5])
-    clrbar = plt.colorbar(scalarMap,cax = cbar_ax2,shrink = 0.5,aspect = 10.,format=OOMFormatter(-1, mathText=True))
+    clrbar = plt.colorbar(scalarMap,cax = cbar_ax2,format=OOMFormatter(-1, mathText=True))
     clrbar.set_label(r"$\sigma_2-\sigma_1$")
     if name:
         plt.savefig(name+'.png',format= 'png', transparent = True, bbox_inches="tight")
