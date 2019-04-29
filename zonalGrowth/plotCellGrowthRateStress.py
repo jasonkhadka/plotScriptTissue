@@ -285,6 +285,137 @@ def addToDict(face,dicts, values):
 			d[face.getID()]=[v]
 	return
 ####################################################################################################################
+# plot the surface with growth rate and stress
+####################################################################################################################
+def plotSurfaceStressGrowthRate(plotData,numOfLayer, eta = etacurrent,name=None, alpha = 0.5, Length=1.0,
+    ids=False, azim = 0, elev = 7,color = 'c',format = 'eps',
+    zaxisoffset=0.2):
+    #import the libraries
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib as mpl
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+    import numpy as np
+    import matplotlib.pyplot as plt
+    #limits of the plot
+    radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
+    ###############################################################################
+    # getting data information 
+    # format of plotData : [tissueSurfaceAreaArray,tissueSurfaceAreaArray2,
+    #						 heightArray, timeArray,timeArray2, dictArray]
+    # #  dictArray = [absStressDict, stressRadialDict,
+    #				 stressOrthoradialDict,growthRateDict, tipDistanceDict]
+    ###############################################################################
+    laststep = plotData[4][-1]
+    ############################################################
+    #getting the dicts
+    dictArray = plotData[5]
+    absstressDict = dictArray[0]# stresses are computed as total abs stress on a cell
+    growthrateDict = dictArray[3]
+    ############################################################
+    maxstress = max(absStressDict[max(absStressDict.keys(), key = lambda k : max(absStressDict[k]))])
+    minstress = min(absStressDict[min(absStressDict.keys(), key = lambda k : min(absStressDict[k]))])
+    ############################################################
+    maxgrowthrate = max(growthrateDict[max(growthrateDict.keys(), key = lambda k : max(growthrateDict[k]))])
+    mingrowthrate = min(growthrateDict[min(growthrateDict.keys(), key = lambda k : min(growthrateDict[k]))])
+    ###############################################################################
+    # colorbar
+    ###############################################################################
+    # for stress
+    jet1 = cm = plt.get_cmap('inferno') 
+    cNorm1  = colors.Normalize(vmin=minstress, vmax=maxstress)
+    scalarMapStress = cmx.ScalarMappable(norm=cNorm1, cmap=jet1)
+    # for growth
+    jet2 = cm = plt.get_cmap('cool') 
+    cNorm2  = colors.Normalize(vmin=mingrowthrate, vmax=maxgrowthrate)
+    scalarMapGrowth = cmx.ScalarMappable(norm=cNorm2, cmap=jet2)
+    ###############################################################################
+    #plotting part
+    ###############################################################################
+    fig = plt.figure(1,frameon=False,figsize=(12,(1.-zaxisoffset)*10))
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    ax = Axes3D(fig)
+    ax.set_xlim((-.7*radius,.7*radius))
+    ax.set_ylim((-.7*radius,.7*radius))
+    ax.set_zlim((0*radius,(1.-zaxisoffset)*1.4*radius))
+    ax.axis('off')
+    ax.xaxis.pane.set_edgecolor('black')
+    ax.yaxis.pane.set_edgecolor('black')
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+
+
+    fig2 = plt.figure(2, frameon=False,figsize=(12,(1.-zaxisoffset)*10))
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    ax = Axes3D(fig)
+    ax.set_xlim((-.7*radius,.7*radius))
+    ax.set_ylim((-.7*radius,.7*radius))
+    ax.set_zlim((0*radius,(1.-zaxisoffset)*1.4*radius))
+    ax.axis('off')
+    ax.xaxis.pane.set_edgecolor('black')
+    ax.yaxis.pane.set_edgecolor('black')
+    ax.xaxis.pane.fill = False
+    ax.yaxis.pane.fill = False
+    ax.zaxis.pane.fill = False
+    #fig = plt.figure()
+    #ax = fig.gca(projection='3d')
+    ##iterating through the cell##
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while (face != None):
+        faceid = face.getID()#grabbing face id
+        if face.getID() == 1:
+            face = faces.next()
+            continue
+        xlist = []
+        ylist = []
+        zlist = []
+        xproj = []
+        yproj = []
+        zproj = []
+        #print "== Face ID : ", faceid, "=="
+        xmean = face.getXCentralised()
+        ymean = face.getYCentralised()
+        zmean = face.getZCentralised()
+        edges = qd.FaceEdgeIterator(face)
+        edge = edges.next()
+        while edge != None:
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertex = edge.Org()
+            #print vertex.getID()
+            xCoord1 = vertex.getXcoordinate()
+            yCoord1 = vertex.getYcoordinate()
+            zCoord1 = vertex.getZcoordinate()
+            xlist.append(xCoord1)
+            ylist.append(yCoord1)
+            zlist.append(zCoord1)
+            edge = edges.next()
+        xlist.append(xlist[0])
+        ylist.append(ylist[0])
+        zlist.append(zlist[0])
+        verts = [zip(xlist, ylist,zlist)]
+        #adding to 3d plot
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = color)
+        pc.set_edgecolor('k')
+        ax.add_collection3d(pc)
+        # adding ids for face
+        if ids: 
+            ax.text(xmean,ymean,zmean,faceid)
+        face = faces.next()
+                #if face.getID() == 1: break
+    #ax.axis("off")
+    ax.view_init(azim = azim,elev=elev)
+    if name == None:#plot the figure
+        plt.show()
+    else:
+        if format == None:
+            plt.savefig(name, transparent = True)
+        else:
+            plt.savefig(name+"."+format, transparent = True, format=format)
+    #plt.clf()
+    return
+####################################################################################################################
 # Calculating and plotting mean stress and growth
 ####################################################################################################################
 def getGrowthRateStress(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = None, areastep = 20,
@@ -311,6 +442,7 @@ def getGrowthRateStress(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea 
 	tissueSurfaceAreaArray = []
 	tissueSurfaceAreaArray2 = []
 	timeArray = []
+	timeArray2 = []
 	dhdAArray = []
 	volumeArray = []
 	radiusMeanArray = []
@@ -398,12 +530,13 @@ def getGrowthRateStress(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea 
 		height = getTissueHeight(cell)
 		heightArray.append(height)
 		timeArray.append(step)
+		timeArray2.append(step2)
 		tissueSurfaceAreaArray.append(tissueSurfaceArea)
 		tissueSurfaceAreaArray2.append(tissueSurfaceArea2)
 		########################################################################
 		print step2, tissueSurfaceArea, height
 	########################################################################
-	return [tissueSurfaceAreaArray,tissueSurfaceAreaArray2, heightArray, timeArray, dictArray]
+	return [tissueSurfaceAreaArray,tissueSurfaceAreaArray2, heightArray, timeArray,timeArray2, dictArray]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
 parser = argparse.ArgumentParser()#parser
@@ -573,6 +706,8 @@ for folder in listdir:
 	plotData[etacurrent] = getGrowthRateStress(numOfLayer, endStep=endStep,eta=etacurrent,startStep = startStep,  stepsize = stepsize,
 		maxarea = maxarea, areastep = areastep,startarea = startarea,resetids = resetids,
 				endarea = endarea)
+	############################################################
+	plotSurfaceStressGrowthRate(plotData[etacurrent],numOfLayer, eta = etacurrent)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
@@ -593,7 +728,7 @@ for key,data in plotData.iteritems():
 	##################################
 	areaHeight.plot(data[0], data[2], c=color,**plotargs)
 	##################################
-	dictArray = data[4]
+	dictArray = data[5]
 	absStressDict = dictArray[0]
 	stressRadialDict = dictArray[1]
 	stressOrthoradialDict = dictArray[2]
@@ -617,8 +752,8 @@ for key,data in plotData.iteritems():
 ############################################################
 
 from matplotlib.lines import Line2D
-legend_elements = [Line2D([0], [0], linestyle = "-", color='k',marker = 'o', label=r"$\sigma_{r}$",**plotargs),
-				   Line2D([0], [0], linestyle = "-", color='k',marker = 'o', label=r"$\sigma_{o}$",**plotargs),
+legend_elements = [Line2D([0], [0], linestyle = "-", color='k',marker = 'o', ms = 20, label=r"$\sigma_{r}$",**plotargs),
+				   Line2D([0], [0], linestyle = "-", color='k',marker = '<', ms = 20, label=r"$\sigma_{o}$",**plotargs),
 				   ]
 stressRadOrthplot.legend(handles = legend_elements)
 

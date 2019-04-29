@@ -287,8 +287,8 @@ def plotHeightSurface(numOfLayer, endStep,eta,startStep=0,stepsize= 1,maxarea = 
 	###################################################
 	listsurfacearea = np.linspace(startarea,endarea,15)
 	for steparea in listsurfacearea:
-		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 10)
-		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep, endStep, step, stepsize = 10)
+		step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 10)
+		step2,tissueSurfaceArea2 = sf.getTimeStep(steparea+areastep, endStep, step, stepsize = 10)
 		if step == step2:break
 		########################################################################
 		if not (os.path.isfile("qdObject_step=%03d.obj"%step) or os.path.isfile("qdObject_step=%03d.obj"%step2) ):#check if file exists
