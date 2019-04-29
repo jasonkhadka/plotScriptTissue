@@ -2411,7 +2411,7 @@ def plotStressSurface(cell, numOfLayer, step = None, alpha = 0.8,
     faces = qd.CellFaceIterator(cell)
     face = faces.next()
     while face != None:
-        if face.getID() == 1:
+        if (face.getID() == 1) or checkExternalFace(face):
             face  = faces.next()
             continue
         eigenvec1 = face.getStressEigenVector1()
@@ -2519,6 +2519,8 @@ def plotStressSurface(cell, numOfLayer, step = None, alpha = 0.8,
         ratio = eigenmax-eigenmin
         #just difference : ratio = abs(max(eigenvalue1, eigenvalue2)- min(eigenvalue1, eigenvalue2))#/max(abs(eigenvalue1),abs(eigenvalue2))
         color = scalarMap.to_rgba(ratio)
+        if checkExternalFace(face):
+            color = 'w'
         #print face.getZCentralised(), alpha_fac
         #ax.add_collection3d(arrow(xcen-0.5,ycen-0.5,zcen-0.5,xcen+0.5,ycen+0.5,zcen+0.5))
         pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = color)
@@ -2598,7 +2600,7 @@ def plotRadialOrthoradialFeedbackCorrectionSurface(cell,
     faces = qd.CellFaceIterator(cell)
     face = faces.next()
     while face != None:
-        if face.getID() == 1:
+        if face.getID() == 1 or checkExternalFace(face):
             face  = faces.next()
             continue
         eigenvec1 = face.getRadialVector()
@@ -2741,6 +2743,9 @@ def plotRadialOrthoradialFeedbackCorrectionSurface(cell,
         #################################################
         color1 = scalarMapRad.to_rgba(eigenvalue1)
         color2 = scalarMapOrth.to_rgba(eigenvalue2)
+        if checkExternalFace(face):
+            color1 = 'w'
+            color2 = 'w'
         #################################################
         pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = color1)
         pc.set_edgecolor('k')
