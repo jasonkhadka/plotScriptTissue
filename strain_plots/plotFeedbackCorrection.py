@@ -219,7 +219,7 @@ for folder in listdir:
 	os.chdir(folder)
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
-	saveName = saveDirectory+'/plot_eta%d'%etacurrent
+	saveName = saveDirectory+'/plot_eta%d_area%d'%(etacurrent,targetsurfacearea)
 	plotFeedbackCorrection(targetid, targetsurfacearea,endStep = endStep, 
 	startStep=startStep,stepsize= stepsize,maxarea = None, areastep = 10,resetids = resetids,
 	saveName = saveName)
