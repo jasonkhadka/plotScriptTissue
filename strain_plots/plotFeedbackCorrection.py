@@ -126,7 +126,7 @@ azim = args.azimuthal
 elev = args.elevation
 norm = args.nonNormalize
 ################################
-targetarea = args.surfaceArea
+targetsurfacearea= args.surfaceArea
 targetid = args.target
 othertargetid = args.othersidetissue
 ################################
