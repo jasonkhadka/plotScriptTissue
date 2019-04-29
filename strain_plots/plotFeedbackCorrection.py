@@ -219,13 +219,14 @@ for folder in listdir:
 	os.chdir(folder)
 	#print float(folderdict['n'])
 	#print "\n",os.getcwd()
-	saveName = saveDirectory+'/plot_eta=%d'%etacurrent
+	saveName = saveDirectory+'/plot_eta%d'%etacurrent
 	plotFeedbackCorrection(targetid, targetsurfacearea,endStep = endStep, 
 	startStep=startStep,stepsize= stepsize,maxarea = None, areastep = 10,resetids = resetids,
 	saveName = saveName)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
+	plt.close('all')
 	counter+= 1
 
 ################################################################################
