@@ -72,10 +72,10 @@ def plotFeedbackCorrection(targetid, targetsurfacearea,endStep = 2000,
 	cell.setRadialOrthoradialStress()
 	sf.plotRadialOrthoradialFeedbackCorrectionSurface(cell, numOfLayer,
 		azim = -60, elev = 60,
-		name =saveName+_"feedbackcorrection")
+		name =saveName+"_feedbackcorrection")
 	sf.plotStressSurface(cell, numOfLayer,
 		azim = -60, elev = 60,
-		name =saveName+_"stressSurface")
+		name =saveName+"_stressSurface")
 	return
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
