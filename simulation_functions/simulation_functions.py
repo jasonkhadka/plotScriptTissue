@@ -2553,7 +2553,6 @@ def plotStressSurface(cell, numOfLayer, step = None, alpha = 0.8,
 #   Function to Plot radial/orthorad feedbackcorrection
 #   on the Surface of the Tissue
 ##########################################################################################
-
 def plotRadialOrthoradialFeedbackCorrectionSurface(cell,
     numOfLayer, step = None, alpha = 0.8, 
     Length=1.0,azim = 0, elev = 7, ids= False, name = None,zaxisoffset=0.3):
@@ -3012,6 +3011,246 @@ def plotPrincipalDeformationFeedbackCorrectionSurface(cell,
     
     formatter = matplotlib.ticker.ScalarFormatter(useMathText=True)
     for ax,scalarMap,label in zip([ax1,ax2],[scalarMapRad,scalarMapOrth],labels):
+        ax.view_init(azim = azim,elev=elev)
+        clrbar = plt.colorbar(scalarMap,ax = ax,shrink=0.5,aspect = 10,format=OOMFormatter(-3, mathText=True),
+                              pad=-0.1)
+        clrbar.set_label(label)
+    #################################################
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1,wspace = 0.)
+    #################################################
+    if name:
+        fig.savefig(name+'.png',format = 'png', transparent = True, bbox_inches="tight",dpi = 300)
+        fig.savefig(name+'.pdf',format = 'pdf', transparent=True,bbox_inches='tight')
+    else:
+        if step != None:
+            plt.title("Time = %d"%step)
+            plt.savefig('stress_Plot_%d.png'%step, transparent=True,bbox_inches='tight')
+        else:
+            plt.show()
+    #################################################
+    return
+##########################################################################################
+#   Function to Plot principal direction feedbackcorrection
+#   on the Surface of the Tissue
+##########################################################################################
+
+def plotTracePrincipalDeformationFeedbackCorrectionSurface(cell,
+    numOfLayer, step = None, alpha = 0.8, 
+    Length=1.0,azim = 0, elev = 7, ids= False, name = None,zaxisoffset=0.3):
+    #calculating forces, stress-matrix and strain-matrix
+    #cell.calculateVertexForce()
+    cell.calculateStressStrain()
+    import matplotlib.colors as colors
+    import matplotlib.cm as cmx
+    #import the libraries
+    from mpl_toolkits.mplot3d import Axes3D
+    import matplotlib
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+    import numpy as np
+    import matplotlib.pyplot as plt
+    #limits of the plot
+    radius = (numOfLayer>1)*(np.sqrt(3.)*(numOfLayer-1)-Length)+Length#the radius of circle to be projected on
+    #plotting part
+    fig = plt.figure(frameon=False,figsize=(12,6))
+    ax1 = fig.add_subplot(121,projection = '3d')
+    ax2 = fig.add_subplot(122,projection = '3d')
+    for ax in [ax1,ax2]:
+        ax.set_xlim((-.7*radius,.7*radius))
+        ax.set_ylim((-.7*radius,.7*radius))
+        ax.set_zlim((0*radius,(1.-zaxisoffset)*1.4*radius))
+        ax.axis('off')
+        ax.xaxis.pane.set_edgecolor('black')
+        ax.yaxis.pane.set_edgecolor('black')
+        ax.xaxis.pane.fill = False
+        ax.yaxis.pane.fill = False
+        ax.zaxis.pane.fill = False
+    ########################################################################
+    #                    Plotting the Stress vectors                       #
+    ########################################################################
+    X = []
+    Y = []
+    Z = []
+    U = []
+    V = []
+    W = []
+    eigenvalue =[]
+    eigenvalue1array = []
+    eigenvalue2array = []
+    eigenvalueratioarray = []
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    while face != None:
+        if face.getID() == 1 or checkExternalFace(face):
+            face  = faces.next()
+            continue
+        eigenvec1 = face.getDeformationEigenVector1()
+        eigenvec2 = face.getDeformationEigenVector2()
+        #################################################
+        eigenvalue1 = face.getPrincipalDeformationDirection1FeedbackCorrection()
+        eigenvalue2 = face.getPrincipalDeformationDirection2FeedbackCorrection()
+        #################################################
+        eigenvalue.append(eigenvalue1)
+        eigenvalue.append(eigenvalue2)
+        #################################################
+        eigenvalue1array.append(eigenvalue1)
+        eigenvalue2array.append(eigenvalue2)
+        #################################################
+        #normalised: 
+        #print face.getID(), eigenvalue1, eigenvalue2
+        eigenvalueratioarray.append(eigenvalue1+eigenvalue2)
+        #just the difference :eigenvalueratioarray.append(abs(max(eigenvalue1, eigenvalue2)- min(eigenvalue1, eigenvalue2)))#/max(abs(eigenvalue1),abs(eigenvalue2)))
+        ####################################################
+        #getting the centroid coordinate 
+        centroidvector = [face.getXCentralised(),
+                        face.getYCentralised(),
+                        face.getZCentralised()]
+        #eigenvectors
+        vector1 = [qd.doublearray_getitem(eigenvec1,0),
+                    qd.doublearray_getitem(eigenvec1,1),
+                    qd.doublearray_getitem(eigenvec1,2)]
+        vector2 = [qd.doublearray_getitem(eigenvec2,0),
+                    qd.doublearray_getitem(eigenvec2,1),
+                    qd.doublearray_getitem(eigenvec2,2)]
+        #computing mid vectors
+        #midvec1 = [(p+q)/2. for p,q in zip(centroidvector,vector1)]
+        #midvec2 = [(p+q)/2. for p,q in zip(centroidvector,vector2)]
+
+        #now adding for plotting
+
+        #vec1
+        X.append(centroidvector[0])
+        Y.append(centroidvector[1])
+        Z.append(centroidvector[2])
+        #getting the vector headings
+        U.append(vector1[0])
+        V.append(vector1[1])
+        W.append(vector1[2])
+
+        #vec2
+        X.append(centroidvector[0])
+        Y.append(centroidvector[1])
+        Z.append(centroidvector[2])
+        #getting the vector headings
+        U.append(vector2[0])
+        V.append(vector2[1])
+        W.append(vector2[2])
+        ####################################################
+        face = faces.next()
+    ###
+    #print "Max Eigen Value Ration :", maxEigenValueRatio
+    #print "Min Eigen Value Ratio :", minEigenValueRatio
+    maxeigenvalue = max(np.abs(eigenvalue))
+    mineigenvalue = min(np.abs(eigenvalue))
+    eigenvalue = np.array(eigenvalue)/maxeigenvalue
+    ####################################################
+    for i in range(0,len(X),2):
+        color1 = 'g'
+        color2 = 'g'
+        veclength1 = (eigenvalue[i])*np.sqrt((U[i])**2+(V[i])**2+(W[i])**2)
+        veclength2 = (eigenvalue[i+1])*np.sqrt((U[i+1])**2+(V[i+1])**2+(W[i+1])**2)
+        if eigenvalue[i]<0.:
+            color1 = 'r'
+        if eigenvalue[i+1]<0.:
+            color2 = 'r'
+        ax1.quiver(X[i], Y[i], Z[i], U[i], V[i], W[i],color=color1,length = veclength1,
+            pivot='middle',zorder=10, linewidths = 1,)
+        #        headwidth= 1e-8, headlength=1e-8)
+        #ax2.quiver(X[i+1], Y[i+1], Z[i+1], U[i+1], V[i+1], W[i+1],color=color2,length = veclength2,
+        #    pivot='middle',zorder=10, linewidths = 1)
+        #headwidth=0.01, headlength=0.01)
+    #########################################################
+    #                 Plotting the Cell                     #
+    #########################################################
+    mineigenvalueratio = min(eigenvalueratioarray)
+    maxeigenvalueratio = max(eigenvalueratioarray)
+    #mineigenvalue2 = min(eigenvalue2array)
+    #maxeigenvalue2 = max(eigenvalue2array)
+    ######### Color Maps ###################
+    jet1 = cm = plt.get_cmap('magma') 
+    cNorm1  = colors.Normalize(vmin=mineigenvalueratio, vmax=maxeigenvalueratio)
+    scalarMapRad = cmx.ScalarMappable(norm=cNorm1, cmap=jet1)
+    ###################
+    #jet2 = cm = plt.get_cmap('magma') 
+    #cNorm2  = colors.Normalize(vmin=mineigenvalue2, vmax=maxeigenvalue2)
+    #scalarMapOrth = cmx.ScalarMappable(norm=cNorm2, cmap=jet2)
+    #########################################################
+    faces = qd.CellFaceIterator(cell)
+    face = faces.next()
+    xcenarray = []
+    ycenarray = []
+    zcenarray = []
+    while (face != None):
+        if face.getID() == 1:
+            face  = faces.next()
+            continue
+        faceid = face.getID()#grabbing face id
+        xlist = []
+        ylist = []
+        zlist = []
+        xproj = []
+        yproj = []
+        zproj = []
+        #print "== Face ID : ", faceid, "=="
+        xmean = face.getXCentralised()
+        ymean = face.getYCentralised()
+        zmean = face.getZCentralised()
+        edges = qd.FaceEdgeIterator(face)
+        edge = edges.next()
+        while edge != None:
+            ####grabbing the origin of edge####
+            #centralised coordiante
+            vertex = edge.Org()
+            #print vertex.getID()
+            xCoord1 = vertex.getXcoordinate()
+            yCoord1 = vertex.getYcoordinate()
+            zCoord1 = vertex.getZcoordinate()
+            xlist.append(xCoord1)
+            ylist.append(yCoord1)
+            zlist.append(zCoord1)
+            edge = edges.next()
+        xlist.append(xlist[0])
+        ylist.append(ylist[0])
+        zlist.append(zlist[0])
+        verts = [zip(xlist, ylist,zlist)]
+        #adding to 3d plot
+        xcenarray.append(face.getXCentralised())
+        ycenarray.append(face.getYCentralised())
+        zcenarray.append(face.getZCentralised())
+        #print face.getZCentralised()
+        #################################################
+        eigenvalue1 = face.getPrincipalDeformationDirection1FeedbackCorrection()
+        eigenvalue2 = face.getPrincipalDeformationDirection2FeedbackCorrection()
+        #################################################
+        color1 = scalarMapRad.to_rgba(eigenvalue1+eigenvalue2)
+        #print eigenvalue2+eigenvalue1, face.getRadialFeedbackCorrection()+face.getOrthoradialFeedbackCorrection()
+        color2 = scalarMapRad.to_rgba((face.getRadialFeedbackCorrection()+face.getOrthoradialFeedbackCorrection()))
+        if checkExternalFace(face):
+            color1 = 'w'
+            color2 = 'w'
+        #################################################
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = color1)
+        pc.set_edgecolor('k')
+        ax1.add_collection3d(pc)
+        #################################################
+        pc = Poly3DCollection(verts,alpha = alpha,linewidths=1, facecolor = color2)
+        pc.set_edgecolor('k')
+        ax2.add_collection3d(pc)
+        #################################################
+        #ax1.scatter(xcenarray[-1], ycenarray[-1],zcenarray[-1], 'o',c='m')
+        #ax2.scatter(xcenarray[-1], ycenarray[-1],zcenarray[-1], 'o',c='m')
+        #################################################
+        if ids:
+            ax2.text(xcenarray[-1], ycenarray[-1],zcenarray[-1], face.getID())
+            ax1.text(xcenarray[-1], ycenarray[-1],zcenarray[-1], face.getID())
+        #################################################
+        face = faces.next()
+        #if face.getID() == 1: break
+    #plt.clf()
+    scalarMapRad._A = []
+    #scalarMapOrth._A = []
+    labels = [r'Tr(Deform feedback)',r'Tr(Rad/Orthorad Feedback)']
+    formatter = matplotlib.ticker.ScalarFormatter(useMathText=True)
+    for ax,scalarMap,label in zip([ax1,ax2],[scalarMapRad,scalarMapRad],labels):
         ax.view_init(azim = azim,elev=elev)
         clrbar = plt.colorbar(scalarMap,ax = ax,shrink=0.5,aspect = 10,format=OOMFormatter(-3, mathText=True),
                               pad=-0.1)
