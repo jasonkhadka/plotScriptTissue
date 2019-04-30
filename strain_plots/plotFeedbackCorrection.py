@@ -216,7 +216,7 @@ for folder in listdir:
 	########################################################
 	if (maxeta != 0) and (etacurrent > maxeta):
 		continue
-	if  (etacurrent %2 == 0):#only even eta analysed for now
+	if  (etacurrent %2 != 0):#only even eta analysed for now
 		continue
 	########################################################
 	percentStep = int((counter)/float(totalfolders)*100)
