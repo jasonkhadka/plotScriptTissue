@@ -70,12 +70,20 @@ def plotFeedbackCorrection(targetid, targetsurfacearea,endStep = 2000,
 	#######################################################################
 	cell.setRadialOrthoradialFeedbackCorrection()
 	cell.setRadialOrthoradialStress()
+	cell.setPrincipalDeformationVector()
+	cell.setPrincipalDeformationFeedbackCorrection()
+	#######################################################################
+	# Plotting
+	#######################################################################
 	sf.plotRadialOrthoradialFeedbackCorrectionSurface(cell, numOfLayer,
 		azim = -60, elev = 60,
-		name =saveName+"_feedbackcorrection")
+		name =saveName+"_feedbackcorrection_radialOrthoradial")
+	sf.plotPrincipalDeformationFeedbackCorrectionSurface(cell, numOfLayer,
+		azim = -60, elev = 60,
+		name =saveName+"_feedbackcorrection_principalDeformation")
 	sf.plotStressSurface(cell, numOfLayer,
 		azim = -60, elev = 60,
-		name =saveName+"_stressSurface")
+		name =saveName+"_stressSurface_principal")
 	return
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
@@ -206,7 +214,7 @@ for folder in listdir:
 		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
 	etacolor = scalarMap.to_rgba(etacurrent)
 	########################################################
-	if (maxeta != 0) and (etacurrent > maxeta):
+	if (maxeta != 0) and (etacurrent > maxeta) and (etacurrent %2 == 0):#only even eta analysed for now
 		continue
 	########################################################
 	percentStep = int((counter)/float(totalfolders)*100)
