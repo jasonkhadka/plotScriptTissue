@@ -78,12 +78,16 @@ def plotFeedbackCorrection(targetid, targetsurfacearea,endStep = 2000,
 	sf.plotRadialOrthoradialFeedbackCorrectionSurface(cell, numOfLayer,
 		azim = -60, elev = 60,
 		name =saveName+"_feedbackcorrection_radialOrthoradial")
+	sf.plotTracePrincipalDeformationFeedbackCorrectionSurface(cell,numOfLayer,
+		azim = -60, elev = 60,
+		name =saveName+"_feedbackcorrection_trace")
 	sf.plotPrincipalDeformationFeedbackCorrectionSurface(cell, numOfLayer,
 		azim = -60, elev = 60,
 		name =saveName+"_feedbackcorrection_principalDeformation")
 	sf.plotStressSurface(cell, numOfLayer,
 		azim = -60, elev = 60,
 		name =saveName+"_stressSurface_principal")
+
 	return
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
