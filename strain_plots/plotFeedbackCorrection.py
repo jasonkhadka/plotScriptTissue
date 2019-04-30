@@ -214,7 +214,9 @@ for folder in listdir:
 		etacurrent = float(dict(item.split("=") for item in folder.split("_"))['n'])
 	etacolor = scalarMap.to_rgba(etacurrent)
 	########################################################
-	if (maxeta != 0) and (etacurrent > maxeta) and (etacurrent %2 == 0):#only even eta analysed for now
+	if (maxeta != 0) and (etacurrent > maxeta):
+		continue
+	if  (etacurrent %2 == 0):#only even eta analysed for now
 		continue
 	########################################################
 	percentStep = int((counter)/float(totalfolders)*100)
