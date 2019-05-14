@@ -322,7 +322,10 @@ def plotStrainSurface(cell, numOfLayer,step = None, alpha = 0.8, Length=1.0,save
     scalarMap._A = []
     clrbar = plt.colorbar(scalarMap,shrink=0.5, aspect=10)
     clrbar.set_label("Magnitude of Strain Anisotrophy")
-    ax.set_title("Time %d : Magnitude of Strain : Max %.4f Min %.4f"%(step,maxEigenValueRatio,minEigenValueRatio), fontsize = 20)
+    if step:
+        ax.set_title("Time %d : Magnitude of Strain : Max %.4f Min %.4f"%(step,maxEigenValueRatio,minEigenValueRatio), fontsize = 20)
+    else:
+        ax.set_title("Magnitude of Strain : Max %.4f Min %.4f"%(maxEigenValueRatio,minEigenValueRatio), fontsize = 20)
     #print xcenarray-0.5
     #plt.close("all")
     #ax.view_init(azim = 90, elev=90)
@@ -442,7 +445,7 @@ def plotMatrixSurface(cell, numOfLayer, step = None,
     alpha = 0.5, Length=1.0,azim = -60.,elev=60,
     format='eps',name = None, ids = True):
     #calculating forces, stress-matrix and strain-matrix
-    cell.calculateVertexForce()
+    #cell.calculateVertexForce()
     cell.calculateStressStrain()
     import matplotlib.colors as colors
     import matplotlib.cm as cmx

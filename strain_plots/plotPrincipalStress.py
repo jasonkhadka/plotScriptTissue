@@ -578,7 +578,6 @@ else:
 	stressplotclrbar1.set_label(r"Mechanical Feedback, $\eta$")
 
 
-
 fig.savefig(saveDirectory+r"/plot_principalStress_targetface=%d.png"%(targetid),transparent = True, bbox_inches="tight")
 
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
