@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import sys 
 sys.path.append("/home/jkhadka/plantdev")
 sys.path.append("/home/jkhadka/plantdev/python_quadedge")
+sys.path.append('/home/jkhadka/transferdata/scripts/strain_plots/')
 sys.path.append('/Users/jasonkhadka/Documents/git/simulations/cluster_simulation/scripts/strain_plots/')
 sys.path.append('/Users/jasonkhadka/Documents/git/simulations/cluster_simulation/scripts/simulation_functions/')
 import quadedge as qd
