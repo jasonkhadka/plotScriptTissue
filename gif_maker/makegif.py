@@ -15,6 +15,8 @@ parser.add_argument('-e',"--endtime", help="End of simulation area",default = No
 parser.add_argument('-d',"--timestep", help="time step for simulation", type = int,default = 1)
 parser.add_argument('-u',"--duration",help="duration for each frame to be displayed in gif", default  = 10, type = int)
 parser.add_argument('-c',"--surfacearea", help = "make gif for simulation till this surfacearea", type = float, default = None)
+#condition is false if used, default: it resets vertex ids
+parser.add_argument('-r',"--resetids", help = "to reset the ids of vertices or not", action="store_false")
 
 
 ## Getting the arguments 
@@ -25,13 +27,14 @@ startstep = args.starttime
 endstep= args.endtime
 timestep = args.timestep
 surfacearea = args.surfacearea
+resetids = args.resetids
 #################################################
 # if surface area is used, calculate timstep
 #################################################
 if surfacearea:
     endStep = 2000
     startStep = 1
-    endStep, endarea= sf.getTimeStep(surfacearea, endStep, startStep, stepsize = 10)
+    endStep, endarea= sf.getTimeStep(surfacearea, endStep, startStep, stepsize = 10,resetids = resetids)
     endarea = int(endarea)
     areastep = timestep#use area step instead of time for plotting
 #####################################################################################################
@@ -50,7 +53,7 @@ if surfacearea:
     startarea = int(sf.getSurfaceAreaTimeStep(1))
     laststep =1
     for steparea in range(startarea, endarea, int(areastep)):
-            step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 5)
+            step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 5,resetids = resetids)
             ########################################################################
             if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
                 break
