@@ -50,7 +50,7 @@ def numericalSort(value):
 if surfacearea:
     file_names = []
     area_list = []
-    startarea = int(sf.getSurfaceAreaTimeStep(1))
+    startarea = int(sf.getSurfaceAreaTimeStep(1,resetids = resetids))
     laststep =1
     for steparea in range(startarea, endarea, int(areastep)):
             step,tissueSurfaceArea = sf.getTimeStep(steparea, endStep, laststep, stepsize = 5,resetids = resetids)
@@ -91,13 +91,13 @@ def gen_frame(path,surfacearea=None, counter=None):
     im.info['transparency'] = 255
     if surfacearea:
         print surfacearea, "Yes!", counter
-        draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype(font = '/usr/share/fonts/truetype/DejaVuSans.ttf',size = 50,encoding="unic")
-        draw.text((0.35*width,0.8*height),r"Area =  %.1f"%surfacearea,fill=120,font = font )
+        #draw = ImageDraw.Draw(im)
+        #font = ImageFont.truetype(font = '/usr/share/fonts/truetype/DejaVuSans.ttf',size = 50,encoding="unic")
+        #draw.text((0.35*width,0.8*height),r"Area =  %.1f"%surfacearea,fill=120,font = font )
         #draw.text((100,50),r"Area %.1f"%surfacearea,font = font )
-        del draw
+        #del draw
         # saving image
-        im.save('SurfaceImage%03d.png'%surfacearea)
+        #im.save('SurfaceImage%03d.png'%surfacearea)
     return im
 ######################################################################
 frames = []
