@@ -197,7 +197,7 @@ else:
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 etathreshold = 0
-jet = cm = plt.get_cmap('plasma') 
+jet = cm = plt.get_cmap('viridis') 
 ##################################################
 if maxeta == 0.:
 	maxvalue = max(etalist)
@@ -274,11 +274,14 @@ ax1.set_ylim(0.8,1.0)
 ###############################################################################
 #color bar fig
 ###############################################################################
+
 scalarMap._A = []
-fig.subplots_adjust(bottom=0.235)
-cbar_ax = fig.add_axes([0.15, 0.07, 0.7, 0.03])
-clrbar = plt.colorbar(scalarMap,orientation='horizontal',cax = cbar_ax)
+fig.tight_layout(rect=[0,0,.9,.9])
+cbar_ax = fig.add_axes([0.95, 0.2, 0.04, 0.75])
+clrbar = plt.colorbar(scalarMap,orientation='vertical',cax = cbar_ax)
 plt.tight_layout()
+clrbar.set_label(r"Mechanical Feedback, $\eta$")
+
 if fastkappaOption:# if true calculate with respect to changing fastkappa, else Eta
 	clrbar.set_label(r"Fast Growth Rate")
 else:
