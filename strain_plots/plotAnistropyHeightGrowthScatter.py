@@ -120,23 +120,23 @@ def getRadialOrthoradialStress(face, radialDict=None,orthoradialDict=None, vecto
 ####################################################################################################################
 # Calculating the max time step for target surface area
 ####################################################################################################################
-def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10):
+def getTimeStep(targetArea, endStep, startStep=1, stepsize = 10,resetids = True):
 	####################################################
 	for step in range(startStep, endStep+1,stepsize):
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):
 			return endStep,0.
 		################################################
-		cell = sf.loadCellFromFile(step,resetids = True)
+		cell = sf.loadCellFromFile(step,resetids = resetids)
 		################################################
 		tissueSurfaceArea = sf.getSurfaceArea(cell)
 		if (tissueSurfaceArea > targetArea):
 			gc.collect()
 			for calstep in range(step-1,step-stepsize-1,-1):
-					cell = sf.loadCellFromFile(calstep,resetids = True)
+					cell = sf.loadCellFromFile(calstep,resetids = resetids)
 					tissueSurfaceArea = sf.getSurfaceArea(cell)
 					if (tissueSurfaceArea <= targetArea):
 						gc.collect()
-						cell = sf.loadCellFromFile(calstep+1,resetids = True)
+						cell = sf.loadCellFromFile(calstep+1,resetids = resetids)
 						tissueSurfaceArea = sf.getSurfaceArea(cell)
 						return calstep+1,tissueSurfaceArea
 		################################################
@@ -237,6 +237,7 @@ def getPrimordiaHeight(cell, targetid):
 def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta, 
 	stressscatter, growthscatter,stressscatter1, growthscatter1, anisotropyplot,
 	color='r',maxeta = 20,startStep=0,stepsize= 1,largerCondition =True ,maxarea = None, areastep = 20,cloud=False,startarea = None,
+	resetids = True, 
 	endarea = 850):
 	import numpy as np
 	import matplotlib.pyplot as plt
@@ -245,7 +246,7 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 	# faceidarray for Primordia
 	if not os.path.isfile("qdObject_step=001.obj"):
 		return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
-	cell = sf.loadCellFromFile(1,resetids = True)
+	cell = sf.loadCellFromFile(1,resetids = resetids)
 	initialTissueSurfaceArea = sf.getSurfaceArea(cell)
 	#######################################################################
 	# Starting the Calculation
@@ -270,14 +271,14 @@ def plotHeightGrowthScatter(numOfLayer, targetid,endStep,eta,
 	if not startarea:#no startarea given
 		startarea = int(initialTissueSurfaceArea)
 	for steparea in range(startarea, endarea, int(areastep)):
-		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 5)
+		step,tissueSurfaceArea = getTimeStep(steparea, endStep, laststep, stepsize = 5,resetids = resetids)
 		########################################################################
-		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep, endStep, step, stepsize = 5)
+		step2,tissueSurfaceArea2 = getTimeStep(steparea+areastep, endStep, step, stepsize = 5, resetids = resetids)
 		########################################################################
 		if not os.path.isfile("qdObject_step=%03d.obj"%step):#check if file exists
 			break
-		cell = sf.loadCellFromFile(step,resetids = True)
-		cell2 = sf.loadCellFromFile(step2,resetids = True)
+		cell = sf.loadCellFromFile(step,resetids = resetids)
+		cell2 = sf.loadCellFromFile(step2,resetids = resetids)
 		################################################
 		cell.calculateStressStrain()
 		################################################
@@ -386,6 +387,8 @@ parser.add_argument("-u","--azimuthal", help = "azimuthal angle for display", de
 parser.add_argument("-v","--elevation", help = "elevation angle for display", default = 60, type = float)
 parser.add_argument('-d',"--areastep", help="area step for calculating the growth in cell area", type = int,default = 20)
 parser.add_argument('-j',"--jobid", help="jobid", type = int,default = None)
+parser.add_argument("-r","--resetids", help = "if option is used, the figures are not normalised", action= "store_false")
+
 ## Getting the arguments 
 args = parser.parse_args()
 #location = args.location
@@ -411,7 +414,7 @@ maxarea = args.maxarea
 startarea = args.startarea
 endarea = args.endarea
 jobid = args.jobid
-
+resetids = args.resetids
 
 startStep = 1
 endStep = 2000
@@ -532,7 +535,8 @@ for folder in listdir:
 				anisotropyplot = anisotropyplot,
 				startStep = startStep,  maxeta = maxeta,
 				color = etacolor,stepsize = stepsize,
-				largerCondition = large,maxarea = maxarea, areastep = areastep, cloud=cloudCondition,startarea = startarea, endarea = endarea)
+				largerCondition = large,maxarea = maxarea, areastep = areastep, cloud=cloudCondition,startarea = startarea, endarea = endarea,
+				resetids = resetids)
 	#print sys.getsizeof(plotData)
 	os.chdir("..")
 	gc.collect()
