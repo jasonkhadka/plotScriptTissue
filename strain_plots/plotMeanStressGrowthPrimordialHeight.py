@@ -249,6 +249,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 	primordiaAreaArray = []
 	boundaryAreaArray = []
 	heightArray = []
+	timestepArray = []
 	###################################################
 	if not startarea:#no startarea given
 		startarea = int(initialTissueSurfaceArea)
@@ -341,6 +342,8 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 		orthoradialStressSDArray.append(np.std(orthoradialStress))
 		radialGrowthSDArray.append(np.std(radialGrowth))
 		orthoradialGrowthSDArray.append(np.std(orthoradialGrowth))
+		#######################################################
+		timestepArray.append(step)
 		#meanstress.errorbar(tissueSurfaceArea, np.mean(radialStress),
 		#    yerr = np.std(radialStress)/float(len(radialStress)),fmt='o',label = r":$\sigma_{r}$",c=color,**plotargs)
 		#meanstress.errorbar(tissueSurfaceArea, np.mean(orthoradialStress),
@@ -367,7 +370,7 @@ def plotMeanStressGrowth(numOfLayer, targetid,endStep,eta,
 			radialGrowthSDArray, orthoradialGrowthSDArray,
 			meanstressEigenvalue1SDArray, meanstressEigenvalue2SDArray,
 			meangrowthEigenvalue1SDArray, meangrowthEigenvalue2SDArray,
-			meangaussianCurvatureArray
+			meangaussianCurvatureArray, timestepArray
 			]
 ####################################################################################################################################################################################
 #setting up the arguments to be passed 
@@ -843,6 +846,7 @@ else:
 	stressROplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	boundaryareaplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	boundaryareaplot1.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
+	heightplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 ################################################################################
 
 
