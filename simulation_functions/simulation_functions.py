@@ -6577,7 +6577,7 @@ def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5, re
 	fastareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logfastarea[:fitlen],bounds=([-np.inf,logfastarea[0]-0.000001],[+np.inf,logfastarea[0]]))
 	slowareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logslowarea[:fitlen],bounds=([-np.inf,logslowarea[0]-0.000001],[+np.inf,logslowarea[0]]))
 	################################################
-	if grrowthrates:
+	if growthrates:
 		return  [fastareafit[0]/slowareafit[0], fastareafit[0], slowareafit[0]]
 	else:
 		return fastareafit[0]/slowareafit[0]
