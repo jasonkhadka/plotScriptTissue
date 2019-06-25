@@ -798,7 +798,7 @@ fig4.subplots_adjust(right=0.9)
 
 
 
-cbar_ax2 = fig2.add_axes([0.97,0.09,0.03,0.4])
+cbar_ax2 = fig2.add_axes([0.99,0.09,0.03,0.4])
 cbar_ax3 = fig3.add_axes([0.54,0.09,0.03,0.4])
 cbar_ax4 = fig4.add_axes([0.85, 0.2, 0.04, 0.65])
 
@@ -834,6 +834,8 @@ if startarea:#start area != none
 	stress12plot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	boundaryareaplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
 	boundaryareaplot1.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+	heightplot.set_xticks(np.linspace(startarea,endarea,3).astype('int'))
+
 else:
 	meangrowth12plot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))
 	meangrowthROplot.set_xticks(np.linspace(minarea,endarea,3).astype('int'))

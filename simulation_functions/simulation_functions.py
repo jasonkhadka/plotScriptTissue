@@ -6528,7 +6528,7 @@ def plotDivisionThresholdSurface(cell, numOfLayer, name=None, alpha = 0.5, Lengt
 ####################################################################################################################
 # calculating growth ratio
 ####################################################################################################################
-def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5, resetids = True):
+def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5, resetids = True, growthrates= False):
 	if not os.path.isfile("qdObject_step=001.obj"):
 			return [0.,0.,0.,0.,0.,0.,0.,0.,0.]
 	cell = loadCellFromFile(1,resetids = resetids)
@@ -6577,7 +6577,10 @@ def getGrowthRatio(numOfLayer, targetid ,endStep ,startStep = 1,stepsize = 5, re
 	fastareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logfastarea[:fitlen],bounds=([-np.inf,logfastarea[0]-0.000001],[+np.inf,logfastarea[0]]))
 	slowareafit, m = sop.curve_fit(fitLinFunc,timeArray[:fitlen],logslowarea[:fitlen],bounds=([-np.inf,logslowarea[0]-0.000001],[+np.inf,logslowarea[0]]))
 	################################################
-	return fastareafit[0]/slowareafit[0]
+	if grrowthrates:
+		return  [fastareafit[0]/slowareafit[0], fastareafit[0], slowareafit[0]]
+	else:
+		return fastareafit[0]/slowareafit[0]
 ####################################################################################################################
 # aspectratio
 ####################################################################################################################
